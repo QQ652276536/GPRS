@@ -46,9 +46,17 @@ public class MainActivity extends AppCompatActivity {
     };
 
     private void ClickUserItem() {
+        if (m_userFragment == null) {
+            m_userFragment = UserFragment.newInstance("", "");
+        }
+        AddOrShowFragment(getSupportFragmentManager().beginTransaction(), m_userFragment);
     }
 
     private void ClickDeviceItem() {
+        if (m_deviceFragment == null) {
+            m_deviceFragment = DeviceFragment.newInstance("", "");
+        }
+        AddOrShowFragment(getSupportFragmentManager().beginTransaction(), m_deviceFragment);
     }
 
     private void ClickMapItem() {
