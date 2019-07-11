@@ -1,5 +1,6 @@
 package com.example.blowdown_app;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -7,11 +8,14 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
+import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity {
+import java.util.Map;
+
+public class MainActivity extends AppCompatActivity implements MapFragment.OnFragmentInteractionListener, DeviceFragment.OnFragmentInteractionListener, UserFragment.OnFragmentInteractionListener {
 
     private Fragment m_currentFragment;
-    private Fragment m_mapFragment;
+    private MapFragment m_mapFragment;
     private DeviceFragment m_deviceFragment;
     private UserFragment m_userFragment;
 
@@ -21,10 +25,22 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         BottomNavigationView bottomNavigationView = findViewById(R.id.nav_view);
         bottomNavigationView.setOnNavigationItemSelectedListener(onNavigationItemSeletecListener);
+        //启动时默认在用户页
+        bottomNavigationView.setSelectedItemId(bottomNavigationView.getMenu().getItem(2).getItemId());
         InitData();
     }
 
     private void InitData() {
+        if (m_userFragment == null) {
+            m_userFragment = UserFragment.newInstance("", "");
+        }
+        //该碎片不在管理器中则添加进去
+        if (!m_userFragment.isAdded()) {
+            getSupportFragmentManager().beginTransaction().add(R.id.fragment_current, m_userFragment).commitAllowingStateLoss();
+        } else {
+            getSupportFragmentManager().beginTransaction().show(m_userFragment).commitAllowingStateLoss();
+        }
+        m_currentFragment = m_userFragment;
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener onNavigationItemSeletecListener = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -72,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
         }
         //如果当前的Fragment未被添加到管理器中
         if (!fragment.isAdded()) {
-            transaction.hide(m_currentFragment).add(R.id.fragment_container, fragment).commitAllowingStateLoss();
+            transaction.hide(m_currentFragment).add(R.id.fragment_current, fragment).commitAllowingStateLoss();
         }
         //否则就显示
         else {
@@ -80,4 +96,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+        Toast.makeText(this, "----------------------------", Toast.LENGTH_LONG).show();
+    }
 }
