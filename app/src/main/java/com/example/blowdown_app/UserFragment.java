@@ -1,5 +1,6 @@
 package com.example.blowdown_app;
 
+import android.R.drawable;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
@@ -10,6 +11,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 
+import java.util.regex.Pattern;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -19,12 +22,14 @@ import android.widget.EditText;
  * Use the {@link UserFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class UserFragment extends Fragment implements View.OnClickListener {
+public class UserFragment extends Fragment implements View.OnClickListener, View.OnFocusChangeListener {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
     private String mParam1;
     private String mParam2;
+    private boolean m_userNameFlag = false;
+    private boolean m_passwordFlag = false;
 
     private View m_userView;
     private EditText m_editText_userName;
@@ -105,7 +110,7 @@ public class UserFragment extends Fragment implements View.OnClickListener {
     }
 
     /**
-     *该Fragment从Activity删除/替换时回调该方法,onDestroy()执行后一定会执行该方法,且只调用一次
+     * 该Fragment从Activity删除/替换时回调该方法,onDestroy()执行后一定会执行该方法,且只调用一次
      */
     @Override
     public void onDetach() {
@@ -116,8 +121,40 @@ public class UserFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         if (R.id.btn_login == v.getId()) {
-        } else if (R.id.btn_register.getId() == v.getId()) {
-        } else if (R.id.btn_forget.getId() == v.getId()) {
+        } else if (R.id.btn_register == v.getId()) {
+        } else if (R.id.btn_forget == v.getId()) {
+        }
+    }
+
+    @Override
+    public void onFocusChange(View v, boolean hasFocus) {
+        if (R.id.editTextUserName == v.getId()) {
+            if (hasFocus) {
+                m_editText_userName.setError(null);
+            } else {
+                String regex = "\\w{3,12}";
+                if (Pattern.matches(regex, m_editText_userName.getText())) {
+                    m_editText_userName.setError(null);
+                    m_userNameFlag = true;
+                } else {
+                    m_editText_userName.setError("用户名非法");
+                }
+                IsAllowLogin();
+            }
+        }
+        if (R.id.editTextPasswrod == v.getId()) {
+            if (hasFocus) {
+                m_editText_password.setError(null);
+            } else {
+                String regex = "[a-zA-Z]{1,}[0-9]{7,15}";
+                if (Pattern.matches(regex, m_editText_password.getText())) {
+                    m_editText_password.setError(null);
+                    m_passwordFlag = true;
+                } else {
+                    m_editText_password.setError("密码非法");
+                }
+                IsAllowLogin();
+            }
         }
     }
 
@@ -125,9 +162,19 @@ public class UserFragment extends Fragment implements View.OnClickListener {
         void onFragmentInteraction(Uri uri);
     }
 
+    private void IsAllowLogin() {
+        if (m_userNameFlag && m_passwordFlag) {
+            m_btn_login.setEnabled(true);
+        } else {
+            m_btn_login.setEnabled(false);
+        }
+    }
+
     private void InitData() {
         m_editText_userName = m_userView.findViewById(R.id.editTextUserName);
+        m_editText_userName.setOnFocusChangeListener(this);
         m_editText_password = m_userView.findViewById(R.id.editTextPasswrod);
+        m_editText_password.setOnFocusChangeListener(this);
         m_btn_login = m_userView.findViewById(R.id.btn_login);
         m_btn_login.setOnClickListener(this);
         m_btn_register = m_userView.findViewById(R.id.btn_register);
