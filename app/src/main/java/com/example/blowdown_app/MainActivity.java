@@ -14,23 +14,27 @@ import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements MapFragment.OnFragmentInteractionListener, DeviceFragment.OnFragmentInteractionListener, UserFragment.OnFragmentInteractionListener {
 
+    //当前页,用来切换
     private Fragment m_currentFragment;
+    //地图页
     private MapFragment m_mapFragment;
+    //设备页
     private DeviceFragment m_deviceFragment;
+    //用户页
     private UserFragment m_userFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        BottomNavigationView bottomNavigationView = findViewById(R.id.nav_view);
-        bottomNavigationView.setOnNavigationItemSelectedListener(onNavigationItemSeletecListener);
-        //启动时默认在用户页
-        bottomNavigationView.setSelectedItemId(bottomNavigationView.getMenu().getItem(2).getItemId());
         InitData();
     }
 
     private void InitData() {
+        BottomNavigationView bottomNavigationView = findViewById(R.id.nav_view);
+        //启动时默认在用户页
+        bottomNavigationView.setSelectedItemId(bottomNavigationView.getMenu().getItem(2).getItemId());
+        //实例化用户页
         if (m_userFragment == null) {
             m_userFragment = UserFragment.newInstance("", "");
         }
@@ -41,6 +45,7 @@ public class MainActivity extends AppCompatActivity implements MapFragment.OnFra
             getSupportFragmentManager().beginTransaction().show(m_userFragment).commitAllowingStateLoss();
         }
         m_currentFragment = m_userFragment;
+        bottomNavigationView.setOnNavigationItemSelectedListener(onNavigationItemSeletecListener);
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener onNavigationItemSeletecListener = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -94,6 +99,7 @@ public class MainActivity extends AppCompatActivity implements MapFragment.OnFra
         else {
             transaction.hide(m_currentFragment).show(fragment).commitAllowingStateLoss();
         }
+        m_currentFragment = fragment;
     }
 
     @Override
