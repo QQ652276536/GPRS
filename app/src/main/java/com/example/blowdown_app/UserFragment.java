@@ -7,6 +7,8 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 
 
 /**
@@ -17,20 +19,23 @@ import android.view.ViewGroup;
  * Use the {@link UserFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class UserFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+public class UserFragment extends Fragment implements View.OnClickListener {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+    private View m_userView;
+    private EditText m_editText_userName;
+    private EditText m_editText_password;
+    private Button m_btn_login;
+    private Button m_btn_register;
+    private Button m_btn_forget;
 
     private OnFragmentInteractionListener mListener;
 
     public UserFragment() {
-        // Required empty public constructor
     }
 
     /**
@@ -51,6 +56,11 @@ public class UserFragment extends Fragment {
         return fragment;
     }
 
+    /**
+     * 创建Fragment时回调,只会被调用一次
+     *
+     * @param savedInstanceState
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,11 +70,20 @@ public class UserFragment extends Fragment {
         }
     }
 
+    /**
+     * 绘制Fragment组件时回调
+     *
+     * @param inflater
+     * @param container
+     * @param savedInstanceState
+     * @return
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_user, container, false);
+        m_userView = inflater.inflate(R.layout.fragment_user, container, false);
+        InitData();
+        return m_userView;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -85,24 +104,35 @@ public class UserFragment extends Fragment {
         }
     }
 
+    /**
+     *该Fragment从Activity删除/替换时回调该方法,onDestroy()执行后一定会执行该方法,且只调用一次
+     */
     @Override
     public void onDetach() {
         super.onDetach();
         mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
+    @Override
+    public void onClick(View v) {
+        if (R.id.btn_login == v.getId()) {
+        } else if (R.id.btn_register.getId() == v.getId()) {
+        } else if (R.id.btn_forget.getId() == v.getId()) {
+        }
+    }
+
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+    }
+
+    private void InitData() {
+        m_editText_userName = m_userView.findViewById(R.id.editTextUserName);
+        m_editText_password = m_userView.findViewById(R.id.editTextPasswrod);
+        m_btn_login = m_userView.findViewById(R.id.btn_login);
+        m_btn_login.setOnClickListener(this);
+        m_btn_register = m_userView.findViewById(R.id.btn_register);
+        m_btn_register.setOnClickListener(this);
+        m_btn_forget = m_userView.findViewById(R.id.btn_forget);
+        m_btn_forget.setOnClickListener(this);
     }
 }
