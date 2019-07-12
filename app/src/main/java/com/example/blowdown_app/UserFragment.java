@@ -239,14 +239,23 @@ public class UserFragment extends Fragment implements View.OnClickListener, View
                 message.what = SHOW_RESPONSE;
                 message.obj = responseStr;
                 handler.sendMessage(message);
-
-
             }
         }).start();
     }
 
+    private void IsLoginEd()
+    {
+        m_loginProgressBar.setVisibility(View.INVISIBLE);
+        m_editText_userName.setEnabled(true);
+        m_editText_password.setEnabled(true);
+        m_btn_login.setEnabled(true);
+        m_btn_forget.setEnabled(true);
+        m_btn_register.setEnabled(true);
+        //TODO:跳转至
+    }
+
     private void Login() {
-        //IsLogining();
+        IsLogining();
         SendWithHttpClient();
     }
 
