@@ -15,7 +15,7 @@
         android:selectAllOnFocus="true"
         android:hint="@string/prompt_email"
         android:layout_marginStart="24dp"
-        android:layout_marginTop="150dp"
+        android:layout_marginTop="75dp"
         android:layout_marginEnd="24dp" />
 
     <EditText
@@ -67,11 +67,5 @@
         android:layout_marginTop="16dp"
         android:layout_marginEnd="96dp"
         android:layout_marginBottom="16dp"/>
-
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="match_parent"
-        android:layout_height="162dp"
-        android:text="TextView" />
 
 </LinearLayout>
