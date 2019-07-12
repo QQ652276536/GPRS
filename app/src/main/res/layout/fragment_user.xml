@@ -29,6 +29,15 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="24dp" />
 
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="@android:style/Widget.DeviceDefault.Light.ProgressBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:visibility="invisible"/>
+
     <Button
         android:id="@+id/btn_login"
         android:layout_width="match_parent"
@@ -37,8 +46,7 @@
         android:layout_marginStart="96dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="96dp"
-        android:layout_marginBottom="16dp"
-        android:enabled="false" />
+        android:layout_marginBottom="16dp" />
 
     <Button
         android:id="@+id/btn_register"
@@ -56,7 +64,14 @@
         android:layout_height="wrap_content"
         android:text="@string/title_forget"
         android:layout_marginStart="96dp"
-        android:layout_marginTop="6dp"
+        android:layout_marginTop="16dp"
         android:layout_marginEnd="96dp"
-        android:layout_marginBottom="4dp"/>
+        android:layout_marginBottom="16dp"/>
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="162dp"
+        android:text="TextView" />
+
 </LinearLayout>
