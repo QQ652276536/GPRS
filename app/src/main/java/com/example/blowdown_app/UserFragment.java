@@ -13,22 +13,14 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
-import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.blowdown_app.entity.UserInfo;
 import com.example.blowdown_app.http.HttpClientUtil;
+import com.google.gson.Gson;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
-
-import java.io.IOException;
+import java.time.Duration;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -250,7 +242,21 @@ public class UserFragment extends Fragment implements View.OnClickListener, View
             {
                 case SHOW_RESPONSE:
                     String responseStr = (String) message.obj;
-                    IsLoginEd();
+                    Gson gson = new Gson();
+                    UserInfo userInfo = gson.fromJson(responseStr, UserInfo.class);
+                    //登录成功
+                    if(userInfo != null)
+                    {
+                        UserSharedPreference.SetUserName(m_userView.getContext(), userInfo.getM_userName());
+                        UserSharedPreference.SetPassword(m_userView.getContext(), userInfo.getM_password());
+                        UserSharedPreference.SetRealName(m_userView.getContext(), userInfo.getM_realName());
+                        UserSharedPreference.SetLevel(m_userView.getContext(), userInfo.getM_level());
+                        IsLoginEd();
+                    }
+                    else
+                    {
+                        Toast.makeText(m_userView.getContext(), "登录失败,请检查网络", Toast.LENGTH_SHORT).show();
+                    }
                     break;
             }
         }
