@@ -20,9 +20,10 @@ import com.example.blowdown_app.http.HttpClientUtil;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.regex.Pattern;
 
 public class UserFragment extends Fragment implements View.OnClickListener, View.OnFocusChangeListener
@@ -30,11 +31,15 @@ public class UserFragment extends Fragment implements View.OnClickListener, View
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     private static final String URL = "http://10.0.2.2:8080/Blowdown/UserInfo/Login";
-    private static final int SHOW_RESPONSE = 0;
+    private static final int MESSAGE_GETRESPONSE = 0;
     //6~12位字母数字组合
     private static final String REGEXUSERNAME = "([a-zA-Z0-9]{6,12})";
     //首位不能是数字,不能全为数字或字母,6~16位
     private static final String REGEXPASSWORD = "^(?![0-9])(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,16}$";
+    //请求响应时间
+    private static int TIMELENGTH = 5;
+    //倒讲间隔时间,毫秒
+    private static int TIMEINTERVAL = 1000;
 
     private String mParam1;
     private String mParam2;
@@ -46,6 +51,7 @@ public class UserFragment extends Fragment implements View.OnClickListener, View
     private Button m_btn_register;
     private Button m_btn_forget;
     private ProgressBar m_loginProgressBar;
+    private Timer m_loginTimer;
 
     private OnFragmentInteractionListener mListener;
 
@@ -70,6 +76,16 @@ public class UserFragment extends Fragment implements View.OnClickListener, View
         args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
+    }
+
+    /**
+     * 停止Fragment时被回调
+     */
+    @Override
+    public void onStop()
+    {
+        super.onStop();
+        m_loginTimer.cancel();
     }
 
     /**
@@ -223,15 +239,27 @@ public class UserFragment extends Fragment implements View.OnClickListener, View
         void onFragmentInteraction(Uri uri);
     }
 
-    private void IsLogining()
+    private TimerTask loginTask = new TimerTask()
     {
-        m_loginProgressBar.setVisibility(View.VISIBLE);
-        m_editText_userName.setEnabled(false);
-        m_editText_password.setEnabled(false);
-        m_btn_login.setEnabled(false);
-        m_btn_forget.setEnabled(false);
-        m_btn_register.setEnabled(false);
-    }
+        @Override
+        public void run()
+        {
+            //返回到UI线程,两种更新UI的方法之一
+            getActivity().runOnUiThread(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    TIMELENGTH--;
+                    if(TIMELENGTH <= 0)
+                    {
+                        IsLoginingEd();
+                        Toast.makeText(m_userView.getContext(), "登录失败,请检查网络", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+        }
+    };
 
     private Handler handler = new Handler()
     {
@@ -241,23 +269,12 @@ public class UserFragment extends Fragment implements View.OnClickListener, View
             super.handleMessage(message);
             switch(message.what)
             {
-                case SHOW_RESPONSE:
+                case MESSAGE_GETRESPONSE:
                     String responseStr = (String) message.obj;
+                    //不同环境SimpleDateFormat模式取到的字符串不一样
                     Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
                     UserInfo userInfo = gson.fromJson(responseStr, UserInfo.class);
-                    //登录成功
-                    if(userInfo != null)
-                    {
-                        UserSharedPreference.SetUserName(m_userView.getContext(), userInfo.getM_userName());
-                        UserSharedPreference.SetPassword(m_userView.getContext(), userInfo.getM_password());
-                        UserSharedPreference.SetRealName(m_userView.getContext(), userInfo.getM_realName());
-                        UserSharedPreference.SetLevel(m_userView.getContext(), userInfo.getM_level());
-                        IsLoginEd();
-                    }
-                    else
-                    {
-                        Toast.makeText(m_userView.getContext(), "登录失败,请检查网络", Toast.LENGTH_SHORT).show();
-                    }
+                    LoginResult(userInfo);
                     break;
             }
         }
@@ -278,15 +295,37 @@ public class UserFragment extends Fragment implements View.OnClickListener, View
                 map.put("m_password", m_editText_password.getText().toString());
                 HttpClientUtil httpClientUtil = new HttpClientUtil();
                 String responseStr = httpClientUtil.SendByPost(URL, map);
-                Message message = new Message();
-                message.what = SHOW_RESPONSE;
-                message.obj = responseStr;
+                //从MessagePool中获取一个Message实例
+                Message message = handler.obtainMessage(MESSAGE_GETRESPONSE, responseStr);
                 handler.sendMessage(message);
             }
         }).start();
     }
 
-    private void IsLoginEd()
+    /**
+     * 登录成功与否
+     */
+    private void LoginResult(UserInfo userInfo)
+    {
+        IsLoginingEd();
+        if(userInfo != null)
+        {
+            UserSharedPreference.SetUserName(m_userView.getContext(), userInfo.getM_userName());
+            UserSharedPreference.SetPassword(m_userView.getContext(), userInfo.getM_password());
+            UserSharedPreference.SetRealName(m_userView.getContext(), userInfo.getM_realName());
+            UserSharedPreference.SetLevel(m_userView.getContext(), userInfo.getM_level());
+            //TODO:跳转页面
+        }
+        else
+        {
+            Toast.makeText(m_userView.getContext(), "用户名或密码错误", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
+     * 登录完成,用于释放控件
+     */
+    private void IsLoginingEd()
     {
         m_loginProgressBar.setVisibility(View.INVISIBLE);
         m_editText_userName.setEnabled(true);
@@ -294,14 +333,30 @@ public class UserFragment extends Fragment implements View.OnClickListener, View
         m_btn_login.setEnabled(true);
         m_btn_forget.setEnabled(true);
         m_btn_register.setEnabled(true);
-        //TODO:跳转至设备页面
-        Toast.makeText(m_userView.getContext(), "登录成功", Toast.LENGTH_SHORT).show();
+        //重置请求超时时间
+        TIMELENGTH = 5;
+    }
+
+    /**
+     * 正在登录,用于禁止控件
+     */
+    private void IsLogining()
+    {
+        m_loginProgressBar.setVisibility(View.VISIBLE);
+        m_editText_userName.setEnabled(false);
+        m_editText_password.setEnabled(false);
+        m_btn_login.setEnabled(false);
+        m_btn_forget.setEnabled(false);
+        m_btn_register.setEnabled(false);
     }
 
     private void Login()
     {
+        m_loginTimer = new Timer();
         IsLogining();
         SendWithHttpClient();
+        //指定定时任务、时间、间隔
+        m_loginTimer.schedule(loginTask, TIMEINTERVAL, TIMEINTERVAL);
     }
 
     private void InitData()
