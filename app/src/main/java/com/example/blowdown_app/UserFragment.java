@@ -18,6 +18,7 @@ import android.widget.Toast;
 import com.example.blowdown_app.entity.UserInfo;
 import com.example.blowdown_app.http.HttpClientUtil;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.time.Duration;
 import java.util.HashMap;
@@ -242,7 +243,7 @@ public class UserFragment extends Fragment implements View.OnClickListener, View
             {
                 case SHOW_RESPONSE:
                     String responseStr = (String) message.obj;
-                    Gson gson = new Gson();
+                    Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
                     UserInfo userInfo = gson.fromJson(responseStr, UserInfo.class);
                     //登录成功
                     if(userInfo != null)
@@ -294,6 +295,7 @@ public class UserFragment extends Fragment implements View.OnClickListener, View
         m_btn_forget.setEnabled(true);
         m_btn_register.setEnabled(true);
         //TODO:跳转至设备页面
+        Toast.makeText(m_userView.getContext(), "登录成功", Toast.LENGTH_SHORT).show();
     }
 
     private void Login()
