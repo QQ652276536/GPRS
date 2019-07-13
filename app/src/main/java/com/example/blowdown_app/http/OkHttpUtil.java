@@ -60,12 +60,15 @@ public class OkHttpUtil {
                 //获得返回的二进制字节数组:response.body().bytes()
                 //获得返回的inputStream:response.body().byteStream()
                 if (response.isSuccessful()) {
-                    Log.i("LoginLog", "收到Post请求的回应");
                     //toString()返回的是对象地址,要接收响应内容用string()
                     String tempStr = response.body().string();
+                    Log.i("LoginLog", "收到Post请求的回应:"+tempStr);
                     //使用回调
+                    //TODO:
                 } else {
                     Log.i("LoginLog", "没有收到Post请求的回应");
+                    //使用回调
+                    //TODO:
                 }
             }
         });

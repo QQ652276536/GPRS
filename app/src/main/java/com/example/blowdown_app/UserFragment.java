@@ -32,8 +32,7 @@ public class UserFragment extends Fragment implements View.OnClickListener, View
 {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    private static final String HTTPCLIENT_URL = "http://10.0.2.2:8080/Blowdown/UserInfo/Login";
-    private static final String OKHTTP_URL = "http://10.0.2.2:8080/Blowdown/UserInfo/Login";
+    private static final String URL = "http://10.0.2.2:8080/Blowdown/UserInfo/Login";
     private static final int MESSAGE_GETRESPONSE = 0;
     //6~12位字母数字组合
     private static final String REGEXUSERNAME = "([a-zA-Z0-9]{6,12})";
@@ -275,11 +274,13 @@ public class UserFragment extends Fragment implements View.OnClickListener, View
                 Map<String, String> map = new HashMap<>();
                 map.put("m_userName", m_editText_userName.getText().toString());
                 map.put("m_password", m_editText_password.getText().toString());
+                //以HttpClient方式的发起请求
                 //HttpClientUtil httpClientUtil = new HttpClientUtil();
-                OkHttpUtil okHttpUtil = new OkHttpUtil();
-                okHttpUtil.SendByPost(OKHTTP_URL,map);
-                String responseStr = okHttpUtil.GetSendByPost();
                 //String responseStr = httpClientUtil.SendByPost(URL, map);
+                //以OkHttp方式的发起请求
+                OkHttpUtil okHttpUtil = new OkHttpUtil();
+                okHttpUtil.SendByPost(URL,map);
+                String responseStr = okHttpUtil.GetSendByPost();
                 //从MessagePool中获取一个Message实例
                 Message message = handler.obtainMessage(MESSAGE_GETRESPONSE, responseStr);
                 handler.sendMessage(message);
@@ -366,7 +367,7 @@ public class UserFragment extends Fragment implements View.OnClickListener, View
             }
         };
         //指定定时任务、时间、间隔
-        m_loginTimer.schedule(loginTask, TIMEINTERVAL, TIMEINTERVAL);
+        //m_loginTimer.schedule(loginTask, TIMEINTERVAL, TIMEINTERVAL);
     }
 
     private void InitData()
