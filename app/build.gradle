@@ -39,4 +39,5 @@ dependencies {
     implementation files('libs/httpcore-4.4.11.jar')
     implementation files('libs/commons-logging-1.2.jar')
     implementation files('libs/gson-2.8.2.jar')
+    implementation 'com.squareup.okhttp3:okhttp:4.0.0'
 }
