@@ -239,28 +239,6 @@ public class UserFragment extends Fragment implements View.OnClickListener, View
         void onFragmentInteraction(Uri uri);
     }
 
-    private TimerTask loginTask = new TimerTask()
-    {
-        @Override
-        public void run()
-        {
-            //返回到UI线程,两种更新UI的方法之一
-            getActivity().runOnUiThread(new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    TIMELENGTH--;
-                    if(TIMELENGTH <= 0)
-                    {
-                        IsLoginingEd();
-                        Toast.makeText(m_userView.getContext(), "登录失败,请检查网络", Toast.LENGTH_SHORT).show();
-                    }
-                }
-            });
-        }
-    };
-
     private Handler handler = new Handler()
     {
         @Override
@@ -333,8 +311,6 @@ public class UserFragment extends Fragment implements View.OnClickListener, View
         m_btn_login.setEnabled(true);
         m_btn_forget.setEnabled(true);
         m_btn_register.setEnabled(true);
-        //重置请求超时时间
-        TIMELENGTH = 5;
     }
 
     /**
@@ -355,6 +331,32 @@ public class UserFragment extends Fragment implements View.OnClickListener, View
         m_loginTimer = new Timer();
         IsLogining();
         SendWithHttpClient();
+        //重置超时时间
+        //TODO:请求超时本应该由Http请求类来完成
+        TIMELENGTH = 5;
+        TimerTask loginTask = new TimerTask()
+        {
+            @Override
+            public void run()
+            {
+                //返回到UI线程,两种更新UI的方法之一
+                getActivity().runOnUiThread(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        TIMELENGTH--;
+                        if(TIMELENGTH <= 0)
+                        {
+                            IsLoginingEd();
+                            //从任务队列中取消任务
+                            m_loginTimer.cancel();
+                            Toast.makeText(m_userView.getContext(), "登录失败,请检查网络", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+            }
+        };
         //指定定时任务、时间、间隔
         m_loginTimer.schedule(loginTask, TIMEINTERVAL, TIMEINTERVAL);
     }
