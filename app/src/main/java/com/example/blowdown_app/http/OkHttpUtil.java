@@ -28,15 +28,38 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class OkHttpUtil {
+public class OkHttpUtil
+{
     private static final int MESSAGE_SUCCESS = 0;
     private static final int MESSAGE_FAIL = 1;
     private static String m_resultStr = "";
 
-    public OkHttpUtil() {
+    public OkHttpUtil()
+    {
     }
 
-    public void SendByPost(String url, Map<String, String> map) {
+    private Handler handler = new Handler()
+    {
+        @Override
+        public void handleMessage(Message message)
+        {
+            super.handleMessage(message);
+            switch (message.what)
+            {
+                case MESSAGE_SUCCESS:
+                    m_resultStr = (String) message.obj;
+                    break;
+                case MESSAGE_FAIL:
+                    m_resultStr = (String) message.obj;
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
+
+    public void SendByPost(String url, Map<String, String> map)
+    {
         String returnStr = "";
         //实例化并设置连接超时时间、读取超时时间
         OkHttpClient okHttpClient = new OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS)
@@ -48,25 +71,35 @@ public class OkHttpUtil {
         Request request = new Request.Builder().post(requestBody).url(url).build();
         Call call = okHttpClient.newCall(request);
         //Android中不允许任何网络的交互在主线程中进行
-        call.enqueue(new Callback() {
+        call.enqueue(new Callback()
+        {
             @Override
-            public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                Log.e("LoginLog", e.toString());
+            public void onFailure(@NotNull Call call, @NotNull IOException e)
+            {
+                Log.e("LoginLog", "请求失败:" + e.toString());
             }
 
+            //获得请求响应的字符串:response.body().string(),另:toString()返回的是对象地址
+            //获得请求响应的二进制字节数组:response.body().bytes()
+            //获得请求响应的inputStream:response.body().byteStream()
             @Override
-            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                //获得返回的字符串:response.body().string()
-                //获得返回的二进制字节数组:response.body().bytes()
-                //获得返回的inputStream:response.body().byteStream()
-                if (response.isSuccessful()) {
-                    //toString()返回的是对象地址,要接收响应内容用string()
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException
+            {
+                if (response.isSuccessful())
+                {
                     String tempStr = response.body().string();
-                    Log.i("LoginLog", "收到Post请求的回应:"+tempStr);
+                    Log.i("LoginLog", "收到Post请求的响应内容:" + tempStr);
+                    Message message = handler.obtainMessage(MESSAGE_SUCCESS,tempStr);
+                    handler.sendMessage(message);
                     //使用回调
                     //TODO:
-                } else {
-                    Log.i("LoginLog", "没有收到Post请求的回应");
+                }
+                else
+                {
+                    String tempStr = response.body().string();
+                    Log.i("LoginLog", "收到Post请求的响应内容:" + tempStr);
+                    Message message = handler.obtainMessage(MESSAGE_FAIL,tempStr);
+                    handler.sendMessage(message);
                     //使用回调
                     //TODO:
                 }
@@ -74,7 +107,8 @@ public class OkHttpUtil {
         });
     }
 
-    public String GetSendByPost() {
+    public String GetSendByPost()
+    {
         return m_resultStr;
     }
 }

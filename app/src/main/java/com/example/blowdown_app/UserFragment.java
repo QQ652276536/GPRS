@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -99,7 +100,7 @@ public class UserFragment extends Fragment implements View.OnClickListener, View
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        if(getArguments() != null)
+        if (getArguments() != null)
         {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -125,7 +126,7 @@ public class UserFragment extends Fragment implements View.OnClickListener, View
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri)
     {
-        if(mListener != null)
+        if (mListener != null)
         {
             mListener.onFragmentInteraction(uri);
         }
@@ -135,7 +136,7 @@ public class UserFragment extends Fragment implements View.OnClickListener, View
     public void onAttach(Context context)
     {
         super.onAttach(context);
-        if(context instanceof OnFragmentInteractionListener)
+        if (context instanceof OnFragmentInteractionListener)
         {
             mListener = (OnFragmentInteractionListener) context;
         }
@@ -158,15 +159,15 @@ public class UserFragment extends Fragment implements View.OnClickListener, View
     @Override
     public void onClick(View v)
     {
-        if(R.id.btn_login == v.getId())
+        if (R.id.btn_login == v.getId())
         {
             //隐藏键盘
             InputMethodManager imm = (InputMethodManager) v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-            if(imm.isActive())
+            if (imm.isActive())
             {
                 imm.hideSoftInputFromWindow(v.getApplicationWindowToken(), 0);
             }
-            if(Pattern.matches(REGEXUSERNAME, m_editText_userName.getText().toString()))
+            if (Pattern.matches(REGEXUSERNAME, m_editText_userName.getText().toString()))
             {
                 m_editText_userName.setError(null);
             }
@@ -174,7 +175,7 @@ public class UserFragment extends Fragment implements View.OnClickListener, View
             {
                 m_editText_userName.setError("用户名非法");
             }
-            if(Pattern.matches(REGEXPASSWORD, m_editText_password.getText().toString()))
+            if (Pattern.matches(REGEXPASSWORD, m_editText_password.getText().toString()))
             {
                 m_editText_password.setError(null);
             }
@@ -182,15 +183,15 @@ public class UserFragment extends Fragment implements View.OnClickListener, View
             {
                 m_editText_password.setError("密码非法");
             }
-            if(m_editText_userName.getError() == null && m_editText_password.getError() == null)
+            if (m_editText_userName.getError() == null && m_editText_password.getError() == null)
             {
                 Login();
             }
         }
-        else if(R.id.btn_register == v.getId())
+        else if (R.id.btn_register == v.getId())
         {
         }
-        else if(R.id.btn_forget == v.getId())
+        else if (R.id.btn_forget == v.getId())
         {
         }
     }
@@ -198,15 +199,15 @@ public class UserFragment extends Fragment implements View.OnClickListener, View
     @Override
     public void onFocusChange(View v, boolean hasFocus)
     {
-        if(R.id.editTextUserName == v.getId())
+        if (R.id.editTextUserName == v.getId())
         {
-            if(hasFocus)
+            if (hasFocus)
             {
                 m_editText_userName.setError(null);
             }
             else
             {
-                if(Pattern.matches(REGEXUSERNAME, m_editText_userName.getText().toString()))
+                if (Pattern.matches(REGEXUSERNAME, m_editText_userName.getText().toString()))
                 {
                     m_editText_userName.setError(null);
                 }
@@ -216,15 +217,15 @@ public class UserFragment extends Fragment implements View.OnClickListener, View
                 }
             }
         }
-        if(R.id.editTextPasswrod == v.getId())
+        if (R.id.editTextPasswrod == v.getId())
         {
-            if(hasFocus)
+            if (hasFocus)
             {
                 m_editText_password.setError(null);
             }
             else
             {
-                if(Pattern.matches(REGEXPASSWORD, m_editText_password.getText().toString()))
+                if (Pattern.matches(REGEXPASSWORD, m_editText_password.getText().toString()))
                 {
                     m_editText_password.setError(null);
                 }
@@ -247,7 +248,7 @@ public class UserFragment extends Fragment implements View.OnClickListener, View
         public void handleMessage(Message message)
         {
             super.handleMessage(message);
-            switch(message.what)
+            switch (message.what)
             {
                 case MESSAGE_GETRESPONSE:
                     String responseStr = (String) message.obj;
@@ -279,7 +280,7 @@ public class UserFragment extends Fragment implements View.OnClickListener, View
                 //String responseStr = httpClientUtil.SendByPost(URL, map);
                 //以OkHttp方式的发起请求
                 OkHttpUtil okHttpUtil = new OkHttpUtil();
-                okHttpUtil.SendByPost(URL,map);
+                okHttpUtil.SendByPost(URL, map);
                 String responseStr = okHttpUtil.GetSendByPost();
                 //从MessagePool中获取一个Message实例
                 Message message = handler.obtainMessage(MESSAGE_GETRESPONSE, responseStr);
@@ -295,8 +296,9 @@ public class UserFragment extends Fragment implements View.OnClickListener, View
     private void LoginResult(UserInfo userInfo)
     {
         IsLoginingEd();
-        if(userInfo != null)
+        if (userInfo != null)
         {
+            Log.i("LoginLog", "登录成功:用户真实姓名为:" + userInfo.getM_realName());
             UserSharedPreference.SetUserName(m_userView.getContext(), userInfo.getM_userName());
             UserSharedPreference.SetPassword(m_userView.getContext(), userInfo.getM_password());
             UserSharedPreference.SetRealName(m_userView.getContext(), userInfo.getM_realName());
@@ -305,6 +307,7 @@ public class UserFragment extends Fragment implements View.OnClickListener, View
         }
         else
         {
+            Log.i("LoginLog", "登录失败:用户名或密码错误");
             Toast.makeText(m_userView.getContext(), "用户名或密码错误", Toast.LENGTH_SHORT).show();
         }
     }
@@ -355,7 +358,7 @@ public class UserFragment extends Fragment implements View.OnClickListener, View
                     public void run()
                     {
                         TIMELENGTH--;
-                        if(TIMELENGTH <= 0)
+                        if (TIMELENGTH <= 0)
                         {
                             IsLoginingEd();
                             //从任务队列中取消任务
