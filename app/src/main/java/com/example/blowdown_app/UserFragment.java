@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -17,6 +18,7 @@ import android.widget.Toast;
 
 import com.example.blowdown_app.entity.UserInfo;
 import com.example.blowdown_app.http.HttpClientUtil;
+import com.example.blowdown_app.http.OkHttpUtil;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -30,7 +32,8 @@ public class UserFragment extends Fragment implements View.OnClickListener, View
 {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    private static final String URL = "http://10.0.2.2:8080/Blowdown/UserInfo/Login";
+    private static final String HTTPCLIENT_URL = "http://10.0.2.2:8080/Blowdown/UserInfo/Login";
+    private static final String OKHTTP_URL = "http://10.0.2.2:8080/Blowdown/UserInfo/Login";
     private static final int MESSAGE_GETRESPONSE = 0;
     //6~12位字母数字组合
     private static final String REGEXUSERNAME = "([a-zA-Z0-9]{6,12})";
@@ -268,14 +271,19 @@ public class UserFragment extends Fragment implements View.OnClickListener, View
             @Override
             public void run()
             {
+                Looper.prepare();
                 Map<String, String> map = new HashMap<>();
                 map.put("m_userName", m_editText_userName.getText().toString());
                 map.put("m_password", m_editText_password.getText().toString());
-                HttpClientUtil httpClientUtil = new HttpClientUtil();
-                String responseStr = httpClientUtil.SendByPost(URL, map);
+                //HttpClientUtil httpClientUtil = new HttpClientUtil();
+                OkHttpUtil okHttpUtil = new OkHttpUtil();
+                okHttpUtil.SendByPost(OKHTTP_URL,map);
+                String responseStr = okHttpUtil.GetSendByPost();
+                //String responseStr = httpClientUtil.SendByPost(URL, map);
                 //从MessagePool中获取一个Message实例
                 Message message = handler.obtainMessage(MESSAGE_GETRESPONSE, responseStr);
                 handler.sendMessage(message);
+                Looper.loop();
             }
         }).start();
     }
