@@ -60,10 +60,11 @@ public class OkHttpUtil
 
     /**
      * 异步发送Post请求,使用Handler处理消息
+     *
      * @param url
      * @param map
      */
-    public void SendByPost(String url, Map<String, String> map)
+    public void AsynSendByPost(String url, Map<String, String> map)
     {
         //实例化并设置连接超时时间、读取超时时间
         OkHttpClient okHttpClient = new OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS)
@@ -93,14 +94,14 @@ public class OkHttpUtil
                 {
                     String tempStr = response.body().string();
                     Log.i("LoginLog", "收到Post请求的响应内容:" + tempStr);
-                    Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_SUCCESS,tempStr);
+                    Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_SUCCESS, tempStr);
                     handler.sendMessage(message);
                 }
                 else
                 {
                     String tempStr = response.body().string();
                     Log.i("LoginLog", "收到Post请求的响应内容:" + tempStr);
-                    Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_FAIL,tempStr);
+                    Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_FAIL, tempStr);
                     handler.sendMessage(message);
                 }
             }
@@ -109,11 +110,12 @@ public class OkHttpUtil
 
     /**
      * 异步发送Post请求,使用回调处理消息
+     *
      * @param url
      * @param map
      * @param listener
      */
-    public void SendByPost(String url, Map<String, String> map,LoginCallBackListener listener)
+    public void AsynSendByPost(String url, Map<String, String> map, LoginCallBackListener listener)
     {
         //实例化并设置连接超时时间、读取超时时间
         OkHttpClient okHttpClient = new OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS)

@@ -259,14 +259,21 @@ public class UserFragment extends Fragment implements View.OnClickListener, View
             switch (message.what)
             {
                 case MESSAGE_GETRESPONSE_SUCCESS:
+                {
                     String responseStr = (String) message.obj;
                     //不同环境SimpleDateFormat模式取到的字符串不一样
                     Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
                     UserInfo userInfo = gson.fromJson(responseStr, UserInfo.class);
                     LoginResult(userInfo);
                     break;
+                }
                 case MESSAGE_GETRESPONSE_FAIL:
+                {
+                    IsLoginingEd();
+                    String responseStr = (String) message.obj;
+                    Toast.makeText(m_userView.getContext(), "登录失败,请检查网络环境", Toast.LENGTH_SHORT).show();
                     break;
+                }
                 default:
                     break;
             }
@@ -274,7 +281,60 @@ public class UserFragment extends Fragment implements View.OnClickListener, View
     };
 
     /**
-     * 以HttpClient发送网络请求,在里面开启线程
+     * 用OkHttp发送网络请求,并在里面开启线程
+     */
+    private void SendWithOkHttp()
+    {
+        new Thread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                Looper.prepare();
+                Map<String, String> map = new HashMap<>();
+                map.put("m_userName", m_editText_userName.getText().toString());
+                map.put("m_password", m_editText_password.getText().toString());
+                OkHttpUtil okHttpUtil = new OkHttpUtil();
+                //异步方式发起请求
+                okHttpUtil.AsynSendByPost(URL, map, new LoginCallBackListener()
+                {
+                    @Override
+                    public void onFailure(@NotNull Call call, @NotNull IOException e)
+                    {
+                        Log.e("LoginLog", "请求失败:" + e.toString());
+                        Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_FAIL, "请求失败:" + e.toString());
+                        handler.sendMessage(message);
+                    }
+
+                    //获得请求响应的字符串:response.body().string()该方法只能被调用一次!另:toString()返回的是对象地址
+                    //获得请求响应的二进制字节数组:response.body().bytes()
+                    //获得请求响应的inputStream:response.body().byteStream()
+                    @Override
+                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException
+                    {
+                        if (response.isSuccessful())
+                        {
+                            String responseStr = response.body().string();
+                            Log.i("LoginLog", "收到Post请求的响应内容:" + responseStr);
+                            Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_SUCCESS, responseStr);
+                            handler.sendMessage(message);
+                        }
+                        else
+                        {
+                            String responseStr = response.body().string();
+                            Log.i("LoginLog", "收到Post请求的响应内容:" + responseStr);
+                            Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_FAIL, responseStr);
+                            handler.sendMessage(message);
+                        }
+                    }
+                });
+                Looper.loop();
+            }
+        }).start();
+    }
+
+    /**
+     * 用HttpClient发送网络请求,并在里面开启线程
      */
     private void SendWithHttpClient()
     {
@@ -287,46 +347,12 @@ public class UserFragment extends Fragment implements View.OnClickListener, View
                 Map<String, String> map = new HashMap<>();
                 map.put("m_userName", m_editText_userName.getText().toString());
                 map.put("m_password", m_editText_password.getText().toString());
-                //以HttpClient方式的发起请求
-                //HttpClientUtil httpClientUtil = new HttpClientUtil();
-                //String responseStr = httpClientUtil.SendByPost(URL, map);
-                //以OkHttp异步方式发起请求
-                OkHttpUtil okHttpUtil = new OkHttpUtil();
-                //okHttpUtil.SendByPost(URL, map);
-                //String responseStr = okHttpUtil.GetSendByPost();
-                okHttpUtil.SendByPost(URL, map, new LoginCallBackListener()
-                {
-                    @Override
-                    public void onFailure(@NotNull Call call, @NotNull IOException e)
-                    {
-                        Log.e("LoginLog", "请求失败:" + e.toString());
-                    }
-
-                    //获得请求响应的字符串:response.body().string()该方法只能被调用一次!另:toString()返回的是对象地址
-                    //获得请求响应的二进制字节数组:response.body().bytes()
-                    //获得请求响应的inputStream:response.body().byteStream()
-                    @Override
-                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException
-                    {
-                        if (response.isSuccessful())
-                        {
-                            String tempStr = response.body().string();
-                            Log.i("LoginLog", "收到Post请求的响应内容:" + tempStr);
-                            Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_SUCCESS, tempStr);
-                            handler.sendMessage(message);
-                        }
-                        else
-                        {
-                            String tempStr = response.body().string();
-                            Log.i("LoginLog", "收到Post请求的响应内容:" + tempStr);
-                            Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_FAIL, tempStr);
-                            handler.sendMessage(message);
-                        }
-                    }
-                });
+                HttpClientUtil httpClientUtil = new HttpClientUtil();
+                String responseStr = httpClientUtil.SendByPost(URL, map);
+                Log.i("LoginLog", "收到Post请求的响应内容:" + responseStr);
                 //从MessagePool中获取一个Message实例
-                //Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_SUCCESS, responseStr);
-                //handler.sendMessage(message);
+                Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_SUCCESS, responseStr);
+                handler.sendMessage(message);
                 Looper.loop();
             }
         }).start();
@@ -384,7 +410,8 @@ public class UserFragment extends Fragment implements View.OnClickListener, View
     {
         m_loginTimer = new Timer();
         IsLogining();
-        SendWithHttpClient();
+        //SendWithHttpClient();
+        SendWithOkHttp();
         //重置超时时间
         //TODO:请求超时本应该由Http请求类来完成
         TIMELENGTH = 5;
