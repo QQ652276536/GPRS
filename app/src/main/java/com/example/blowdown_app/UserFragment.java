@@ -19,22 +19,30 @@ import android.widget.Toast;
 
 import com.example.blowdown_app.entity.UserInfo;
 import com.example.blowdown_app.http.HttpClientUtil;
+import com.example.blowdown_app.http.LoginCallBackListener;
 import com.example.blowdown_app.http.OkHttpUtil;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.regex.Pattern;
 
+import okhttp3.Call;
+import okhttp3.Response;
+
 public class UserFragment extends Fragment implements View.OnClickListener, View.OnFocusChangeListener
 {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     private static final String URL = "http://10.0.2.2:8080/Blowdown/UserInfo/Login";
-    private static final int MESSAGE_GETRESPONSE = 0;
+    private static final int MESSAGE_GETRESPONSE_SUCCESS = 0;
+    private static final int MESSAGE_GETRESPONSE_FAIL = 1;
     //6~12位字母数字组合
     private static final String REGEXUSERNAME = "([a-zA-Z0-9]{6,12})";
     //首位不能是数字,不能全为数字或字母,6~16位
@@ -250,19 +258,23 @@ public class UserFragment extends Fragment implements View.OnClickListener, View
             super.handleMessage(message);
             switch (message.what)
             {
-                case MESSAGE_GETRESPONSE:
+                case MESSAGE_GETRESPONSE_SUCCESS:
                     String responseStr = (String) message.obj;
                     //不同环境SimpleDateFormat模式取到的字符串不一样
                     Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
                     UserInfo userInfo = gson.fromJson(responseStr, UserInfo.class);
                     LoginResult(userInfo);
                     break;
+                case MESSAGE_GETRESPONSE_FAIL:
+                    break;
+                default:
+                    break;
             }
         }
     };
 
     /**
-     * 发送网络请求,在里面开启线程
+     * 以HttpClient发送网络请求,在里面开启线程
      */
     private void SendWithHttpClient()
     {
@@ -278,13 +290,43 @@ public class UserFragment extends Fragment implements View.OnClickListener, View
                 //以HttpClient方式的发起请求
                 //HttpClientUtil httpClientUtil = new HttpClientUtil();
                 //String responseStr = httpClientUtil.SendByPost(URL, map);
-                //以OkHttp方式的发起请求
+                //以OkHttp异步方式发起请求
                 OkHttpUtil okHttpUtil = new OkHttpUtil();
-                okHttpUtil.SendByPost(URL, map);
-                String responseStr = okHttpUtil.GetSendByPost();
+                //okHttpUtil.SendByPost(URL, map);
+                //String responseStr = okHttpUtil.GetSendByPost();
+                okHttpUtil.SendByPost(URL, map, new LoginCallBackListener()
+                {
+                    @Override
+                    public void onFailure(@NotNull Call call, @NotNull IOException e)
+                    {
+                        Log.e("LoginLog", "请求失败:" + e.toString());
+                    }
+
+                    //获得请求响应的字符串:response.body().string()该方法只能被调用一次!另:toString()返回的是对象地址
+                    //获得请求响应的二进制字节数组:response.body().bytes()
+                    //获得请求响应的inputStream:response.body().byteStream()
+                    @Override
+                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException
+                    {
+                        if (response.isSuccessful())
+                        {
+                            String tempStr = response.body().string();
+                            Log.i("LoginLog", "收到Post请求的响应内容:" + tempStr);
+                            Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_SUCCESS, tempStr);
+                            handler.sendMessage(message);
+                        }
+                        else
+                        {
+                            String tempStr = response.body().string();
+                            Log.i("LoginLog", "收到Post请求的响应内容:" + tempStr);
+                            Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_FAIL, tempStr);
+                            handler.sendMessage(message);
+                        }
+                    }
+                });
                 //从MessagePool中获取一个Message实例
-                Message message = handler.obtainMessage(MESSAGE_GETRESPONSE, responseStr);
-                handler.sendMessage(message);
+                //Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_SUCCESS, responseStr);
+                //handler.sendMessage(message);
                 Looper.loop();
             }
         }).start();
