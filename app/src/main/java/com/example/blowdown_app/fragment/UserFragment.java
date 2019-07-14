@@ -1,4 +1,4 @@
-package com.example.blowdown_app;
+package com.example.blowdown_app.fragment;
 
 import android.content.Context;
 import android.net.Uri;
@@ -17,6 +17,8 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.example.blowdown_app.R;
+import com.example.blowdown_app.UserSharedPreference;
 import com.example.blowdown_app.entity.UserInfo;
 import com.example.blowdown_app.http.HttpClientUtil;
 import com.example.blowdown_app.http.LoginCallBackListener;
@@ -225,7 +227,7 @@ public class UserFragment extends Fragment implements View.OnClickListener, View
                 }
             }
         }
-        if (R.id.editTextPasswrod == v.getId())
+        if (R.id.editTextPassword == v.getId())
         {
             if (hasFocus)
             {
@@ -446,7 +448,7 @@ public class UserFragment extends Fragment implements View.OnClickListener, View
     {
         m_editText_userName = m_userView.findViewById(R.id.editTextUserName);
         m_editText_userName.setOnFocusChangeListener(this);
-        m_editText_password = m_userView.findViewById(R.id.editTextPasswrod);
+        m_editText_password = m_userView.findViewById(R.id.editTextPassword);
         m_editText_password.setOnFocusChangeListener(this);
         m_btn_login = m_userView.findViewById(R.id.btn_login);
         m_btn_login.setOnClickListener(this);
