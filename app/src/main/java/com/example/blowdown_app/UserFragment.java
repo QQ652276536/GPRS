@@ -271,7 +271,7 @@ public class UserFragment extends Fragment implements View.OnClickListener, View
                 {
                     IsLoginingEd();
                     String responseStr = (String) message.obj;
-                    Toast.makeText(m_userView.getContext(), "登录失败,请检查网络环境", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(m_userView.getContext(), "登录超时,请检查网络环境", Toast.LENGTH_SHORT).show();
                     break;
                 }
                 default:
@@ -413,7 +413,6 @@ public class UserFragment extends Fragment implements View.OnClickListener, View
         //SendWithHttpClient();
         SendWithOkHttp();
         //重置超时时间
-        //TODO:请求超时本应该由Http请求类来完成
         TIMELENGTH = 5;
         TimerTask loginTask = new TimerTask()
         {
@@ -439,6 +438,7 @@ public class UserFragment extends Fragment implements View.OnClickListener, View
             }
         };
         //指定定时任务、时间、间隔
+        //请求超时已由Http请求设置,这里留作笔记,后续可能会用得上
         //m_loginTimer.schedule(loginTask, TIMEINTERVAL, TIMEINTERVAL);
     }
 
