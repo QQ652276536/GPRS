@@ -6,7 +6,7 @@
 
 
     <EditText
-        android:id="@+id/editTextUserName_register"
+        android:id="@+id/editTextUserName_login"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
@@ -16,34 +16,10 @@
         android:hint="@string/prompt_email"
         android:inputType="textEmailAddress"
         android:selectAllOnFocus="true"
-        android:text="LiXiaoWei" />
+        android:text="qwer1234" />
 
     <EditText
-        android:id="@+id/editTextRealName_register"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="24dp"
-        android:ems="10"
-        android:hint="@string/prompt_realName"
-        android:inputType="textPersonName"
-        android:text="李小伟" />
-
-    <EditText
-        android:id="@+id/editTextPhone_register"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="24dp"
-        android:ems="10"
-        android:hint="@string/prompt_phone"
-        android:inputType="numberSigned"
-        android:text="13477855544" />
-
-    <EditText
-        android:id="@+id/editTextPassword_register"
+        android:id="@+id/editTextPassword_login"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
@@ -54,20 +30,8 @@
         android:inputType="textPassword"
         android:text="a123456" />
 
-    <EditText
-        android:id="@+id/editTextRePassword_register"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="24dp"
-        android:ems="10"
-        android:hint="@string/prompt_rePassword"
-        android:inputType="textPassword"
-        android:text="a123456" />
-
     <ProgressBar
-        android:id="@+id/progressBar_register"
+        android:id="@+id/progressBar_login"
         style="@android:style/Widget.DeviceDefault.Light.ProgressBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -76,7 +40,17 @@
         android:visibility="invisible" />
 
     <Button
-        android:id="@+id/btn_register_register"
+        android:id="@+id/btn_login_login"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="96dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="96dp"
+        android:layout_marginBottom="16dp"
+        android:text="@string/title_login" />
+
+    <Button
+        android:id="@+id/btn_register_login"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="96dp"
@@ -86,13 +60,13 @@
         android:text="@string/title_register" />
 
     <Button
-        android:id="@+id/btn_login_register"
+        android:id="@+id/btn_forget_login"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="96dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="96dp"
         android:layout_marginBottom="16dp"
-        android:text="@string/title_login" />
+        android:text="@string/title_forget" />
 
 </LinearLayout>

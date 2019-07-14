@@ -16,7 +16,6 @@ import com.example.blowdown_app.fragment.UserFragment;
 
 public class MainActivity extends AppCompatActivity implements MapFragment.OnFragmentInteractionListener, DeviceFragment.OnFragmentInteractionListener, UserFragment.OnFragmentInteractionListener
 {
-
     //当前页,用来切换
     private Fragment m_currentFragment;
     //地图页
@@ -54,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements MapFragment.OnFra
             getSupportFragmentManager().beginTransaction().show(m_userFragment).commitAllowingStateLoss();
         }
         m_currentFragment = m_userFragment;
+        //因为启动时默认选中用户页,所以要在后面注册监听事件
         bottomNavigationView.setOnNavigationItemSelectedListener(onNavigationItemSeletecListener);
     }
 
