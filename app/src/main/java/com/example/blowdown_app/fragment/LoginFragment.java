@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,6 +31,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -210,7 +212,13 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
             //该碎片不在管理器中则添加进去
             if (!m_registerFragment.isAdded())
             {
-                getChildFragmentManager().beginTransaction().add(R.id.fragment_current_user, m_registerFragment).commitAllowingStateLoss();
+                //getChildFragmentManager().beginTransaction().add(R.id.fragment_current_user, m_registerFragment)
+                // .commitAllowingStateLoss();
+                Fragment fragment = getFragmentManager().getFragments().get(0);
+                Fragment fragment1 = getFragmentManager().getFragments().get(1);
+                getFragmentManager().beginTransaction().hide(fragment).commit();
+                getFragmentManager().beginTransaction().show(fragment1).commit();
+                int a = 1;
             }
             else
             {

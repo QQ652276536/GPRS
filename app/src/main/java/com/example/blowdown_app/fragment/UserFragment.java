@@ -51,6 +51,7 @@ public class UserFragment extends Fragment
     private View m_userView;
     //登录页
     private LoginFragment m_loginFragment;
+    private RegisterFragment m_registerFragment;
     private TextView m_textView;
 
     private OnFragmentInteractionListener mListener;
@@ -172,6 +173,14 @@ public class UserFragment extends Fragment
         else
         {
             getChildFragmentManager().beginTransaction().show(m_loginFragment).commitAllowingStateLoss();
+        }
+        if (m_registerFragment == null)
+        {
+            m_registerFragment = RegisterFragment.newInstance("", "");
+        }
+        if (!m_registerFragment.isAdded())
+        {
+            getChildFragmentManager().beginTransaction().add(R.id.fragment_current_user, m_registerFragment).commitAllowingStateLoss();
         }
         m_textView = m_userView.findViewById(R.id.textView_user);
     }
