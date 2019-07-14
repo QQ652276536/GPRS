@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -48,8 +49,8 @@ public class UserFragment extends Fragment
     private String mParam2;
 
     private View m_userView;
+    //登录页
     private LoginFragment m_loginFragment;
-    private RegisterFragment m_registerFragment;
     private TextView m_textView;
 
     private OnFragmentInteractionListener mListener;
@@ -156,9 +157,22 @@ public class UserFragment extends Fragment
         void onFragmentInteraction(Uri uri);
     }
 
-
     private void InitData()
     {
+        if (m_loginFragment == null)
+        {
+            m_loginFragment = LoginFragment.newInstance("", "");
+        }
+        //碎片不在管理器中则添加进去
+        if (!m_loginFragment.isAdded())
+        {
+            getChildFragmentManager().beginTransaction().add(R.id.fragment_current_user, m_loginFragment).commitAllowingStateLoss();
+        }
+        //默认在登录页
+        else
+        {
+            getChildFragmentManager().beginTransaction().show(m_loginFragment).commitAllowingStateLoss();
+        }
         m_textView = m_userView.findViewById(R.id.textView_user);
     }
 }

@@ -11,10 +11,15 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.example.blowdown_app.fragment.DeviceFragment;
+import com.example.blowdown_app.fragment.ForgetFragment;
+import com.example.blowdown_app.fragment.LoginFragment;
 import com.example.blowdown_app.fragment.MapFragment;
+import com.example.blowdown_app.fragment.RegisterFragment;
 import com.example.blowdown_app.fragment.UserFragment;
 
-public class MainActivity extends AppCompatActivity implements MapFragment.OnFragmentInteractionListener, DeviceFragment.OnFragmentInteractionListener, UserFragment.OnFragmentInteractionListener
+public class MainActivity extends AppCompatActivity implements MapFragment.OnFragmentInteractionListener, DeviceFragment.OnFragmentInteractionListener
+        , UserFragment.OnFragmentInteractionListener, LoginFragment.OnFragmentInteractionListener, RegisterFragment.OnFragmentInteractionListener
+        , ForgetFragment.OnFragmentInteractionListener
 {
     //当前页,用来切换
     private Fragment m_currentFragment;

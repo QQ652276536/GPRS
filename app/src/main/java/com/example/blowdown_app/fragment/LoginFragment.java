@@ -65,6 +65,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
     private Button m_btn_forget;
     private ProgressBar m_loginProgressBar;
     private Timer m_loginTimer;
+    private RegisterFragment m_registerFragment;
 
     private OnFragmentInteractionListener mListener;
 
@@ -169,6 +170,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
     @Override
     public void onClick(View v)
     {
+        //登录,这里是发起登录请求
         if (R.id.btn_login_login == v.getId())
         {
             //隐藏键盘
@@ -198,9 +200,24 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
                 Login();
             }
         }
+        //注册,这里是跳转至注册页面
         else if (R.id.btn_register_login == v.getId())
         {
+            if (m_registerFragment == null)
+            {
+                m_registerFragment = RegisterFragment.newInstance("", "");
+            }
+            //该碎片不在管理器中则添加进去
+            if (!m_registerFragment.isAdded())
+            {
+                getChildFragmentManager().beginTransaction().add(R.id.fragment_current_user, m_registerFragment).commitAllowingStateLoss();
+            }
+            else
+            {
+                getChildFragmentManager().beginTransaction().show(m_registerFragment).commitAllowingStateLoss();
+            }
         }
+        //忘记密码,这里是跳转至找回密码页
         else if (R.id.btn_forget_login == v.getId())
         {
         }
