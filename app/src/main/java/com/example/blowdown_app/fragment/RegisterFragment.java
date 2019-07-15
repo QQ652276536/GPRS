@@ -168,19 +168,12 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
         //登录,这里是跳转至登录页面
         if (R.id.btn_login_register == v.getId())
         {
-            if (m_loginFragment == null)
-            {
-                m_loginFragment = LoginFragment.newInstance("", "");
-            }
-            //该碎片不在管理器中则添加进去
-            if (!m_loginFragment.isAdded())
-            {
-                getChildFragmentManager().beginTransaction().add(R.id.fragment_current_user, m_loginFragment).commitAllowingStateLoss();
-            }
-            else
-            {
-                getChildFragmentManager().beginTransaction().show(m_loginFragment).commitAllowingStateLoss();
-            }
+            Fragment loginFragment = getFragmentManager().getFragments().get(0);
+            Fragment registerFragment = getFragmentManager().getFragments().get(1);
+            Fragment forgetFragment = getFragmentManager().getFragments().get(2);
+            getFragmentManager().beginTransaction().hide(registerFragment).commitAllowingStateLoss();
+            getFragmentManager().beginTransaction().hide(forgetFragment).commitAllowingStateLoss();
+            getFragmentManager().beginTransaction().show(loginFragment).commitAllowingStateLoss();
         }
         //注册,这里是发起注册请求
         else if (R.id.btn_register_register == v.getId())

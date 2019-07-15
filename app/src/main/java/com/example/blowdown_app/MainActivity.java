@@ -40,6 +40,7 @@ public class MainActivity extends AppCompatActivity implements MapFragment.OnFra
 
     private void InitData()
     {
+        //底部导航栏
         BottomNavigationView bottomNavigationView = findViewById(R.id.nav_view);
         //启动时默认在用户页
         bottomNavigationView.setSelectedItemId(bottomNavigationView.getMenu().getItem(2).getItemId());

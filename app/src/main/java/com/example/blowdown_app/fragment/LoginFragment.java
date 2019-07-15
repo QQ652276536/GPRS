@@ -113,7 +113,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null)
+        if(getArguments() != null)
         {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -139,7 +139,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri)
     {
-        if (mListener != null)
+        if(mListener != null)
         {
             mListener.onFragmentInteraction(uri);
         }
@@ -149,7 +149,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
     public void onAttach(Context context)
     {
         super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener)
+        if(context instanceof OnFragmentInteractionListener)
         {
             mListener = (OnFragmentInteractionListener) context;
         }
@@ -173,15 +173,15 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
     public void onClick(View v)
     {
         //登录,这里是发起登录请求
-        if (R.id.btn_login_login == v.getId())
+        if(R.id.btn_login_login == v.getId())
         {
             //隐藏键盘
             InputMethodManager imm = (InputMethodManager) v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-            if (imm.isActive())
+            if(imm.isActive())
             {
                 imm.hideSoftInputFromWindow(v.getApplicationWindowToken(), 0);
             }
-            if (Pattern.matches(REGEXUSERNAME, m_editText_userName.getText().toString()))
+            if(Pattern.matches(REGEXUSERNAME, m_editText_userName.getText().toString()))
             {
                 m_editText_userName.setError(null);
             }
@@ -189,7 +189,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
             {
                 m_editText_userName.setError("用户名非法");
             }
-            if (Pattern.matches(REGEXPASSWORD, m_editText_password.getText().toString()))
+            if(Pattern.matches(REGEXPASSWORD, m_editText_password.getText().toString()))
             {
                 m_editText_password.setError(null);
             }
@@ -197,52 +197,45 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
             {
                 m_editText_password.setError("密码非法");
             }
-            if (m_editText_userName.getError() == null && m_editText_password.getError() == null)
+            if(m_editText_userName.getError() == null && m_editText_password.getError() == null)
             {
                 Login();
             }
         }
         //注册,这里是跳转至注册页面
-        else if (R.id.btn_register_login == v.getId())
+        else if(R.id.btn_register_login == v.getId())
         {
-            if (m_registerFragment == null)
-            {
-                m_registerFragment = RegisterFragment.newInstance("", "");
-            }
-            //该碎片不在管理器中则添加进去
-            if (!m_registerFragment.isAdded())
-            {
-                //getChildFragmentManager().beginTransaction().add(R.id.fragment_current_user, m_registerFragment)
-                // .commitAllowingStateLoss();
-                Fragment fragment = getFragmentManager().getFragments().get(0);
-                Fragment fragment1 = getFragmentManager().getFragments().get(1);
-                getFragmentManager().beginTransaction().hide(fragment).commit();
-                getFragmentManager().beginTransaction().show(fragment1).commit();
-                int a = 1;
-            }
-            else
-            {
-                getChildFragmentManager().beginTransaction().show(m_registerFragment).commitAllowingStateLoss();
-            }
+            Fragment loginFragment = getFragmentManager().getFragments().get(0);
+            Fragment registerFragment = getFragmentManager().getFragments().get(1);
+            Fragment forgetFragment = getFragmentManager().getFragments().get(2);
+            getFragmentManager().beginTransaction().hide(loginFragment).commitAllowingStateLoss();
+            getFragmentManager().beginTransaction().hide(forgetFragment).commitAllowingStateLoss();
+            getFragmentManager().beginTransaction().show(registerFragment).commitAllowingStateLoss();
         }
         //忘记密码,这里是跳转至找回密码页
-        else if (R.id.btn_forget_login == v.getId())
+        else if(R.id.btn_forget_login == v.getId())
         {
+            Fragment loginFragment = getFragmentManager().getFragments().get(0);
+            Fragment registerFragment = getFragmentManager().getFragments().get(1);
+            Fragment forgetFragment = getFragmentManager().getFragments().get(2);
+            getFragmentManager().beginTransaction().hide(loginFragment).commitAllowingStateLoss();
+            getFragmentManager().beginTransaction().hide(registerFragment).commitAllowingStateLoss();
+            getFragmentManager().beginTransaction().show(forgetFragment).commitAllowingStateLoss();
         }
     }
 
     @Override
     public void onFocusChange(View v, boolean hasFocus)
     {
-        if (R.id.editTextUserName_login == v.getId())
+        if(R.id.editTextUserName_login == v.getId())
         {
-            if (hasFocus)
+            if(hasFocus)
             {
                 m_editText_userName.setError(null);
             }
             else
             {
-                if (Pattern.matches(REGEXUSERNAME, m_editText_userName.getText().toString()))
+                if(Pattern.matches(REGEXUSERNAME, m_editText_userName.getText().toString()))
                 {
                     m_editText_userName.setError(null);
                 }
@@ -252,15 +245,15 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
                 }
             }
         }
-        if (R.id.editTextPassword_login == v.getId())
+        if(R.id.editTextPassword_login == v.getId())
         {
-            if (hasFocus)
+            if(hasFocus)
             {
                 m_editText_password.setError(null);
             }
             else
             {
-                if (Pattern.matches(REGEXPASSWORD, m_editText_password.getText().toString()))
+                if(Pattern.matches(REGEXPASSWORD, m_editText_password.getText().toString()))
                 {
                     m_editText_password.setError(null);
                 }
@@ -283,7 +276,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
         public void handleMessage(Message message)
         {
             super.handleMessage(message);
-            switch (message.what)
+            switch(message.what)
             {
                 case MESSAGE_GETRESPONSE_SUCCESS:
                 {
@@ -339,7 +332,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
                     @Override
                     public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException
                     {
-                        if (response.isSuccessful())
+                        if(response.isSuccessful())
                         {
                             String responseStr = response.body().string();
                             Log.i("LoginLog", "收到Post请求的响应内容:" + responseStr);
@@ -391,7 +384,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
     private void LoginResult(UserInfo userInfo)
     {
         IsLoginEd();
-        if (userInfo != null)
+        if(userInfo != null)
         {
             Log.i("LoginLog", "登录成功:用户真实姓名为:" + userInfo.getM_realName());
             UserSharedPreference.SetUserName(m_userView.getContext(), userInfo.getM_userName());
@@ -453,7 +446,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
                     public void run()
                     {
                         TIMELENGTH--;
-                        if (TIMELENGTH <= 0)
+                        if(TIMELENGTH <= 0)
                         {
                             IsLoginEd();
                             //从任务队列中取消任务

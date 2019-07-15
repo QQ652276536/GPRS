@@ -52,6 +52,7 @@ public class UserFragment extends Fragment
     //登录页
     private LoginFragment m_loginFragment;
     private RegisterFragment m_registerFragment;
+    private ForgetFragment m_forgetFragment;
     private TextView m_textView;
 
     private OnFragmentInteractionListener mListener;
@@ -160,11 +161,12 @@ public class UserFragment extends Fragment
 
     private void InitData()
     {
+        m_textView = m_userView.findViewById(R.id.textView_user);
+        //子碎片不在管理器中则添加进去
         if (m_loginFragment == null)
         {
             m_loginFragment = LoginFragment.newInstance("", "");
         }
-        //碎片不在管理器中则添加进去
         if (!m_loginFragment.isAdded())
         {
             getChildFragmentManager().beginTransaction().add(R.id.fragment_current_user, m_loginFragment).commitAllowingStateLoss();
@@ -182,6 +184,13 @@ public class UserFragment extends Fragment
         {
             getChildFragmentManager().beginTransaction().add(R.id.fragment_current_user, m_registerFragment).commitAllowingStateLoss();
         }
-        m_textView = m_userView.findViewById(R.id.textView_user);
+        if (m_forgetFragment == null)
+        {
+            m_forgetFragment = ForgetFragment.newInstance("", "");
+        }
+        if (!m_forgetFragment.isAdded())
+        {
+            getChildFragmentManager().beginTransaction().add(R.id.fragment_current_user, m_forgetFragment).commitAllowingStateLoss();
+        }
     }
 }
