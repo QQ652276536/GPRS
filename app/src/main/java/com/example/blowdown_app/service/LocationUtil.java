@@ -16,7 +16,6 @@ import java.util.List;
 public class LocationUtil
 {
     private LocationClient m_locationClient;
-    private MyLocationListener m_myLocationListener = new MyLocationListener();
 
 
     public LocationUtil()
@@ -27,9 +26,36 @@ public class LocationUtil
     {
         //声明定位的类
         m_locationClient = new LocationClient(context);
-        //注册监听
-        m_locationClient.registerLocationListener(m_myLocationListener);
-        Start();
+    }
+
+    /**
+     * 取消监听
+     *
+     * @param listener
+     */
+    public void UnregisterListener(BDAbstractLocationListener listener)
+    {
+        if(listener != null)
+        {
+            m_locationClient.unRegisterLocationListener(listener);
+        }
+    }
+
+    /**
+     * 注册监听
+     *
+     * @param listener
+     * @return
+     */
+    public boolean RegisterListener(BDAbstractLocationListener listener)
+    {
+        boolean isSuccess = false;
+        if(listener != null)
+        {
+            m_locationClient.registerLocationListener(listener);
+            isSuccess = true;
+        }
+        return isSuccess;
     }
 
     /**
@@ -100,52 +126,6 @@ public class LocationUtil
         //需将配置好的LocationClientOption对象,通过setLocOption方法传递给LocationClient对象使用
         //更多LocationClientOption的配置,请参照类参考中LocationClientOption类的详细说明
         m_locationClient.setLocOption(option);
-    }
-
-    /**
-     * 实现定位监听,该接口会异步获取定位结果
-     */
-    private class MyLocationListener extends BDAbstractLocationListener
-    {
-        //此处的BDLocation为定位结果信息类,通过它的各种get方法可获取定位相关的全部结果
-        // 以下只列举部分获取经纬度相关（常用）的结果信息更多结果信息获取说明,请参照类参考中BDLocation类中的说明
-        @Override
-        public void onReceiveLocation(BDLocation location)
-        {
-            //获取纬度信息
-            double latitude = location.getLatitude();
-            //获取经度信息
-            double longitude = location.getLongitude();
-            //获取定位精度,默认值为0.0f
-            float radius = location.getRadius();
-            //获取经纬度坐标类型,以LocationClientOption中设置过的坐标类型为准
-            String coorType = location.getCoorType();
-            //获取定位类型、定位错误返回码,具体信息可参照类参考中BDLocation类中的说明
-            int errorCode = location.getLocType();
-            //获取详细地址信息
-            String addr = location.getAddrStr();
-            //获取国家
-            String country = location.getCountry();
-            //获取省份
-            String province = location.getProvince();
-            //获取城市
-            String city = location.getCity();
-            //获取区县
-            String district = location.getDistrict();
-            //获取街道信息
-            String street = location.getStreet();
-            //获取位置描述信息
-            String locationDescribe = location.getLocationDescribe();
-            //获取周边POI信息
-            List<Poi> poiList = location.getPoiList();
-            //POI信息包括POI ID、名称等,具体信息请参照类参考中POI类的相关说明
-            if(poiList != null)
-            {
-                for(Poi poi : poiList)
-                {
-                }
-            }
-        }
     }
 
 }
