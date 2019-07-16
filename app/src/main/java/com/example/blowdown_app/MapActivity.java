@@ -184,7 +184,7 @@ public class MapActivity extends AppCompatActivity
                     //运营商信息
                     sb.append("\n运营商信息 : ");
                     sb.append(location.getOperators());
-                    sb.append("网络定位成功");
+                    sb.append("\n网络定位成功");
                 }
                 //离线定位结果
                 else if(location.getLocType() == BDLocation.TypeOffLineLocation)
