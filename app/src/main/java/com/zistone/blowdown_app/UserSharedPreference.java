@@ -1,4 +1,4 @@
-package com.example.blowdown_app;
+package com.zistone.blowdown_app;
 
 import android.content.Context;
 import android.content.SharedPreferences;

@@ -1,4 +1,4 @@
-package com.example.blowdown_app.entity;
+package com.zistone.blowdown_app.entity;
 
 import java.util.Date;
 

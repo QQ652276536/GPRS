@@ -1,44 +1,15 @@
-package com.example.blowdown_app.fragment;
+package com.zistone.blowdown_app.fragment;
 
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.example.blowdown_app.R;
-import com.example.blowdown_app.UserSharedPreference;
-import com.example.blowdown_app.entity.UserInfo;
-import com.example.blowdown_app.http.HttpClientUtil;
-import com.example.blowdown_app.http.LoginCallBackListener;
-import com.example.blowdown_app.http.OkHttpUtil;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
-import org.jetbrains.annotations.NotNull;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.regex.Pattern;
-
-import okhttp3.Call;
-import okhttp3.Response;
+import com.zistone.blowdown_app.R;
 
 public class UserFragment extends Fragment
 {

@@ -1,4 +1,4 @@
-package com.example.blowdown_app.fragment;
+package com.zistone.blowdown_app.fragment;
 
 import android.content.Context;
 import android.net.Uri;
@@ -17,25 +17,15 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.example.blowdown_app.R;
-import com.example.blowdown_app.UserSharedPreference;
-import com.example.blowdown_app.entity.UserInfo;
-import com.example.blowdown_app.http.HttpClientUtil;
-import com.example.blowdown_app.http.OkHttpUtil;
+import com.zistone.blowdown_app.R;
+import com.zistone.blowdown_app.entity.UserInfo;
+import com.zistone.blowdown_app.http.HttpClientUtil;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import org.jetbrains.annotations.NotNull;
-
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.regex.Pattern;
-
-import okhttp3.Call;
-import okhttp3.Response;
 
 public class RegisterFragment extends Fragment implements View.OnClickListener, View.OnFocusChangeListener
 {

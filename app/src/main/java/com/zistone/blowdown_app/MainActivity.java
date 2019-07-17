@@ -1,4 +1,4 @@
-package com.example.blowdown_app;
+package com.zistone.blowdown_app;
 
 import android.net.Uri;
 import android.os.Bundle;
@@ -10,12 +10,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.example.blowdown_app.fragment.DeviceFragment;
-import com.example.blowdown_app.fragment.ForgetFragment;
-import com.example.blowdown_app.fragment.LoginFragment;
-import com.example.blowdown_app.fragment.MapFragment;
-import com.example.blowdown_app.fragment.RegisterFragment;
-import com.example.blowdown_app.fragment.UserFragment;
+import com.zistone.blowdown_app.R;
+import com.zistone.blowdown_app.fragment.DeviceFragment;
+import com.zistone.blowdown_app.fragment.ForgetFragment;
+import com.zistone.blowdown_app.fragment.LoginFragment;
+import com.zistone.blowdown_app.fragment.MapFragment;
+import com.zistone.blowdown_app.fragment.RegisterFragment;
+import com.zistone.blowdown_app.fragment.UserFragment;
 
 public class MainActivity extends AppCompatActivity implements MapFragment.OnFragmentInteractionListener, DeviceFragment.OnFragmentInteractionListener
         , UserFragment.OnFragmentInteractionListener, LoginFragment.OnFragmentInteractionListener, RegisterFragment.OnFragmentInteractionListener

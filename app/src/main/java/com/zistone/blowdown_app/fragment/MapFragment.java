@@ -1,4 +1,4 @@
-package com.example.blowdown_app.fragment;
+package com.zistone.blowdown_app.fragment;
 
 import android.content.Context;
 import android.net.Uri;
@@ -8,7 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.blowdown_app.R;
+import com.zistone.blowdown_app.R;
 
 
 /**

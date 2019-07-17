@@ -1,4 +1,4 @@
-package com.example.blowdown_app.fragment;
+package com.zistone.blowdown_app.fragment;
 
 import android.content.Context;
 import android.net.Uri;
@@ -8,18 +8,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.blowdown_app.R;
-
+import com.zistone.blowdown_app.R;
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link DeviceFragment.OnFragmentInteractionListener} interface
+ * {@link ForgetFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link DeviceFragment#newInstance} factory method to
+ * Use the {@link ForgetFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class DeviceFragment extends Fragment
+public class ForgetFragment extends Fragment
 {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -32,7 +31,7 @@ public class DeviceFragment extends Fragment
 
     private OnFragmentInteractionListener mListener;
 
-    public DeviceFragment()
+    public ForgetFragment()
     {
         // Required empty public constructor
     }
@@ -43,12 +42,12 @@ public class DeviceFragment extends Fragment
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment DeviceFragment.
+     * @return A new instance of fragment ForgetFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static DeviceFragment newInstance(String param1, String param2)
+    public static ForgetFragment newInstance(String param1, String param2)
     {
-        DeviceFragment fragment = new DeviceFragment();
+        ForgetFragment fragment = new ForgetFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -72,7 +71,7 @@ public class DeviceFragment extends Fragment
                              Bundle savedInstanceState)
     {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_device, container, false);
+        return inflater.inflate(R.layout.fragment_forget, container, false);
     }
 
     // TODO: Rename method, update argument and hook method into UI event

@@ -1,23 +1,16 @@
-package com.example.blowdown_app.http;
+package com.zistone.blowdown_app.http;
 
-import android.annotation.SuppressLint;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 
-import com.example.blowdown_app.entity.UserInfo;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import org.jetbrains.annotations.NotNull;
-import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.LogRecord;
 
 import okhttp3.Call;
 import okhttp3.Callback;
