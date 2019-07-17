@@ -1,4 +1,4 @@
-package com.zistone.blowdown_app;
+package com.zistone.blowdown_app.activity;
 
 import android.Manifest;
 import android.content.BroadcastReceiver;

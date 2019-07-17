@@ -34,7 +34,7 @@
             android:value="NX5tgDi30WdDbxYv9XIXyqSefUqwwQW7" />
 
         <activity
-            android:name="com.zistone.blowdown_app.MapActivity"
+            android:name="com.zistone.blowdown_app.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
