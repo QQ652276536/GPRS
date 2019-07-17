@@ -1,5 +1,9 @@
 package com.example.blowdown_app;
 
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
@@ -11,14 +15,104 @@ import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.baidu.location.Poi;
 import com.baidu.mapapi.map.BaiduMap;
+import com.baidu.mapapi.map.BitmapDescriptor;
+import com.baidu.mapapi.map.MapStatus;
+import com.baidu.mapapi.map.MapStatusUpdateFactory;
+import com.baidu.mapapi.map.MapView;
+import com.baidu.mapapi.map.MyLocationConfiguration;
+import com.baidu.mapapi.map.MyLocationData;
+import com.baidu.mapapi.model.LatLng;
 import com.example.blowdown_app.service.LocationUtil;
 
 import java.util.List;
 
-public class MapActivity extends AppCompatActivity
+public class MapActivity extends AppCompatActivity implements SensorEventListener
 {
     private LocationUtil m_locationUtil;
+    private LocationClient m_locationClient;
     private TextView m_text;
+    private MapView m_mapView;
+    private BaiduMap m_baiduMap;
+    private SensorManager m_sensorManager;
+    //是否首次定位
+    private boolean m_isFirstLoc = true;
+    private double m_lastX;
+    private MyLocationData m_locationData;
+    private int m_currentDirection;
+    //当前纬度
+    private double m_currentLat;
+    //当前经度
+    private double m_currentLon;
+    //当前定位精度
+    private float m_currentAccracy;
+
+    @Override
+    protected void onDestroy()
+    {
+        //停止定位
+        m_locationClient.stop();
+        //关闭定位图层
+        m_baiduMap.setMyLocationEnabled(false);
+        m_mapView.onDestroy();
+        m_mapView = null;
+        super.onDestroy();
+    }
+
+    /**
+     * Activity不可见时
+     */
+    @Override
+    protected void onStop()
+    {
+        //注销监听
+        m_locationUtil.UnregisterListener(m_myLocationListener);
+        m_locationClient.unRegisterLocationListener(m_myLocationListener);
+        //停止定位服务
+        m_locationUtil.Stop();
+        super.onStop();
+    }
+
+    /**
+     * Activity获得焦点时,Activity执行在这之后
+     */
+    @Override
+    protected void onResume()
+    {
+        m_mapView.onResume();
+        super.onResume();
+        //为系统的方向传感器注册监听器
+        m_sensorManager.registerListener(this, m_sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION), SensorManager.SENSOR_DELAY_UI);
+    }
+
+    /**
+     * Activity失去焦点时
+     */
+    @Override
+    protected void onPause()
+    {
+        m_mapView.onPause();
+        super.onPause();
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent sensorEvent)
+    {
+        double x = sensorEvent.values[SensorManager.DATA_X];
+        if(Math.abs(x - m_lastX) > 1.0)
+        {
+            m_currentDirection = (int) x;
+            m_locationData = new MyLocationData.Builder().accuracy(m_currentAccracy).direction(m_currentDirection).latitude(m_currentLat).longitude(m_currentLon).build();
+            //此处设置开发者获取到的方向信息,顺时针0-360
+            m_baiduMap.setMyLocationData(m_locationData);
+        }
+        m_lastX = x;
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy)
+    {
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -26,19 +120,37 @@ public class MapActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
         m_text = findViewById(R.id.textView);
+        //获取传感器管理服务
+        m_sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        //支持TextView内容滑动
         m_text.setMovementMethod(ScrollingMovementMethod.getInstance());
+        m_mapView = findViewById(R.id.mapView);
+        //地图初始化
+        MapStatus.Builder builder = new MapStatus.Builder();
+        builder.overlook(0);
+        m_baiduMap = m_mapView.getMap();
+        m_baiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(builder.build()));
+        //定位模式:罗盘
+        MyLocationConfiguration locationConfiguration = new MyLocationConfiguration(MyLocationConfiguration.LocationMode.COMPASS, true, null);
+        m_baiduMap.setMyLocationConfiguration(locationConfiguration);
+        //开启定位图层
+        m_baiduMap.setMyLocationEnabled(true);
+        //定位初始化
+        m_locationClient = new LocationClient(this);
+        m_locationClient.registerLocationListener(m_myLocationListener);
+        LocationClientOption option = new LocationClientOption();
+        //打开GPS
+        option.setOpenGps(true);
+        //设置坐标类型
+        option.setCoorType("bd09ll");
+        option.setScanSpan(1000);
+        m_locationClient.setLocOption(option);
+        m_locationClient.start();
     }
 
-    @Override
-    protected void onStop()
-    {
-        //注销监听
-        m_locationUtil.UnregisterListener(m_myLocationListener);
-        //停止定位服务
-        m_locationUtil.Stop();
-        super.onStop();
-    }
-
+    /**
+     * Activity可见时
+     */
     @Override
     protected void onStart()
     {
@@ -104,14 +216,17 @@ public class MapActivity extends AppCompatActivity
                 sb.append(location.getTime());
                 //获取纬度信息
                 double latitude = location.getLatitude();
+                m_currentLat = latitude;
                 sb.append("\n纬度 : ");
                 sb.append(latitude);
                 //获取经度信息
                 double longitude = location.getLongitude();
+                m_currentLon = longitude;
                 sb.append("\n经度 : ");
                 sb.append(longitude);
                 //获取定位精度,默认值为0.0f
                 float radius = location.getRadius();
+                m_currentAccracy = radius;
                 sb.append("\n精度 : ");
                 sb.append(radius);
                 //获取经纬度坐标类型,以LocationClientOption中设置过的坐标类型为准
@@ -203,9 +318,27 @@ public class MapActivity extends AppCompatActivity
                 {
                     sb.append("无法获取有效定位依据导致定位失败,一般是由于手机的原因,处于飞行模式下一般会造成这种结果,可以试着重启手机");
                 }
-                PrintLocationResult(sb.toString());
+                //将定位信息显示在TextView
+                //PrintLocationResult(sb.toString());
+                m_locationData = new MyLocationData.Builder().accuracy(location.getRadius()).direction(m_currentDirection).latitude(location.getLatitude()).longitude(location.getLongitude()).build();
+                //此处设置开发者获取到的方向信息,顺时针0-360
+                m_baiduMap.setMyLocationData(m_locationData);
+                //如果是首次定位
+                if(m_isFirstLoc)
+                {
+                    m_isFirstLoc = false;
+                    LatLng ll = new LatLng(location.getLatitude(), location.getLongitude());
+                    MapStatus.Builder builder = new MapStatus.Builder();
+                    builder.target(ll).zoom(18.0f);
+                    m_baiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(builder.build()));
+                }
             }
         }
     };
 
+    @Override
+    public void onPointerCaptureChanged(boolean hasCapture)
+    {
+
+    }
 }
