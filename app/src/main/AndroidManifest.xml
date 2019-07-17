@@ -27,11 +27,11 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"><!-- 使用明文通信,不推荐 -->
 
-        <!-- AK鉴权 -->
+        <!-- 华为平板的AK鉴权 -->
         <!-- meta-data需要写在application中 -->
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
-            android:value="iHpQqgevg3XxMWbPDWTyoY9Mm7plx2qi" />
+            android:value="NX5tgDi30WdDbxYv9XIXyqSefUqwwQW7" />
 
         <activity
             android:name="com.zistone.blowdown_app.MapActivity"

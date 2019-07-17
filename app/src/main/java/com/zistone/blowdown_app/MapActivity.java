@@ -1,12 +1,22 @@
 package com.zistone.blowdown_app;
 
+import android.Manifest;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.text.method.ScrollingMovementMethod;
+import android.view.View;
 import android.widget.TextView;
 
 import com.baidu.location.BDAbstractLocationListener;
@@ -14,6 +24,7 @@ import com.baidu.location.BDLocation;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.baidu.location.Poi;
+import com.baidu.mapapi.SDKInitializer;
 import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.MapStatus;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
@@ -23,13 +34,14 @@ import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.model.LatLng;
 import com.zistone.blowdown_app.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MapActivity extends AppCompatActivity implements SensorEventListener
 {
     private MyLocationListener m_locationListener = new MyLocationListener();
     private LocationClient m_locationClient;
-    private TextView m_text;
+    private TextView m_textView;
     private MapView m_mapView;
     private BaiduMap m_baiduMap;
     private SensorManager m_sensorManager;
@@ -44,6 +56,77 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
     private double m_currentLon;
     //当前定位精度
     private float m_currentAccracy;
+    private boolean m_isPermissionRequested;
+    private SDKReceiver m_sdkReceiver;
+
+    /**
+     * Android6.0之后需要动态申请权限
+     */
+    private void RequestPermission()
+    {
+        if (Build.VERSION.SDK_INT >= 23 && !m_isPermissionRequested)
+        {
+            m_isPermissionRequested = true;
+            ArrayList<String> permissionsList = new ArrayList<>();
+            String[] permissions = {
+                    Manifest.permission.ACCESS_NETWORK_STATE,
+                    Manifest.permission.INTERNET,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.WRITE_SETTINGS,
+                    Manifest.permission.ACCESS_WIFI_STATE,
+            };
+            for (String perm : permissions)
+            {
+                if (PackageManager.PERMISSION_GRANTED != checkSelfPermission(perm))
+                {
+                    //进入到这里代表没有权限
+                    permissionsList.add(perm);
+                }
+            }
+            if (!permissionsList.isEmpty())
+            {
+                requestPermissions(permissionsList.toArray(new String[permissionsList.size()]), 0);
+            }
+        }
+    }
+
+    /**
+     * 构造广播监听类,监听SDK的Key验证以及网络异常广播
+     */
+    public class SDKReceiver extends BroadcastReceiver
+    {
+        @Override
+        public void onReceive(Context context, Intent intent)
+        {
+            String action = intent.getAction();
+            if (TextUtils.isEmpty(action))
+            {
+                return;
+            }
+            //鉴权错误信息描述
+            m_textView.setTextColor(Color.RED);
+            if (action.equals(SDKInitializer.SDK_BROADTCAST_ACTION_STRING_PERMISSION_CHECK_ERROR))
+            {
+                m_textView.setText("Key验证出错!错误码:"
+                        + intent.getIntExtra(SDKInitializer.SDK_BROADTCAST_INTENT_EXTRA_INFO_KEY_ERROR_CODE, 0)
+                        + ";错误信息:"
+                        + intent.getStringExtra(SDKInitializer.SDK_BROADTCAST_INTENT_EXTRA_INFO_KEY_ERROR_MESSAGE));
+            }
+            else if (action.equals(SDKInitializer.SDK_BROADCAST_ACTION_STRING_NETWORK_ERROR))
+            {
+                m_textView.setText("网络出错");
+            }
+            else if (action.equals(SDKInitializer.SDK_BROADTCAST_ACTION_STRING_PERMISSION_CHECK_OK))
+            {
+                m_textView.setText("Key验证成功!功能可以正常使用");
+                m_textView.setTextColor(Color.GREEN);
+                m_textView.setVisibility(View.GONE);
+            }
+        }
+    }
 
     /**
      * 定位结果回调
@@ -56,7 +139,7 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
             //此处的BDLocation为定位结果信息类,通过它的各种get方法可获取定位相关的全部结果
             //以下只列举部分获取经纬度相关（常用）的结果信息更多结果信息获取说明,请参照类参考中BDLocation类中的说明
             //BDLocation.TypeServerError:服务端定位失败,请您检查是否禁用获取位置信息权限,尝试重新请求定位
-            if(null == m_mapView || null == location || BDLocation.TypeServerError == location.getLocType())
+            if (null == m_mapView || null == location || BDLocation.TypeServerError == location.getLocType())
             {
                 return;
             }
@@ -119,14 +202,14 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
             //获取周边POI信息
             List<Poi> poiList = location.getPoiList();
             //POI信息包括POI ID、名称等,具体信息请参照类参考中POI类的相关说明
-            if(poiList != null)
+            if (poiList != null)
             {
-                for(Poi poi : poiList)
+                for (Poi poi : poiList)
                 {
                 }
             }
             //GPS定位结果
-            if(location.getLocType() == BDLocation.TypeGpsLocation)
+            if (location.getLocType() == BDLocation.TypeGpsLocation)
             {
                 sb.append("\n速度(km/h) : ");
                 sb.append(location.getSpeed());
@@ -139,10 +222,10 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
                 sb.append("GPS定位成功");
             }
             //网络定位结果
-            else if(location.getLocType() == BDLocation.TypeNetWorkLocation)
+            else if (location.getLocType() == BDLocation.TypeNetWorkLocation)
             {
                 //如果有海拔高度
-                if(location.hasAltitude())
+                if (location.hasAltitude())
                 {
                     sb.append("\n海拔(米) : ");
                     sb.append(location.getAltitude());
@@ -153,19 +236,19 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
                 sb.append("\n网络定位成功");
             }
             //离线定位结果
-            else if(location.getLocType() == BDLocation.TypeOffLineLocation)
+            else if (location.getLocType() == BDLocation.TypeOffLineLocation)
             {
                 sb.append("离线定位成功,离线定位结果也是有效的");
             }
-            else if(location.getLocType() == BDLocation.TypeServerError)
+            else if (location.getLocType() == BDLocation.TypeServerError)
             {
                 sb.append("服务端网络定位失败,可以反馈IMEI号和大体定位时间到loc-bugs@baidu.com,会有人追查原因");
             }
-            else if(location.getLocType() == BDLocation.TypeNetWorkException)
+            else if (location.getLocType() == BDLocation.TypeNetWorkException)
             {
                 sb.append("网络不同导致定位失败,请检查网络是否通畅");
             }
-            else if(location.getLocType() == BDLocation.TypeCriteriaException)
+            else if (location.getLocType() == BDLocation.TypeCriteriaException)
             {
                 sb.append("无法获取有效定位依据导致定位失败,一般是由于手机的原因,处于飞行模式下一般会造成这种结果,可以试着重启手机");
             }
@@ -175,7 +258,7 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
             //此处设置开发者获取到的方向信息,顺时针0-360
             m_baiduMap.setMyLocationData(m_locationData);
             //如果是首次定位
-            if(m_isFirstLoc)
+            if (m_isFirstLoc)
             {
                 m_isFirstLoc = false;
                 //根据经纬度定位位置
@@ -202,19 +285,19 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
                 @Override
                 public void run()
                 {
-                    m_text.post(new Runnable()
+                    m_textView.post(new Runnable()
                     {
                         @Override
                         public void run()
                         {
-                            m_text.setText(finalStr);
+                            m_textView.setText(finalStr);
                         }
                     });
 
                 }
             }).start();
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             e.printStackTrace();
         }
@@ -289,6 +372,8 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
         m_baiduMap.setMyLocationEnabled(false);
         m_mapView.onDestroy();
         m_mapView = null;
+        //取消监听SDK广播
+        unregisterReceiver(m_sdkReceiver);
         super.onDestroy();
     }
 
@@ -329,7 +414,7 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
     public void onSensorChanged(SensorEvent sensorEvent)
     {
         double x = sensorEvent.values[SensorManager.DATA_X];
-        if(Math.abs(x - m_lastX) > 1.0)
+        if (Math.abs(x - m_lastX) > 1.0)
         {
             m_currentDirection = (int) x;
             m_locationData = new MyLocationData.Builder().accuracy(m_currentAccracy).direction(m_currentDirection).latitude(m_currentLat).longitude(m_currentLon).build();
@@ -349,12 +434,21 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
-        m_text = findViewById(R.id.textView);
+        m_textView = findViewById(R.id.textView);
+        m_mapView = findViewById(R.id.mapView);
+        //动态获取权限
+        RequestPermission();
+        //注册SDK广播监听者
+        IntentFilter iFilter = new IntentFilter();
+        iFilter.addAction(SDKInitializer.SDK_BROADTCAST_ACTION_STRING_PERMISSION_CHECK_OK);
+        iFilter.addAction(SDKInitializer.SDK_BROADTCAST_ACTION_STRING_PERMISSION_CHECK_ERROR);
+        iFilter.addAction(SDKInitializer.SDK_BROADCAST_ACTION_STRING_NETWORK_ERROR);
+        m_sdkReceiver = new SDKReceiver();
+        registerReceiver(m_sdkReceiver, iFilter);
         //获取传感器管理服务
         m_sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         //支持TextView内容滑动
-        m_text.setMovementMethod(ScrollingMovementMethod.getInstance());
-        m_mapView = findViewById(R.id.mapView);
+        m_textView.setMovementMethod(ScrollingMovementMethod.getInstance());
         //地图初始化
         MapStatus.Builder builder = new MapStatus.Builder();
         builder.overlook(0);
