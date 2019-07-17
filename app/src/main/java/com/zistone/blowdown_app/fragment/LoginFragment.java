@@ -468,6 +468,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
         m_editText_password.setOnFocusChangeListener(this);
         m_btn_login = m_userView.findViewById(R.id.btn_login_login);
         m_btn_login.setOnClickListener(this);
+        //强制让登录按钮获得焦点
+        m_btn_login.requestFocus();
         m_btn_register = m_userView.findViewById(R.id.btn_register_login);
         m_btn_register.setOnClickListener(this);
         m_btn_forget = m_userView.findViewById(R.id.btn_forget_login);

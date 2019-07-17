@@ -7,6 +7,9 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.net.Uri;
 import android.os.Build;
@@ -39,7 +42,7 @@ import java.util.List;
 
 import static android.content.Context.SENSOR_SERVICE;
 
-public class MapFragment extends Fragment implements View.OnClickListener, View.OnFocusChangeListener
+public class MapFragment extends Fragment implements View.OnClickListener, SensorEventListener
 {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
@@ -92,6 +95,25 @@ public class MapFragment extends Fragment implements View.OnClickListener, View.
         args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent event)
+    {
+        double x = event.values[SensorManager.DATA_X];
+        if (Math.abs(x - m_lastX) > 1.0)
+        {
+            m_currentDirection = (int) x;
+            m_locationData = new MyLocationData.Builder().accuracy(m_currentAccracy).direction(m_currentDirection).latitude(m_currentLat).longitude(m_currentLon).build();
+            //此处设置开发者获取到的方向信息,顺时针0-360
+            m_baiduMap.setMyLocationData(m_locationData);
+        }
+        m_lastX = x;
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy)
+    {
     }
 
     /**
@@ -408,6 +430,8 @@ public class MapFragment extends Fragment implements View.OnClickListener, View.
     public void onStop()
     {
         super.onStop();
+        //取消注册传感器监听
+        m_sensorManager.unregisterListener(this);
     }
 
     /**
@@ -481,8 +505,11 @@ public class MapFragment extends Fragment implements View.OnClickListener, View.
     }
 
     @Override
-    public void onFocusChange(View v, boolean hasFocus)
+    public void onResume()
     {
+        super.onResume();
+        //为系统的方向传感器注册监听器
+        m_sensorManager.registerListener(this, m_sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION), SensorManager.SENSOR_DELAY_UI);
     }
 
     public interface OnFragmentInteractionListener
