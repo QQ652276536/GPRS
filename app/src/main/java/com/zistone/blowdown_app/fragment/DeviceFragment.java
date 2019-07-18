@@ -140,9 +140,9 @@ public class DeviceFragment extends Fragment
             @Override
             public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target)
             {
-                //得到当拖拽的viewHolder的Position
+                //得到当前拖拽的Item的位置
                 int fromPosition = viewHolder.getAdapterPosition();
-                //拿到当前拖拽到的item的viewHolder
+                //要拖拽到的Item的位置
                 int toPosition = target.getAdapterPosition();
                 if(fromPosition < toPosition)
                 {
@@ -214,7 +214,7 @@ public class DeviceFragment extends Fragment
             {
                 m_listStr.remove(position);
                 m_leftSlideRemoveAdapter.notifyDataSetChanged();
-                Toast.makeText(m_context, " position = " + position, Toast.LENGTH_SHORT).show();
+                //Toast.makeText(m_context, " position = " + position, Toast.LENGTH_SHORT).show();
             }
         };
     }
