@@ -51,7 +51,7 @@ public class DeviceFragment extends Fragment
     private LeftSlideRemoveView m_leftSlideRemoveView;
 
     private String[] titles = {
-            "设备A\n00000000001", "设备B\n00000000001", "设备C\n00000000001", "设备D\n00000000001", "设备E\n00000000001", "设备F\n00000000001", "设备G\n00000000001", "设备H\n00000000001", "设备I\n00000000001"
+            "设备A\n000001", "设备B\n000001", "设备C\n000001", "设备D\n000001", "设备E\n000001", "设备F\n000001", "设备G\n000001", "设备H\n000001"
     };
     private List<String> m_listStr = new ArrayList<>();
     private ItemTouchHelper mItemTouchHelper;
