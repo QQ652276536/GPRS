@@ -389,7 +389,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
             UserSharedPreference.SetPassword(m_userView.getContext(), userInfo.getM_password());
             UserSharedPreference.SetRealName(m_userView.getContext(), userInfo.getM_realName());
             UserSharedPreference.SetLevel(m_userView.getContext(), userInfo.getM_level());
-            //TODO:跳转页面
+            //TODO:跳转至设备页面
         }
         else
         {

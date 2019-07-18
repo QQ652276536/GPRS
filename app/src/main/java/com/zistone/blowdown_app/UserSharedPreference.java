@@ -57,4 +57,17 @@ public class UserSharedPreference
         editor.putString("realName", realName);
         return editor.commit();
     }
+
+    public static int GetState(Context context)
+    {
+        return Share(context).getInt("state", 0);
+    }
+
+    public static boolean SetState(Context context, int state)
+    {
+        SharedPreferences.Editor editor = Share(context).edit();
+        editor.putInt("state", state);
+        return editor.commit();
+    }
+
 }

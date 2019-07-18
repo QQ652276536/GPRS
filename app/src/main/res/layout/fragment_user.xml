@@ -8,11 +8,34 @@
         android:id="@+id/textView_user"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="我是用户页" />
+        android:text="我是用户页,登录登出注册都是我的子碎片" />
+
     <LinearLayout
         android:id="@+id/fragment_current_user"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:orientation="vertical"></LinearLayout>
+        android:orientation="vertical">
+
+        <ProgressBar
+            android:id="@+id/progressBar_logout"
+            style="@android:style/Widget.DeviceDefault.Light.ProgressBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:visibility="invisible" />
+
+        <Button
+            android:id="@+id/btn_user_logout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="96dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="96dp"
+            android:layout_marginBottom="16dp"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:text="@string/title_logout" />
+    </LinearLayout>
 </LinearLayout>

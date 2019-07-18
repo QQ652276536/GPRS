@@ -7,11 +7,12 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.zistone.blowdown_app.R;
 
-public class UserFragment extends Fragment
+public class UserFragment extends Fragment implements View.OnClickListener
 {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
@@ -25,6 +26,7 @@ public class UserFragment extends Fragment
     private RegisterFragment m_registerFragment;
     private ForgetFragment m_forgetFragment;
     private TextView m_textView;
+    private Button m_btn_logout;
 
     private OnFragmentInteractionListener mListener;
 
@@ -51,6 +53,47 @@ public class UserFragment extends Fragment
         return fragment;
     }
 
+    private void InitData()
+    {
+        m_textView = m_userView.findViewById(R.id.textView_user);
+        m_btn_logout = m_userView.findViewById(R.id.btn_user_logout);
+        //子碎片不在管理器中则添加进去
+        if(m_loginFragment == null)
+        {
+            m_loginFragment = LoginFragment.newInstance("", "");
+        }
+        if(!m_loginFragment.isAdded())
+        {
+            getChildFragmentManager().beginTransaction().add(R.id.fragment_current_user, m_loginFragment).commitAllowingStateLoss();
+        }
+        //用户碎片的默认子碎片为登录
+        else
+        {
+            getChildFragmentManager().beginTransaction().show(m_loginFragment).commitAllowingStateLoss();
+        }
+        if(m_registerFragment == null)
+        {
+            m_registerFragment = RegisterFragment.newInstance("", "");
+        }
+        if(!m_registerFragment.isAdded())
+        {
+            getChildFragmentManager().beginTransaction().add(R.id.fragment_current_user, m_registerFragment).commitAllowingStateLoss();
+        }
+        if(m_forgetFragment == null)
+        {
+            m_forgetFragment = ForgetFragment.newInstance("", "");
+        }
+        if(!m_forgetFragment.isAdded())
+        {
+            getChildFragmentManager().beginTransaction().add(R.id.fragment_current_user, m_forgetFragment).commitAllowingStateLoss();
+        }
+    }
+
+    public interface OnFragmentInteractionListener
+    {
+        void onFragmentInteraction(Uri uri);
+    }
+
     /**
      * 停止Fragment时被回调
      */
@@ -69,7 +112,7 @@ public class UserFragment extends Fragment
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null)
+        if(getArguments() != null)
         {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -95,7 +138,7 @@ public class UserFragment extends Fragment
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri)
     {
-        if (mListener != null)
+        if(mListener != null)
         {
             mListener.onFragmentInteraction(uri);
         }
@@ -105,7 +148,7 @@ public class UserFragment extends Fragment
     public void onAttach(Context context)
     {
         super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener)
+        if(context instanceof OnFragmentInteractionListener)
         {
             mListener = (OnFragmentInteractionListener) context;
         }
@@ -125,43 +168,21 @@ public class UserFragment extends Fragment
         mListener = null;
     }
 
-    public interface OnFragmentInteractionListener
+    @Override
+    public void onClick(View v)
     {
-        void onFragmentInteraction(Uri uri);
-    }
-
-    private void InitData()
-    {
-        m_textView = m_userView.findViewById(R.id.textView_user);
-        //子碎片不在管理器中则添加进去
-        if (m_loginFragment == null)
+        if(v.getId() == R.id.btn_user_logout)
         {
-            m_loginFragment = LoginFragment.newInstance("", "");
-        }
-        if (!m_loginFragment.isAdded())
-        {
-            getChildFragmentManager().beginTransaction().add(R.id.fragment_current_user, m_loginFragment).commitAllowingStateLoss();
-        }
-        //默认在登录页
-        else
-        {
-            getChildFragmentManager().beginTransaction().show(m_loginFragment).commitAllowingStateLoss();
-        }
-        if (m_registerFragment == null)
-        {
-            m_registerFragment = RegisterFragment.newInstance("", "");
-        }
-        if (!m_registerFragment.isAdded())
-        {
-            getChildFragmentManager().beginTransaction().add(R.id.fragment_current_user, m_registerFragment).commitAllowingStateLoss();
-        }
-        if (m_forgetFragment == null)
-        {
-            m_forgetFragment = ForgetFragment.newInstance("", "");
-        }
-        if (!m_forgetFragment.isAdded())
-        {
-            getChildFragmentManager().beginTransaction().add(R.id.fragment_current_user, m_forgetFragment).commitAllowingStateLoss();
+            //TODO:注销成功后跳转至登录界面
+            if(!m_loginFragment.isAdded())
+            {
+                getChildFragmentManager().beginTransaction().add(R.id.fragment_current_user, m_loginFragment).commitAllowingStateLoss();
+            }
+            //用户碎片的默认子碎片为登录
+            else
+            {
+                getChildFragmentManager().beginTransaction().show(m_loginFragment).commitAllowingStateLoss();
+            }
         }
     }
 }

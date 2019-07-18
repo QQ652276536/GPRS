@@ -4,6 +4,7 @@ import java.util.Date;
 
 public class UserInfo
 {
+
     public UserInfo()
     {
     }
@@ -75,7 +76,7 @@ public class UserInfo
     }
 
     /**
-     * 用户权限
+     * 用户权限:1普通用户2管理员3超级管理员
      */
     private int m_level;
 
@@ -90,7 +91,7 @@ public class UserInfo
     }
 
     /**
-     * 用户状态
+     * 用户状态:1正常使用2注销3冻结
      */
     private int m_state;
 

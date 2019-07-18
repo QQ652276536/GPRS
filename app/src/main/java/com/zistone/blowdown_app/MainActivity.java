@@ -1,5 +1,6 @@
 package com.zistone.blowdown_app;
 
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -18,9 +19,7 @@ import com.zistone.blowdown_app.fragment.MapFragment;
 import com.zistone.blowdown_app.fragment.RegisterFragment;
 import com.zistone.blowdown_app.fragment.UserFragment;
 
-public class MainActivity extends AppCompatActivity implements MapFragment.OnFragmentInteractionListener, DeviceFragment.OnFragmentInteractionListener
-        , UserFragment.OnFragmentInteractionListener, LoginFragment.OnFragmentInteractionListener, RegisterFragment.OnFragmentInteractionListener
-        , ForgetFragment.OnFragmentInteractionListener
+public class MainActivity extends AppCompatActivity implements MapFragment.OnFragmentInteractionListener, DeviceFragment.OnFragmentInteractionListener, UserFragment.OnFragmentInteractionListener, LoginFragment.OnFragmentInteractionListener, RegisterFragment.OnFragmentInteractionListener, ForgetFragment.OnFragmentInteractionListener
 {
     //当前页,用来切换
     private Fragment m_currentFragment;
@@ -43,24 +42,44 @@ public class MainActivity extends AppCompatActivity implements MapFragment.OnFra
     {
         //底部导航栏
         BottomNavigationView bottomNavigationView = findViewById(R.id.nav_view);
-        //启动时默认在用户页
-        bottomNavigationView.setSelectedItemId(bottomNavigationView.getMenu().getItem(2).getItemId());
-        //实例化用户页
-        if (m_userFragment == null)
+        //启动时如果已经登录过则在设备页,否则在用户页的登录界面
+        if(!"".equals(UserSharedPreference.GetRealName(this)) && 1 == UserSharedPreference.GetState(this))
         {
-            m_userFragment = UserFragment.newInstance("", "");
-        }
-        //该碎片不在管理器中则添加进去
-        if (!m_userFragment.isAdded())
-        {
-            getSupportFragmentManager().beginTransaction().add(R.id.fragment_current, m_userFragment).commitAllowingStateLoss();
+            bottomNavigationView.setSelectedItemId(bottomNavigationView.getMenu().getItem(1).getItemId());
+            //实例化设备页
+            if(m_deviceFragment == null)
+            {
+                m_deviceFragment = DeviceFragment.newInstance("", "");
+            }
+            //该碎片不在管理器中则添加进去
+            if(!m_deviceFragment.isAdded())
+            {
+                getSupportFragmentManager().beginTransaction().add(R.id.fragment_current, m_deviceFragment).commitAllowingStateLoss();
+            }
+            else
+            {
+                getSupportFragmentManager().beginTransaction().show(m_deviceFragment).commitAllowingStateLoss();
+            }
+            m_currentFragment = m_deviceFragment;
         }
         else
         {
-            getSupportFragmentManager().beginTransaction().show(m_userFragment).commitAllowingStateLoss();
+            bottomNavigationView.setSelectedItemId(bottomNavigationView.getMenu().getItem(2).getItemId());
+            if(m_userFragment == null)
+            {
+                m_userFragment = UserFragment.newInstance("", "");
+            }
+            if(!m_userFragment.isAdded())
+            {
+                getSupportFragmentManager().beginTransaction().add(R.id.fragment_current, m_userFragment).commitAllowingStateLoss();
+            }
+            else
+            {
+                getSupportFragmentManager().beginTransaction().show(m_userFragment).commitAllowingStateLoss();
+            }
+            m_currentFragment = m_userFragment;
         }
-        m_currentFragment = m_userFragment;
-        //因为启动时默认选中用户页,所以要在后面注册监听事件
+        //因为启动时有默认选中页,防止事件重复触发,所以在后面注册监听事件
         bottomNavigationView.setOnNavigationItemSelectedListener(onNavigationItemSeletecListener);
     }
 
@@ -69,7 +88,7 @@ public class MainActivity extends AppCompatActivity implements MapFragment.OnFra
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem menuItem)
         {
-            switch (menuItem.getItemId())
+            switch(menuItem.getItemId())
             {
                 case R.id.navigation_map:
                     ClickMapItem();
@@ -87,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements MapFragment.OnFra
 
     private void ClickUserItem()
     {
-        if (m_userFragment == null)
+        if(m_userFragment == null)
         {
             m_userFragment = UserFragment.newInstance("", "");
         }
@@ -96,7 +115,7 @@ public class MainActivity extends AppCompatActivity implements MapFragment.OnFra
 
     private void ClickDeviceItem()
     {
-        if (m_deviceFragment == null)
+        if(m_deviceFragment == null)
         {
             m_deviceFragment = DeviceFragment.newInstance("", "");
         }
@@ -105,7 +124,7 @@ public class MainActivity extends AppCompatActivity implements MapFragment.OnFra
 
     private void ClickMapItem()
     {
-        if (m_mapFragment == null)
+        if(m_mapFragment == null)
         {
             m_mapFragment = MapFragment.newInstance("", "");
         }
@@ -114,12 +133,12 @@ public class MainActivity extends AppCompatActivity implements MapFragment.OnFra
 
     private void AddOrShowFragment(FragmentTransaction transaction, Fragment fragment)
     {
-        if (m_currentFragment == null)
+        if(m_currentFragment == null)
         {
             return;
         }
         //如果当前的Fragment未被添加到管理器中
-        if (!fragment.isAdded())
+        if(!fragment.isAdded())
         {
             transaction.hide(m_currentFragment).add(R.id.fragment_current, fragment).commitAllowingStateLoss();
         }
@@ -134,6 +153,6 @@ public class MainActivity extends AppCompatActivity implements MapFragment.OnFra
     @Override
     public void onFragmentInteraction(Uri uri)
     {
-        Toast.makeText(this, "----------------------------", Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "----------DuangDuangDuang------------", Toast.LENGTH_LONG).show();
     }
 }
