@@ -1,83 +1,65 @@
 package com.zistone.blowdown_app.control;
 
 import android.content.Context;
+import android.support.annotation.DrawableRes;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.zistone.blowdown_app.R;
-import com.zistone.blowdown_app.entity.DeviceInfo;
 
 import java.util.List;
 
-/**
- * 自定义Adapter
- */
-public abstract class LeftSlideRemoveAdapter extends BaseAdapter
+public class LeftSlideRemoveAdapter extends RecyclerView.Adapter<LeftSlideRemoveAdapter.ViewHolder>
 {
-    public Context m_context;
-    public OnItemRemoveListener m_listener;
 
-    public LeftSlideRemoveAdapter()
+    private List<String> m_listStr;
+    private Context m_context;
+    private LayoutInflater m_layoutInflater;
+
+    public LeftSlideRemoveAdapter(List<String> list, Context context)
     {
+        this.m_listStr = list;
+        this.m_context = context;
+        this.m_layoutInflater = LayoutInflater.from(context);
     }
 
-    public LeftSlideRemoveAdapter(Context context)
+    public class ViewHolder extends RecyclerView.ViewHolder
     {
-        this.m_context = context;
+        TextView m_textView;
+        ImageView m_image;
+        LinearLayout m_linear_item, m_linear_hidden;
+
+        public ViewHolder(View itemView)
+        {
+            super(itemView);
+            m_textView = itemView.findViewById(R.id.text_title);
+            m_image = itemView.findViewById(R.id.img);
+            m_linear_item = itemView.findViewById(R.id.linear_item);
+            m_linear_hidden = itemView.findViewById(R.id.linear_hidden);
+        }
     }
 
     @Override
-    public final View getView(final int position, View convertView, ViewGroup parent)
+    public LeftSlideRemoveAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
     {
-        ViewHolder holder;
-        if(convertView == null)
-        {
-            LayoutInflater inflater = LayoutInflater.from(m_context);
-            convertView = inflater.inflate(R.layout.view_left_slide_remove, parent, false);
-            holder = new ViewHolder();
-            holder.viewContent = convertView.findViewById(R.id.view_content);
-            holder.textRemove = convertView.findViewById(R.id.text_remove);
-            convertView.setTag(holder);
-            //viewChild是实际的界面
-            holder.viewChild = getSubView(position, null, parent);
-            holder.viewContent.addView(holder.viewChild);
-        }
-        else
-        {
-            holder = (ViewHolder) convertView.getTag();
-            getSubView(position, holder.viewChild, parent);
-        }
-        holder.textRemove.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                if(m_listener != null)
-                {
-                    m_listener.onItemRemove(position);
-                    notifyDataSetChanged();
-                }
-            }
-        });
-        return convertView;
+        return new ViewHolder(m_layoutInflater.inflate(R.layout.view_left_slide_remove, parent, false));
     }
 
-    public abstract View getSubView(int position, View convertView, ViewGroup parent);
-
-    public class ViewHolder
+    @Override
+    public void onBindViewHolder(LeftSlideRemoveAdapter.ViewHolder holder, int position)
     {
-        RelativeLayout viewContent;
-        View viewChild;
-        View textRemove;
+        holder.m_textView.setText(m_listStr.get(position));
+        holder.m_image.setImageResource(R.mipmap.device3);
     }
 
-    public interface OnItemRemoveListener
+    @Override
+    public int getItemCount()
     {
-        void onItemRemove(int position);
+        return m_listStr == null ? 0 : m_listStr.size();
     }
 }

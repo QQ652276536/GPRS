@@ -12,7 +12,7 @@ import android.widget.TextView;
 
 import com.zistone.blowdown_app.R;
 
-public class UserFragment extends Fragment implements View.OnClickListener
+public class UserFragment extends Fragment
 {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
@@ -25,8 +25,6 @@ public class UserFragment extends Fragment implements View.OnClickListener
     private LoginFragment m_loginFragment;
     private RegisterFragment m_registerFragment;
     private ForgetFragment m_forgetFragment;
-    private TextView m_textView;
-    private Button m_btn_logout;
 
     private OnFragmentInteractionListener mListener;
 
@@ -55,8 +53,6 @@ public class UserFragment extends Fragment implements View.OnClickListener
 
     private void InitData()
     {
-        m_textView = m_userView.findViewById(R.id.textView_user);
-        m_btn_logout = m_userView.findViewById(R.id.btn_user_logout);
         //子碎片不在管理器中则添加进去
         if(m_loginFragment == null)
         {
@@ -168,21 +164,4 @@ public class UserFragment extends Fragment implements View.OnClickListener
         mListener = null;
     }
 
-    @Override
-    public void onClick(View v)
-    {
-        if(v.getId() == R.id.btn_user_logout)
-        {
-            //TODO:注销成功后跳转至登录界面
-            if(!m_loginFragment.isAdded())
-            {
-                getChildFragmentManager().beginTransaction().add(R.id.fragment_current_user, m_loginFragment).commitAllowingStateLoss();
-            }
-            //用户碎片的默认子碎片为登录
-            else
-            {
-                getChildFragmentManager().beginTransaction().show(m_loginFragment).commitAllowingStateLoss();
-            }
-        }
-    }
 }
