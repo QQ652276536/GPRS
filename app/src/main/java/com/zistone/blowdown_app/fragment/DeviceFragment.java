@@ -51,8 +51,7 @@ public class DeviceFragment extends Fragment
     private LeftSlideRemoveView m_leftSlideRemoveView;
 
     private String[] titles = {
-            "设备A\n00000000001", "设备B\n00000000001", "设备C\n00000000001", "设备D\n00000000001", "设备E\n00000000001", "设备F\n00000000001"
-            ,"设备G\n00000000001", "设备H\n00000000001", "设备I\n00000000001"
+            "设备A\n00000000001", "设备B\n00000000001", "设备C\n00000000001", "设备D\n00000000001", "设备E\n00000000001", "设备F\n00000000001", "设备G\n00000000001", "设备H\n00000000001", "设备I\n00000000001"
     };
     private List<String> m_listStr = new ArrayList<>();
     private ItemTouchHelper mItemTouchHelper;
@@ -93,6 +92,7 @@ public class DeviceFragment extends Fragment
         m_leftSlideRemoveView.addItemDecoration(new DividerItemDecoration(m_context, DividerItemDecoration.VERTICAL));
         m_leftSlideRemoveAdapter = new LeftSlideRemoveAdapter(m_listStr, getContext());
         m_leftSlideRemoveView.setAdapter(m_leftSlideRemoveAdapter);
+        //注册触摸监听事件
         m_leftSlideRemoveView.addOnItemTouchListener(new OnRecyclerItemClickListener(m_leftSlideRemoveView)
         {
             @Override
@@ -112,7 +112,6 @@ public class DeviceFragment extends Fragment
                 }
             }
         });
-
         mItemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.Callback()
         {
             /**
@@ -206,13 +205,12 @@ public class DeviceFragment extends Fragment
                 viewHolder.itemView.setBackgroundColor(0);
             }
         });
-
         mItemTouchHelper.attachToRecyclerView(m_leftSlideRemoveView);
-
+        //隐藏部分(删除)点击事件的具体实现
         m_leftSlideRemoveView.m_rightListener = new LeftSlideRemoveView.OnRightClickListener()
         {
             @Override
-            public void onRightClick(int position, String id)
+            public void OnRightClick(int position, String id)
             {
                 m_listStr.remove(position);
                 m_leftSlideRemoveAdapter.notifyDataSetChanged();

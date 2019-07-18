@@ -13,6 +13,7 @@ import android.view.animation.LinearInterpolator;
 import android.widget.LinearLayout;
 import android.widget.Scroller;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.zistone.blowdown_app.R;
 
@@ -30,8 +31,6 @@ public class LeftSlideRemoveView extends RecyclerView
     private LinearLayout m_currentItemLayout, m_lastItemLayout;
     //隐藏部分
     private LinearLayout m_linearHidden;
-    private TextView m_textView;
-    private LinearLayout m_linearDel;
     //隐藏部分长度
     private int m_hiddenWidth;
     //记录连续移动的长度
@@ -129,16 +128,15 @@ public class LeftSlideRemoveView extends RecyclerView
                     m_currentItemLayout = viewHolder.m_linear_item;
                     //找到具体元素
                     m_linearHidden = m_currentItemLayout.findViewById(R.id.linear_hidden);
-                    m_linearDel = m_currentItemLayout.findViewById(R.id.linear_hidden);
-                    m_linearDel.setOnClickListener(new View.OnClickListener()
+                    //给隐藏部分(删除)注册点击事件
+                    m_linearHidden.setOnClickListener(new View.OnClickListener()
                     {
                         @Override
                         public void onClick(View v)
                         {
                             if(m_rightListener != null)
                             {
-                                //点击"删除"
-                                m_rightListener.onRightClick(m_currentSelectPosition, "");
+                                m_rightListener.OnRightClick(m_currentSelectPosition, "");
                             }
                         }
                     });
@@ -241,6 +239,6 @@ public class LeftSlideRemoveView extends RecyclerView
 
     public interface OnRightClickListener
     {
-        void onRightClick(int position, String id);
+        void OnRightClick(int position, String id);
     }
 }
