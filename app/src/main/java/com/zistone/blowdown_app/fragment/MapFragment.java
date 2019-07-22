@@ -91,6 +91,8 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
     private Marker m_marker;
     //标记的经纬度
     private LatLng m_latLng;
+    //标记的经纬度对应的详细信息
+    private String m_latLngStr = "山东省德州市平原县";
 
     private OnFragmentInteractionListener mListener;
 
@@ -475,16 +477,17 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
                 // 的地图旋转等效果
                 TextView textView = new TextView(getActivity());
                 //内容距中
-                textView.setGravity(Gravity.CENTER);
+                textView.setGravity(Gravity.LEFT);
                 //设置背景图片
                 //textView.setBackgroundResource(R.drawable.icon_gcoding);
-                textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
+                textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
                 textView.setTextColor(Color.RED);
                 //添加阴影
                 //textView.setShadowLayer(3, 0, 0, Color.BLACK);
-                textView.setText("百度地图SDK百度地图SDK\n百度地图SDK百度地图SDK\n百度地图SDK百度地图SDK");
+                textView.setText(m_latLngStr);
                 //释放使用的绘图缓存
                 textView.destroyDrawingCache();
+                //通过测量实现TextView和文字的大小一致
                 textView.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
                 textView.layout(0, 0, textView.getMeasuredWidth(), textView.getMeasuredHeight());
                 //启用绘制缓存
@@ -494,8 +497,6 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
                 BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(bitmapText);
                 textOverlayOptions = new MarkerOptions().icon(bitmapDescriptor).position(m_latLng);
                 m_baiduMap.addOverlay(textOverlayOptions);
-
-
                 //定义地图状态
                 MapStatus mapStatus = new MapStatus.Builder().target(m_latLng).zoom(14).build();
                 //定义MapStatusUpdate对象,以便描述地图状态将要发生的变化
