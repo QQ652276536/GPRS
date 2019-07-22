@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.hardware.Sensor;
@@ -18,6 +19,8 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.text.method.ScrollingMovementMethod;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +32,9 @@ import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.baidu.location.Poi;
 import com.baidu.mapapi.SDKInitializer;
+import com.baidu.mapapi.animation.Animation;
+import com.baidu.mapapi.animation.ScaleAnimation;
+import com.baidu.mapapi.animation.Transformation;
 import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.BitmapDescriptor;
 import com.baidu.mapapi.map.BitmapDescriptorFactory;
@@ -123,6 +129,44 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
     public interface OnFragmentInteractionListener
     {
         void onFragmentInteraction(Uri uri);
+    }
+
+    /**
+     * 创建平移动画
+     */
+    private Animation Transformation()
+    {
+        Point point = m_baiduMap.getProjection().toScreenLocation(m_latLng);
+        LatLng latLng = m_baiduMap.getProjection().fromScreenLocation(new Point(point.x, point.y - 30));
+        Transformation mTransforma = new Transformation(m_latLng, latLng, m_latLng);
+        mTransforma.setDuration(500);
+        //动画重复模式
+        mTransforma.setRepeatMode(Animation.RepeatMode.RESTART);
+        //动画重复次数
+        mTransforma.setRepeatCount(2);
+        mTransforma.setAnimationListener(new Animation.AnimationListener()
+        {
+            @Override
+            public void onAnimationStart()
+            {
+            }
+
+            @Override
+            public void onAnimationEnd()
+            {
+            }
+
+            @Override
+            public void onAnimationCancel()
+            {
+            }
+
+            @Override
+            public void onAnimationRepeat()
+            {
+            }
+        });
+        return mTransforma;
     }
 
     /**
@@ -425,14 +469,42 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
                 m_latLng = new LatLng(37.023537, 116.289429);
                 MarkerOptions markerOptions = new MarkerOptions().position(m_latLng).icon(ICON_MARKER);
                 m_marker = (Marker) (m_baiduMap.addOverlay(markerOptions));
-                OverlayOptions ooText = new TextOptions().bgColor(0xAAFFFF00).fontSize(26).fontColor(0xFFFF00FF).text("百度地图SDK百度地图SDK\r\n百度地图SDK\n百度地图SDK").rotate(0).position(m_latLng);
-                m_baiduMap.addOverlay(ooText);
+                OverlayOptions textOverlayOptions = new TextOptions().bgColor(0xAAFFFF00).fontSize(18).fontColor(0xFFFF00FF).text("百度地图SDK").rotate(0).position(m_latLng);
+                //m_baiduMap.addOverlay(textOverlayOptions);
+                //由于中心点偏差导致的效果很不理想,为了解决这个问题,可以采用TextView渲染Bitmap然后添加为图标覆盖物的方式,这样既可以实现换行,也可以控制中心点,实现正常
+                // 的地图旋转等效果
+                TextView textView = new TextView(getActivity());
+                //内容距中
+                textView.setGravity(Gravity.CENTER);
+                //设置背景图片
+                //textView.setBackgroundResource(R.drawable.icon_gcoding);
+                textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
+                textView.setTextColor(Color.RED);
+                //添加阴影
+                //textView.setShadowLayer(3, 0, 0, Color.BLACK);
+                textView.setText("百度地图SDK百度地图SDK\n百度地图SDK百度地图SDK\n百度地图SDK百度地图SDK");
+                //释放使用的绘图缓存
+                textView.destroyDrawingCache();
+                textView.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+                textView.layout(0, 0, textView.getMeasuredWidth(), textView.getMeasuredHeight());
+                //启用绘制缓存
+                textView.setDrawingCacheEnabled(true);
+                //将View的内容以图片的方式保存
+                Bitmap bitmapText = textView.getDrawingCache(true);
+                BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(bitmapText);
+                textOverlayOptions = new MarkerOptions().icon(bitmapDescriptor).position(m_latLng);
+                m_baiduMap.addOverlay(textOverlayOptions);
+
+
                 //定义地图状态
                 MapStatus mapStatus = new MapStatus.Builder().target(m_latLng).zoom(14).build();
-                //定义MapStatusUpdate对象，以便描述地图状态将要发生的变化
+                //定义MapStatusUpdate对象,以便描述地图状态将要发生的变化
                 MapStatusUpdate mapStatusUpdate = MapStatusUpdateFactory.newMapStatus(mapStatus);
                 //改变地图状态
                 m_baiduMap.setMapStatus(mapStatusUpdate);
+                //添加平移动画
+                m_marker.setAnimation(Transformation());
+                m_marker.startAnimation();
             }
         });
         /*********************************以上为根据提供的经纬度实现定位其它设备*********************************/
@@ -459,8 +531,9 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
     public void onDestroy()
     {
         m_marker.cancelAnimation();
-        //MapView的生命周期与Fragment同步，当Fragment销毁时需调用MapView.destroy()
+        //MapView的生命周期与Fragment同步,当Fragment销毁时需调用MapView.destroy()
         m_baiduMapView.onDestroy();
+        m_marker.remove();
         super.onDestroy();
         //回收Bitmap资源
         ICON_MARKER.recycle();
