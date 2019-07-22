@@ -90,7 +90,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
     //标记
     private Marker m_marker;
     //标记的经纬度
-    private LatLng m_latLng;
+    private LatLng m_latLng = new LatLng(37.023537, 116.289429);
     //标记的经纬度对应的详细信息
     private String m_latLngStr = "山东省德州市平原县";
 
@@ -467,8 +467,6 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
             @Override
             public void onMapLoaded()
             {
-                //设定经纬度
-                m_latLng = new LatLng(37.023537, 116.289429);
                 MarkerOptions markerOptions = new MarkerOptions().position(m_latLng).icon(ICON_MARKER);
                 m_marker = (Marker) (m_baiduMap.addOverlay(markerOptions));
                 OverlayOptions textOverlayOptions = new TextOptions().bgColor(0xAAFFFF00).fontSize(18).fontColor(0xFFFF00FF).text("百度地图SDK").rotate(0).position(m_latLng);
@@ -481,7 +479,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
                 //设置背景图片
                 //textView.setBackgroundResource(R.drawable.icon_gcoding);
                 textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
-                textView.setTextColor(Color.RED);
+                textView.setTextColor(Color.GREEN);
                 //添加阴影
                 //textView.setShadowLayer(3, 0, 0, Color.BLACK);
                 textView.setText(m_latLngStr);
