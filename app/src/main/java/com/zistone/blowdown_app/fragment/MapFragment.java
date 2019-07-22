@@ -479,7 +479,8 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
                 //设置背景图片
                 //textView.setBackgroundResource(R.drawable.icon_gcoding);
                 textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
-                textView.setTextColor(Color.GREEN);
+                //textView.setBackgroundColor(0xAAFFFF80);
+                textView.setTextColor(Color.RED);
                 //添加阴影
                 //textView.setShadowLayer(3, 0, 0, Color.BLACK);
                 textView.setText(m_latLngStr);
