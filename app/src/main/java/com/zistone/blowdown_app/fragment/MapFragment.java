@@ -39,6 +39,8 @@ import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.Marker;
 import com.baidu.mapapi.map.MarkerOptions;
 import com.baidu.mapapi.map.MyLocationData;
+import com.baidu.mapapi.map.OverlayOptions;
+import com.baidu.mapapi.map.TextOptions;
 import com.baidu.mapapi.model.LatLng;
 import com.zistone.blowdown_app.R;
 
@@ -52,7 +54,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     private static final String URL = "http://10.0.2.2:8080/Blowdown/UserInfo/Login";
-    private static final BitmapDescriptor BIT_MARKER_ICON = BitmapDescriptorFactory.fromResource(R.drawable.icon_mark);
+    private static final BitmapDescriptor ICON_MARKER = BitmapDescriptorFactory.fromResource(R.drawable.icon_mark);
 
     private String mParam1;
     private String mParam2;
@@ -282,8 +284,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
             m_textView.setTextColor(Color.RED);
             if(action.equals(SDKInitializer.SDK_BROADTCAST_ACTION_STRING_PERMISSION_CHECK_ERROR))
             {
-                m_textView.setText("Key验证出错!错误码:" + intent.getIntExtra(SDKInitializer.SDK_BROADTCAST_INTENT_EXTRA_INFO_KEY_ERROR_CODE,
-                        0) + ";错误信息:" + intent.getStringExtra(SDKInitializer.SDK_BROADTCAST_INTENT_EXTRA_INFO_KEY_ERROR_MESSAGE));
+                m_textView.setText("Key验证出错!错误码:" + intent.getIntExtra(SDKInitializer.SDK_BROADTCAST_INTENT_EXTRA_INFO_KEY_ERROR_CODE, 0) + ";错误信息:" + intent.getStringExtra(SDKInitializer.SDK_BROADTCAST_INTENT_EXTRA_INFO_KEY_ERROR_MESSAGE));
                 m_textView.setTextColor(Color.RED);
                 m_textView.setVisibility(View.INVISIBLE);
             }
@@ -372,9 +373,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
             m_isPermissionRequested = true;
             ArrayList<String> permissionsList = new ArrayList<>();
             String[] permissions = {
-                    Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.INTERNET, Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                    Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.ACCESS_COARSE_LOCATION,
-                    Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.WRITE_SETTINGS, Manifest.permission.ACCESS_WIFI_STATE,
+                    Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.INTERNET, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.WRITE_SETTINGS, Manifest.permission.ACCESS_WIFI_STATE,
             };
             for(String perm : permissions)
             {
@@ -422,14 +421,14 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
             @Override
             public void onMapLoaded()
             {
-                m_latLng = m_baiduMap.getMapStatus().target;
-                m_centerPoint = m_baiduMap.getProjection().toScreenLocation(m_latLng);
-                MarkerOptions ooF = new MarkerOptions().position(m_latLng).icon(BIT_MARKER_ICON).perspective(true).fixedScreenPosition(m_centerPoint);
-                m_marker = (Marker) (m_baiduMap.addOverlay(ooF));
-                //设定中心点坐标
-                LatLng cenpt = new LatLng(37.023537, 116.289429);
+                //设定经纬度
+                m_latLng = new LatLng(37.023537, 116.289429);
+                MarkerOptions markerOptions = new MarkerOptions().position(m_latLng).icon(ICON_MARKER);
+                m_marker = (Marker) (m_baiduMap.addOverlay(markerOptions));
+                OverlayOptions ooText = new TextOptions().bgColor(0xAAFFFF00).fontSize(26).fontColor(0xFFFF00FF).text("百度地图SDK百度地图SDK\r\n百度地图SDK\n百度地图SDK").rotate(0).position(m_latLng);
+                m_baiduMap.addOverlay(ooText);
                 //定义地图状态
-                MapStatus mapStatus = new MapStatus.Builder().target(cenpt).zoom(10).build();
+                MapStatus mapStatus = new MapStatus.Builder().target(m_latLng).zoom(14).build();
                 //定义MapStatusUpdate对象，以便描述地图状态将要发生的变化
                 MapStatusUpdate mapStatusUpdate = MapStatusUpdateFactory.newMapStatus(mapStatus);
                 //改变地图状态
@@ -454,6 +453,17 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
         iFilter.addAction(SDKInitializer.SDK_BROADCAST_ACTION_STRING_NETWORK_ERROR);
         m_sdkReceiver = new SDKReceiver();
         getContext().registerReceiver(m_sdkReceiver, iFilter);
+    }
+
+    @Override
+    public void onDestroy()
+    {
+        m_marker.cancelAnimation();
+        //MapView的生命周期与Fragment同步，当Fragment销毁时需调用MapView.destroy()
+        m_baiduMapView.onDestroy();
+        super.onDestroy();
+        //回收Bitmap资源
+        ICON_MARKER.recycle();
     }
 
     @Override
