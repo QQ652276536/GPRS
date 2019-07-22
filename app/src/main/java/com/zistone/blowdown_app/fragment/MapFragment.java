@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.Point;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -29,10 +30,14 @@ import com.baidu.location.LocationClientOption;
 import com.baidu.location.Poi;
 import com.baidu.mapapi.SDKInitializer;
 import com.baidu.mapapi.map.BaiduMap;
+import com.baidu.mapapi.map.BitmapDescriptor;
+import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.MapStatus;
+import com.baidu.mapapi.map.MapStatusUpdate;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
-import com.baidu.mapapi.map.MyLocationConfiguration;
+import com.baidu.mapapi.map.Marker;
+import com.baidu.mapapi.map.MarkerOptions;
 import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.model.LatLng;
 import com.zistone.blowdown_app.R;
@@ -47,6 +52,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     private static final String URL = "http://10.0.2.2:8080/Blowdown/UserInfo/Login";
+    private static final BitmapDescriptor BIT_MARKER_ICON = BitmapDescriptorFactory.fromResource(R.drawable.icon_mark);
 
     private String mParam1;
     private String mParam2;
@@ -71,6 +77,12 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
     private float m_currentAccracy;
     private boolean m_isPermissionRequested;
     private SDKReceiver m_sdkReceiver;
+    //标记的中心点
+    private Point m_centerPoint;
+    //标记
+    private Marker m_marker;
+    //标记的经纬度
+    private LatLng m_latLng;
 
     private OnFragmentInteractionListener mListener;
 
@@ -97,23 +109,18 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
         return fragment;
     }
 
-    @Override
-    public void onSensorChanged(SensorEvent event)
+    // TODO: Rename method, update argument and hook method into UI event
+    public void onButtonPressed(Uri uri)
     {
-        double x = event.values[SensorManager.DATA_X];
-        if (Math.abs(x - m_lastX) > 1.0)
+        if(mListener != null)
         {
-            m_currentDirection = (int) x;
-            m_locationData = new MyLocationData.Builder().accuracy(m_currentAccracy).direction(m_currentDirection).latitude(m_currentLat).longitude(m_currentLon).build();
-            //此处设置开发者获取到的方向信息,顺时针0-360
-            m_baiduMap.setMyLocationData(m_locationData);
+            mListener.onFragmentInteraction(uri);
         }
-        m_lastX = x;
     }
 
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy)
+    public interface OnFragmentInteractionListener
     {
+        void onFragmentInteraction(Uri uri);
     }
 
     /**
@@ -127,7 +134,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
             //此处的BDLocation为定位结果信息类,通过它的各种get方法可获取定位相关的全部结果
             //以下只列举部分获取经纬度相关（常用）的结果信息更多结果信息获取说明,请参照类参考中BDLocation类中的说明
             //BDLocation.TypeServerError:服务端定位失败,请您检查是否禁用获取位置信息权限,尝试重新请求定位
-            if (null == m_baiduMapView || null == location || BDLocation.TypeServerError == location.getLocType())
+            if(null == m_baiduMapView || null == location || BDLocation.TypeServerError == location.getLocType())
             {
                 return;
             }
@@ -190,14 +197,14 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
             //获取周边POI信息
             List<Poi> poiList = location.getPoiList();
             //POI信息包括POI ID、名称等,具体信息请参照类参考中POI类的相关说明
-            if (poiList != null)
+            if(poiList != null)
             {
-                for (Poi poi : poiList)
+                for(Poi poi : poiList)
                 {
                 }
             }
             //GPS定位结果
-            if (location.getLocType() == BDLocation.TypeGpsLocation)
+            if(location.getLocType() == BDLocation.TypeGpsLocation)
             {
                 sb.append("\n速度(km/h) : ");
                 sb.append(location.getSpeed());
@@ -210,10 +217,10 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
                 sb.append("GPS定位成功");
             }
             //网络定位结果
-            else if (location.getLocType() == BDLocation.TypeNetWorkLocation)
+            else if(location.getLocType() == BDLocation.TypeNetWorkLocation)
             {
                 //如果有海拔高度
-                if (location.hasAltitude())
+                if(location.hasAltitude())
                 {
                     sb.append("\n海拔(米) : ");
                     sb.append(location.getAltitude());
@@ -224,19 +231,19 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
                 sb.append("\n网络定位成功");
             }
             //离线定位结果
-            else if (location.getLocType() == BDLocation.TypeOffLineLocation)
+            else if(location.getLocType() == BDLocation.TypeOffLineLocation)
             {
                 sb.append("离线定位成功,离线定位结果也是有效的");
             }
-            else if (location.getLocType() == BDLocation.TypeServerError)
+            else if(location.getLocType() == BDLocation.TypeServerError)
             {
                 sb.append("服务端网络定位失败,可以反馈IMEI号和大体定位时间到loc-bugs@baidu.com,会有人追查原因");
             }
-            else if (location.getLocType() == BDLocation.TypeNetWorkException)
+            else if(location.getLocType() == BDLocation.TypeNetWorkException)
             {
                 sb.append("网络不同导致定位失败,请检查网络是否通畅");
             }
-            else if (location.getLocType() == BDLocation.TypeCriteriaException)
+            else if(location.getLocType() == BDLocation.TypeCriteriaException)
             {
                 sb.append("无法获取有效定位依据导致定位失败,一般是由于手机的原因,处于飞行模式下一般会造成这种结果,可以试着重启手机");
             }
@@ -246,7 +253,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
             //此处设置开发者获取到的方向信息,顺时针0-360
             m_baiduMap.setMyLocationData(m_locationData);
             //如果是首次定位
-            if (m_isFirstLoc)
+            if(m_isFirstLoc)
             {
                 m_isFirstLoc = false;
                 //根据经纬度定位位置
@@ -267,24 +274,26 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
         public void onReceive(Context context, Intent intent)
         {
             String action = intent.getAction();
-            if (TextUtils.isEmpty(action))
+            if(TextUtils.isEmpty(action))
             {
                 return;
             }
             //鉴权错误信息描述
             m_textView.setTextColor(Color.RED);
-            if (action.equals(SDKInitializer.SDK_BROADTCAST_ACTION_STRING_PERMISSION_CHECK_ERROR))
+            if(action.equals(SDKInitializer.SDK_BROADTCAST_ACTION_STRING_PERMISSION_CHECK_ERROR))
             {
-                m_textView.setText("Key验证出错!错误码:"
-                        + intent.getIntExtra(SDKInitializer.SDK_BROADTCAST_INTENT_EXTRA_INFO_KEY_ERROR_CODE, 0)
-                        + ";错误信息:"
-                        + intent.getStringExtra(SDKInitializer.SDK_BROADTCAST_INTENT_EXTRA_INFO_KEY_ERROR_MESSAGE));
+                m_textView.setText("Key验证出错!错误码:" + intent.getIntExtra(SDKInitializer.SDK_BROADTCAST_INTENT_EXTRA_INFO_KEY_ERROR_CODE,
+                        0) + ";错误信息:" + intent.getStringExtra(SDKInitializer.SDK_BROADTCAST_INTENT_EXTRA_INFO_KEY_ERROR_MESSAGE));
+                m_textView.setTextColor(Color.RED);
+                m_textView.setVisibility(View.INVISIBLE);
             }
-            else if (action.equals(SDKInitializer.SDK_BROADCAST_ACTION_STRING_NETWORK_ERROR))
+            else if(action.equals(SDKInitializer.SDK_BROADCAST_ACTION_STRING_NETWORK_ERROR))
             {
                 m_textView.setText("网络出错");
+                m_textView.setTextColor(Color.RED);
+                m_textView.setVisibility(View.INVISIBLE);
             }
-            else if (action.equals(SDKInitializer.SDK_BROADTCAST_ACTION_STRING_PERMISSION_CHECK_OK))
+            else if(action.equals(SDKInitializer.SDK_BROADTCAST_ACTION_STRING_PERMISSION_CHECK_OK))
             {
                 m_textView.setText("Key验证成功!功能可以正常使用");
                 m_textView.setTextColor(Color.GREEN);
@@ -358,29 +367,24 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
      */
     private void RequestPermission()
     {
-        if (Build.VERSION.SDK_INT >= 23 && !m_isPermissionRequested)
+        if(Build.VERSION.SDK_INT >= 23 && !m_isPermissionRequested)
         {
             m_isPermissionRequested = true;
             ArrayList<String> permissionsList = new ArrayList<>();
             String[] permissions = {
-                    Manifest.permission.ACCESS_NETWORK_STATE,
-                    Manifest.permission.INTERNET,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                    Manifest.permission.READ_EXTERNAL_STORAGE,
-                    Manifest.permission.ACCESS_COARSE_LOCATION,
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.WRITE_SETTINGS,
-                    Manifest.permission.ACCESS_WIFI_STATE,
+                    Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.INTERNET, Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.WRITE_SETTINGS, Manifest.permission.ACCESS_WIFI_STATE,
             };
-            for (String perm : permissions)
+            for(String perm : permissions)
             {
-                if (PackageManager.PERMISSION_GRANTED != getContext().checkSelfPermission(perm))
+                if(PackageManager.PERMISSION_GRANTED != getContext().checkSelfPermission(perm))
                 {
                     //进入到这里代表没有权限
                     permissionsList.add(perm);
                 }
             }
-            if (!permissionsList.isEmpty())
+            if(!permissionsList.isEmpty())
             {
                 requestPermissions(permissionsList.toArray(new String[permissionsList.size()]), 0);
             }
@@ -389,7 +393,57 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
 
     private void InitData()
     {
+        //获取传感器管理服务
+        m_sensorManager = (SensorManager) getContext().getSystemService(SENSOR_SERVICE);
+        //地图初始化
+        m_baiduMap = m_baiduMapView.getMap();
+        MapStatus.Builder builder = new MapStatus.Builder();
+        //设置地图仰角
+        builder.overlook(0);
+        /*********************************以下为调用定位该设备的的代码,这里并未使用,需求是实现定位其它设备*********************************/
+        //        m_baiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(builder.build()));
+        //        //定位模式:罗盘
+        //        MyLocationConfiguration locationConfiguration = new MyLocationConfiguration(MyLocationConfiguration.LocationMode.COMPASS, true, null);
+        //        m_baiduMap.setMyLocationConfiguration(locationConfiguration);
+        //        //开启定位图层
+        //        m_baiduMap.setMyLocationEnabled(true);
+        //        //定位初始化
+        //        m_locationClient = new LocationClient(getContext());
+        //        m_locationClient.registerLocationListener(m_locationListener);
+        //        //设置坐标各项参数
+        //        LocationClientOption option = SetLocationClientOption(new LocationClientOption());
+        //        m_locationClient.setLocOption(option);
+        //        m_locationClient.start();
+        /*********************************以上为调用定位该设备的的代码,这里并未使用,需求是实现定位其它设备*********************************/
+
+        /*********************************以下为根据提供的经纬度实现定位其它设备*********************************/
+        m_baiduMap.setOnMapLoadedCallback(new BaiduMap.OnMapLoadedCallback()
+        {
+            @Override
+            public void onMapLoaded()
+            {
+                m_latLng = m_baiduMap.getMapStatus().target;
+                m_centerPoint = m_baiduMap.getProjection().toScreenLocation(m_latLng);
+                MarkerOptions ooF = new MarkerOptions().position(m_latLng).icon(BIT_MARKER_ICON).perspective(true).fixedScreenPosition(m_centerPoint);
+                m_marker = (Marker) (m_baiduMap.addOverlay(ooF));
+                //设定中心点坐标
+                LatLng cenpt = new LatLng(37.023537, 116.289429);
+                //定义地图状态
+                MapStatus mapStatus = new MapStatus.Builder().target(cenpt).zoom(10).build();
+                //定义MapStatusUpdate对象，以便描述地图状态将要发生的变化
+                MapStatusUpdate mapStatusUpdate = MapStatusUpdateFactory.newMapStatus(mapStatus);
+                //改变地图状态
+                m_baiduMap.setMapStatus(mapStatusUpdate);
+            }
+        });
+        /*********************************以上为根据提供的经纬度实现定位其它设备*********************************/
+    }
+
+    private void InitView()
+    {
         m_textView = m_mapView.findViewById(R.id.textView);
+        //支持TextView内容滑动
+        m_textView.setMovementMethod(ScrollingMovementMethod.getInstance());
         m_baiduMapView = m_mapView.findViewById(R.id.mapView);
         //动态获取权限
         RequestPermission();
@@ -400,27 +454,25 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
         iFilter.addAction(SDKInitializer.SDK_BROADCAST_ACTION_STRING_NETWORK_ERROR);
         m_sdkReceiver = new SDKReceiver();
         getContext().registerReceiver(m_sdkReceiver, iFilter);
-        //获取传感器管理服务
-        m_sensorManager = (SensorManager) getContext().getSystemService(SENSOR_SERVICE);
-        //支持TextView内容滑动
-        m_textView.setMovementMethod(ScrollingMovementMethod.getInstance());
-        //地图初始化
-        MapStatus.Builder builder = new MapStatus.Builder();
-        builder.overlook(0);
-        m_baiduMap = m_baiduMapView.getMap();
-        m_baiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(builder.build()));
-        //定位模式:罗盘
-        MyLocationConfiguration locationConfiguration = new MyLocationConfiguration(MyLocationConfiguration.LocationMode.COMPASS, true, null);
-        m_baiduMap.setMyLocationConfiguration(locationConfiguration);
-        //开启定位图层
-        m_baiduMap.setMyLocationEnabled(true);
-        //定位初始化
-        m_locationClient = new LocationClient(getContext());
-        m_locationClient.registerLocationListener(m_locationListener);
-        //设置坐标各项参数
-        LocationClientOption option = SetLocationClientOption(new LocationClientOption());
-        m_locationClient.setLocOption(option);
-        m_locationClient.start();
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent event)
+    {
+        double x = event.values[SensorManager.DATA_X];
+        if(Math.abs(x - m_lastX) > 1.0)
+        {
+            m_currentDirection = (int) x;
+            m_locationData = new MyLocationData.Builder().accuracy(m_currentAccracy).direction(m_currentDirection).latitude(m_currentLat).longitude(m_currentLon).build();
+            //此处设置开发者获取到的方向信息,顺时针0-360
+            m_baiduMap.setMyLocationData(m_locationData);
+        }
+        m_lastX = x;
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy)
+    {
     }
 
     /**
@@ -443,7 +495,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null)
+        if(getArguments() != null)
         {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -462,24 +514,16 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         m_mapView = inflater.inflate(R.layout.fragment_map, container, false);
+        InitView();
         InitData();
         return m_mapView;
-    }
-
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri)
-    {
-        if (mListener != null)
-        {
-            mListener.onFragmentInteraction(uri);
-        }
     }
 
     @Override
     public void onAttach(Context context)
     {
         super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener)
+        if(context instanceof OnFragmentInteractionListener)
         {
             mListener = (OnFragmentInteractionListener) context;
         }
@@ -512,8 +556,4 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
         m_sensorManager.registerListener(this, m_sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION), SensorManager.SENSOR_DELAY_UI);
     }
 
-    public interface OnFragmentInteractionListener
-    {
-        void onFragmentInteraction(Uri uri);
-    }
 }
