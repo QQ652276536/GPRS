@@ -11,19 +11,20 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.zistone.blowdown_app.R;
+import com.zistone.blowdown_app.entity.DeviceInfo;
 
 import java.util.List;
 
 public class LeftSlideRemoveAdapter extends RecyclerView.Adapter<LeftSlideRemoveAdapter.ViewHolder>
 {
 
-    private List<String> m_listStr;
+    private List<DeviceInfo> m_deviceList;
     private Context m_context;
     private LayoutInflater m_layoutInflater;
 
-    public LeftSlideRemoveAdapter(List<String> list, Context context)
+    public LeftSlideRemoveAdapter(List<DeviceInfo> list, Context context)
     {
-        this.m_listStr = list;
+        this.m_deviceList = list;
         this.m_context = context;
         this.m_layoutInflater = LayoutInflater.from(context);
     }
@@ -53,13 +54,16 @@ public class LeftSlideRemoveAdapter extends RecyclerView.Adapter<LeftSlideRemove
     @Override
     public void onBindViewHolder(LeftSlideRemoveAdapter.ViewHolder holder, int position)
     {
-        holder.m_textView.setText(m_listStr.get(position));
+        String deviceName = m_deviceList.get(position).getM_deviceName();
+        String deviceType = m_deviceList.get(position).getM_deviceType();
+        String state = m_deviceList.get(position).getM_state() == 0 ? "离线" : "在线";
+        holder.m_textView.setText(deviceName + "\t" + deviceType + "\n" + state);
         holder.m_image.setImageResource(R.mipmap.device3);
     }
 
     @Override
     public int getItemCount()
     {
-        return m_listStr == null ? 0 : m_listStr.size();
+        return m_deviceList == null ? 0 : m_deviceList.size();
     }
 }

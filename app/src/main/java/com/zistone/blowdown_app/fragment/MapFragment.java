@@ -66,7 +66,6 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
 {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    private static final String URL = "http://10.0.2.2:8080/Blowdown/UserInfo/Login";
     private static final BitmapDescriptor ICON_MARKER = BitmapDescriptorFactory.fromResource(R.drawable.icon_mark);
 
     private String mParam1;
@@ -697,6 +696,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         m_mapView = inflater.inflate(R.layout.fragment_map, container, false);
+        m_latLng = getArguments().getParcelable("DEVICE");
         InitView();
         InitData();
         return m_mapView;

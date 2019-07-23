@@ -21,39 +21,37 @@ import com.zistone.blowdown_app.R;
 import com.zistone.blowdown_app.control.LeftSlideRemoveAdapter;
 import com.zistone.blowdown_app.control.LeftSlideRemoveView;
 import com.zistone.blowdown_app.control.OnRecyclerItemClickListener;
+import com.zistone.blowdown_app.entity.DeviceInfo;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link DeviceFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link DeviceFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class DeviceFragment extends Fragment
 {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private static final String ARG_PARAM1 = "";
+    private static final String ARG_PARAM2 = "";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private String[] titles = {
+            "设备A", "设备B", "设备C", "设备D", "设备E", "设备F", "设备G", "设备H"
+    };
+    private String[] types = {
+            "A00001", "B00001", "C00001", "D00001", "E00001", "F00001", "G00001", "H00001"
+    };
+    private int[] states = {
+            1, 0, 0, 1, 1, 0, 0, 1
+    };
+    private float[] lats = {
+            (float) 114.003481, (float) 121.506377, (float) 37.023537, (float) 111.377191, (float) 121.326997, 0, 0, 0
+    };
+    private float[] lots = {
+            (float) 22.52837, (float) 31.245105, (float) 116.289429, (float) 30.66441, (float) 31.200547, 0, 0, 0
+    };
 
     private Context m_context;
     private View m_deviceView;
     private LeftSlideRemoveView m_leftSlideRemoveView;
-
-    private String[] titles = {
-            "设备A\n000001", "设备B\n000001", "设备C\n000001", "设备D\n000001", "设备E\n000001", "设备F\n000001", "设备G\n000001", "设备H\n000001"
-    };
-    private List<String> m_listStr = new ArrayList<>();
+    private List<DeviceInfo> m_deviceList = new ArrayList<>();
     private ItemTouchHelper mItemTouchHelper;
     private LeftSlideRemoveAdapter m_leftSlideRemoveAdapter;
 
@@ -61,18 +59,15 @@ public class DeviceFragment extends Fragment
 
     public DeviceFragment()
     {
-        // Required empty public constructor
     }
 
     /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
+     * 使用工厂方法创建新的实例
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
      * @return A new instance of fragment DeviceFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static DeviceFragment newInstance(String param1, String param2)
     {
         DeviceFragment fragment = new DeviceFragment();
@@ -83,6 +78,23 @@ public class DeviceFragment extends Fragment
         return fragment;
     }
 
+    /**
+     * Activity中加载Fragment时会要求实现onFragmentInteraction(Uri uri)方法,此方法主要作用是从fragment向activity传递数据
+     */
+    public interface OnFragmentInteractionListener
+    {
+        void onFragmentInteraction(Uri uri);
+    }
+
+    // TODO: Rename method, update argument and hook method into UI event
+    public void onButtonPressed(Uri uri)
+    {
+        if(mListener != null)
+        {
+            mListener.onFragmentInteraction(uri);
+        }
+    }
+
     public void InitView()
     {
         m_context = m_deviceView.getContext();
@@ -90,7 +102,7 @@ public class DeviceFragment extends Fragment
         m_leftSlideRemoveView.setLayoutManager(new LinearLayoutManager(getContext()));
         //添加自定义分割线
         m_leftSlideRemoveView.addItemDecoration(new DividerItemDecoration(m_context, DividerItemDecoration.VERTICAL));
-        m_leftSlideRemoveAdapter = new LeftSlideRemoveAdapter(m_listStr, getContext());
+        m_leftSlideRemoveAdapter = new LeftSlideRemoveAdapter(m_deviceList, getContext());
         m_leftSlideRemoveView.setAdapter(m_leftSlideRemoveAdapter);
         //注册触摸监听事件
         m_leftSlideRemoveView.addOnItemTouchListener(new OnRecyclerItemClickListener(m_leftSlideRemoveView)
@@ -98,7 +110,9 @@ public class DeviceFragment extends Fragment
             @Override
             public void OnItemClick(RecyclerView.ViewHolder vh)
             {
-                Toast.makeText(m_context, m_listStr.get(vh.getLayoutPosition()), Toast.LENGTH_SHORT).show();
+                DeviceInfo deviceInfo = m_deviceList.get(vh.getLayoutPosition());
+                Toast.makeText(m_context, deviceInfo.getM_deviceName(), Toast.LENGTH_SHORT).show();
+
             }
 
             @Override
@@ -148,14 +162,14 @@ public class DeviceFragment extends Fragment
                 {
                     for(int i = fromPosition; i < toPosition; i++)
                     {
-                        Collections.swap(m_listStr, i, i + 1);
+                        Collections.swap(m_deviceList, i, i + 1);
                     }
                 }
                 else
                 {
                     for(int i = fromPosition; i > toPosition; i--)
                     {
-                        Collections.swap(m_listStr, i, i - 1);
+                        Collections.swap(m_deviceList, i, i - 1);
                     }
                 }
                 m_leftSlideRemoveAdapter.notifyItemMoved(fromPosition, toPosition);
@@ -212,18 +226,24 @@ public class DeviceFragment extends Fragment
             @Override
             public void OnRightClick(int position, String id)
             {
-                m_listStr.remove(position);
+                m_deviceList.remove(position);
                 m_leftSlideRemoveAdapter.notifyDataSetChanged();
                 //Toast.makeText(m_context, " position = " + position, Toast.LENGTH_SHORT).show();
             }
         };
     }
 
-    public void InitData()
+    public void InitDeviceData()
     {
         for(int i = 0; i < titles.length; i++)
         {
-            m_listStr.add(titles[i]);
+            DeviceInfo tempDevice = new DeviceInfo();
+            tempDevice.setM_deviceName(titles[i]);
+            tempDevice.setM_deviceType(types[i]);
+            tempDevice.setM_state(states[i]);
+            tempDevice.setM_lat(lats[i]);
+            tempDevice.setM_lot(lots[i]);
+            m_deviceList.add(tempDevice);
         }
     }
 
@@ -233,8 +253,8 @@ public class DeviceFragment extends Fragment
         super.onCreate(savedInstanceState);
         if(getArguments() != null)
         {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            getArguments().getString(ARG_PARAM1);
+            getArguments().getString(ARG_PARAM2);
         }
     }
 
@@ -243,17 +263,8 @@ public class DeviceFragment extends Fragment
     {
         m_deviceView = inflater.inflate(R.layout.fragment_device, container, false);
         InitView();
-        InitData();
+        InitDeviceData();
         return m_deviceView;
-    }
-
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri)
-    {
-        if(mListener != null)
-        {
-            mListener.onFragmentInteraction(uri);
-        }
     }
 
     @Override
@@ -275,21 +286,5 @@ public class DeviceFragment extends Fragment
     {
         super.onDetach();
         mListener = null;
-    }
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener
-    {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
     }
 }

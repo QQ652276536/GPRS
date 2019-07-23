@@ -23,8 +23,8 @@
             android:id="@+id/img"
             android:layout_width="wrap_content"
             android:layout_height="50dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
             android:src="@mipmap/device3" />
     </LinearLayout>
 
