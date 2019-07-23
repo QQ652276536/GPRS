@@ -92,18 +92,15 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
     private float m_currentAccracy;
     private boolean m_isPermissionRequested;
     private SDKReceiver m_sdkReceiver;
-    //标记的中心点
-    private Point m_centerPoint;
     //标记
     private Marker m_marker;
     //标记的经纬度
     private LatLng m_latLng = new LatLng(37.023537, 116.289429);
     //private LatLng m_latLng;
     //标记的经纬度对应的详细信息
-    private String m_latLngStr = "山东省德州市平原县";
+    private String m_latLngStr = "";
     //地理编码搜索
     private GeoCoder m_geoCoder;
-    private TextView m_textViewForBitmap;
 
     private OnFragmentInteractionListener mListener;
 
@@ -448,14 +445,61 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
     }
 
     /**
-     * 由于中心点偏差导致的效果很不理想,为了解决这个问题,可以采用TextView渲染Bitmap然后添加为图标覆盖物的方式,这样既可以实现换行,也可以控制中心点,实现正常的地图旋转等效果
+     * 设置地图状态和标记的位置
+     */
+    private void SetMapStateAndMarkOptions()
+    {
+        //设置标记的位置和图标
+        MarkerOptions markerOptions = new MarkerOptions().position(m_latLng).icon(ICON_MARKER);
+        //标记添加至地图中
+        m_marker = (Marker) (m_baiduMap.addOverlay(markerOptions));
+        //定义地图状态
+        MapStatus mapStatus = new MapStatus.Builder().target(m_latLng).zoom(14).build();
+        //定义MapStatusUpdate对象,以便描述地图状态将要发生的变化
+        MapStatusUpdate mapStatusUpdate = MapStatusUpdateFactory.newMapStatus(mapStatus);
+        //改变地图状态
+        m_baiduMap.setMapStatus(mapStatusUpdate);
+        //添加平移动画
+        m_marker.setAnimation(Transformation());
+        m_marker.startAnimation();
+    }
+
+    /**
+     * 百度地图API提供的绘制文字有中心点偏差,导致效果很不理想,为了解决这个问题,可以采用TextView渲染Bitmap然后添加为图标覆盖物的方式,这样既可以实现换行,也可以控制中心点
+     * ,实现正常的地图旋转等效果
+     * <p>
+     * 使用该方式绘制文字时不允许为"",否则会抛BDMapSDKException: marker's icon can not be null
      *
      * @param latLng
      * @param str
+     * @param foreColor
+     * @param backColor
      */
-    private void DrawMarkerText(LatLng latLng, String str)
+    private void DrawMarkerText(LatLng latLng, String str, int foreColor, int backColor)
     {
-
+        if(null == latLng || latLng.latitude == 0 || latLng.longitude == 0 || "".equals(str))
+        {
+            return;
+        }
+        TextView textView = new TextView(getActivity());
+        //内容距中
+        textView.setGravity(Gravity.LEFT);
+        textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
+        textView.setBackgroundColor(backColor);
+        textView.setTextColor(foreColor);
+        textView.setText(str);
+        //更新绘制缓存之前把旧的销毁
+        textView.destroyDrawingCache();
+        //通过测量实现TextView和文字的大小一致
+        textView.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+        textView.layout(0, 0, textView.getMeasuredWidth(), textView.getMeasuredHeight());
+        //启用绘制缓存
+        textView.setDrawingCacheEnabled(true);
+        //将View的内容以图片的方式保存
+        Bitmap bitmapText = textView.getDrawingCache(true);
+        BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(bitmapText);
+        OverlayOptions textOverlayOptions = new MarkerOptions().icon(bitmapDescriptor).position(latLng);
+        m_baiduMap.addOverlay(textOverlayOptions);
     }
 
     private void InitData()
@@ -498,45 +542,9 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
             @Override
             public void onMapLoaded()
             {
+                SetMapStateAndMarkOptions();
                 //根据经纬度搜索出对应地理位置
-                //m_geoCoder.reverseGeoCode(new ReverseGeoCodeOption().location(m_latLng).newVersion(1).radius(500));
-                //设置标记的位置和图标
-                MarkerOptions markerOptions = new MarkerOptions().position(m_latLng).icon(ICON_MARKER);
-                //标记添加至地图中
-                m_marker = (Marker) (m_baiduMap.addOverlay(markerOptions));
-
-                //定义地图状态
-                MapStatus mapStatus = new MapStatus.Builder().target(m_latLng).zoom(14).build();
-                //定义MapStatusUpdate对象,以便描述地图状态将要发生的变化
-                MapStatusUpdate mapStatusUpdate = MapStatusUpdateFactory.newMapStatus(mapStatus);
-                //改变地图状态
-                m_baiduMap.setMapStatus(mapStatusUpdate);
-                //添加平移动画
-                m_marker.setAnimation(Transformation());
-                m_marker.startAnimation();
-
-                //OverlayOptions textOverlayOptions = new TextOptions().bgColor(0xAAFFFF00).fontSize(18).fontColor(0xFFFF00FF).text("百度地图SDK").rotate(0).position(m_latLng);
-                //m_baiduMap.addOverlay(textOverlayOptions);
-                //由于中心点偏差导致的效果很不理想,为了解决这个问题,可以采用TextView渲染Bitmap然后添加为图标覆盖物的方式,这样既可以实现换行,也可以控制中心点,实现正常
-                // 的地图旋转等效果
-                TextView textView = new TextView(getActivity());
-                //内容距中
-                textView.setGravity(Gravity.LEFT);
-                textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
-                //textView.setBackgroundColor(0xAAFFFF80);
-                textView.setTextColor(Color.RED);
-                textView.setText(m_latLngStr);
-                textView.destroyDrawingCache();
-                //通过测量实现TextView和文字的大小一致
-                textView.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
-                textView.layout(0, 0, textView.getMeasuredWidth(), textView.getMeasuredHeight());
-                //启用绘制缓存
-                textView.setDrawingCacheEnabled(true);
-                //将View的内容以图片的方式保存
-                Bitmap bitmapText = textView.getDrawingCache(true);
-                BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(bitmapText);
-                OverlayOptions textOverlayOptions = new MarkerOptions().icon(bitmapDescriptor).position(m_latLng);
-                m_baiduMap.addOverlay(textOverlayOptions);
+                m_geoCoder.reverseGeoCode(new ReverseGeoCodeOption().location(m_latLng).newVersion(1).radius(500));
             }
         });
         /*********************************以上为根据提供的经纬度实现定位其它设备*********************************/
@@ -576,7 +584,11 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
         //显示
         else
         {
-            InitData();
+            //清除所有覆盖物
+            m_baiduMap.clear();
+            SetMapStateAndMarkOptions();
+            //根据经纬度搜索出对应地理位置
+            m_geoCoder.reverseGeoCode(new ReverseGeoCodeOption().location(m_latLng).newVersion(1).radius(500));
         }
     }
 
@@ -590,7 +602,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
     {
         if(null == geoCodeResult || SearchResult.ERRORNO.NO_ERROR != geoCodeResult.error)
         {
-            m_latLngStr = "未能找到结果";
+            Toast.makeText(getContext(), "未能找到结果", Toast.LENGTH_SHORT);
             return;
         }
     }
@@ -605,12 +617,13 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
     {
         if(null == reverseGeoCodeResult || SearchResult.ERRORNO.NO_ERROR != reverseGeoCodeResult.error)
         {
-            m_latLngStr = "未能找到结果";
+            Toast.makeText(getContext(), "未能找到结果", Toast.LENGTH_SHORT);
             return;
         }
         else
         {
             m_latLngStr = reverseGeoCodeResult.getAddress();
+            DrawMarkerText(m_latLng, m_latLngStr, Color.RED, 0xAAFFFF80);
         }
     }
 

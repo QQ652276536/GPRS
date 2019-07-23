@@ -92,177 +92,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
         return fragment;
     }
 
-    /**
-     * 停止Fragment时被回调
-     */
-    @Override
-    public void onStop()
-    {
-        super.onStop();
-        m_loginTimer.cancel();
-    }
-
-    /**
-     * 创建Fragment时回调,只会被调用一次
-     *
-     * @param savedInstanceState
-     */
-    @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
-        super.onCreate(savedInstanceState);
-        if(getArguments() != null)
-        {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
-
-    /**
-     * 绘制Fragment组件时回调
-     *
-     * @param inflater
-     * @param container
-     * @param savedInstanceState
-     * @return
-     */
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
-    {
-        m_userView = inflater.inflate(R.layout.fragment_login, container, false);
-        InitData();
-        return m_userView;
-    }
-
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri)
-    {
-        if(mListener != null)
-        {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
-
-    @Override
-    public void onAttach(Context context)
-    {
-        super.onAttach(context);
-        if(context instanceof OnFragmentInteractionListener)
-        {
-            mListener = (OnFragmentInteractionListener) context;
-        }
-        else
-        {
-            throw new RuntimeException(context.toString() + " must implement OnFragmentInteractionListener");
-        }
-    }
-
-    /**
-     * 该Fragment从Activity删除/替换时回调该方法,onDestroy()执行后一定会执行该方法,且只调用一次
-     */
-    @Override
-    public void onDetach()
-    {
-        super.onDetach();
-        mListener = null;
-    }
-
-    @Override
-    public void onClick(View v)
-    {
-        //登录,这里是发起登录请求
-        if(R.id.btn_login_login == v.getId())
-        {
-            //隐藏键盘
-            InputMethodManager imm = (InputMethodManager) v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-            if(imm.isActive())
-            {
-                imm.hideSoftInputFromWindow(v.getApplicationWindowToken(), 0);
-            }
-            if(Pattern.matches(REGEXUSERNAME, m_editText_userName.getText().toString()))
-            {
-                m_editText_userName.setError(null);
-            }
-            else
-            {
-                m_editText_userName.setError("用户名非法");
-            }
-            if(Pattern.matches(REGEXPASSWORD, m_editText_password.getText().toString()))
-            {
-                m_editText_password.setError(null);
-            }
-            else
-            {
-                m_editText_password.setError("密码非法");
-            }
-            if(m_editText_userName.getError() == null && m_editText_password.getError() == null)
-            {
-                Login();
-            }
-        }
-        //注册,这里是跳转至注册页面
-        else if(R.id.btn_register_login == v.getId())
-        {
-            Fragment loginFragment = getFragmentManager().getFragments().get(0);
-            Fragment registerFragment = getFragmentManager().getFragments().get(1);
-            Fragment forgetFragment = getFragmentManager().getFragments().get(2);
-            getFragmentManager().beginTransaction().hide(loginFragment).commitAllowingStateLoss();
-            getFragmentManager().beginTransaction().hide(forgetFragment).commitAllowingStateLoss();
-            getFragmentManager().beginTransaction().show(registerFragment).commitAllowingStateLoss();
-        }
-        //忘记密码,这里是跳转至找回密码页
-        else if(R.id.btn_forget_login == v.getId())
-        {
-            Fragment loginFragment = getFragmentManager().getFragments().get(0);
-            Fragment registerFragment = getFragmentManager().getFragments().get(1);
-            Fragment forgetFragment = getFragmentManager().getFragments().get(2);
-            getFragmentManager().beginTransaction().hide(loginFragment).commitAllowingStateLoss();
-            getFragmentManager().beginTransaction().hide(registerFragment).commitAllowingStateLoss();
-            getFragmentManager().beginTransaction().show(forgetFragment).commitAllowingStateLoss();
-        }
-    }
-
-    @Override
-    public void onFocusChange(View v, boolean hasFocus)
-    {
-        if(R.id.editTextUserName_login == v.getId())
-        {
-            if(hasFocus)
-            {
-                m_editText_userName.setError(null);
-            }
-            else
-            {
-                if(Pattern.matches(REGEXUSERNAME, m_editText_userName.getText().toString()))
-                {
-                    m_editText_userName.setError(null);
-                }
-                else
-                {
-                    m_editText_userName.setError("用户名非法");
-                }
-            }
-        }
-        if(R.id.editTextPassword_login == v.getId())
-        {
-            if(hasFocus)
-            {
-                m_editText_password.setError(null);
-            }
-            else
-            {
-                if(Pattern.matches(REGEXPASSWORD, m_editText_password.getText().toString()))
-                {
-                    m_editText_password.setError(null);
-                }
-                else
-                {
-                    m_editText_password.setError("密码非法");
-                }
-            }
-        }
-    }
-
     public interface OnFragmentInteractionListener
     {
         void onFragmentInteraction(Uri uri);
@@ -476,4 +305,176 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
         m_btn_forget.setOnClickListener(this);
         m_loginProgressBar = m_userView.findViewById(R.id.progressBar_login);
     }
+
+    /**
+     * 停止Fragment时被回调
+     */
+    @Override
+    public void onStop()
+    {
+        super.onStop();
+        m_loginTimer.cancel();
+    }
+
+    /**
+     * 创建Fragment时回调,只会被调用一次
+     *
+     * @param savedInstanceState
+     */
+    @Override
+    public void onCreate(Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+        if(getArguments() != null)
+        {
+            mParam1 = getArguments().getString(ARG_PARAM1);
+            mParam2 = getArguments().getString(ARG_PARAM2);
+        }
+    }
+
+    /**
+     * 绘制Fragment组件时回调
+     *
+     * @param inflater
+     * @param container
+     * @param savedInstanceState
+     * @return
+     */
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+    {
+        m_userView = inflater.inflate(R.layout.fragment_login, container, false);
+        InitData();
+        return m_userView;
+    }
+
+    // TODO: Rename method, update argument and hook method into UI event
+    public void onButtonPressed(Uri uri)
+    {
+        if(mListener != null)
+        {
+            mListener.onFragmentInteraction(uri);
+        }
+    }
+
+    @Override
+    public void onAttach(Context context)
+    {
+        super.onAttach(context);
+        if(context instanceof OnFragmentInteractionListener)
+        {
+            mListener = (OnFragmentInteractionListener) context;
+        }
+        else
+        {
+            throw new RuntimeException(context.toString() + " must implement OnFragmentInteractionListener");
+        }
+    }
+
+    /**
+     * 该Fragment从Activity删除/替换时回调该方法,onDestroy()执行后一定会执行该方法,且只调用一次
+     */
+    @Override
+    public void onDetach()
+    {
+        super.onDetach();
+        mListener = null;
+    }
+
+    @Override
+    public void onClick(View v)
+    {
+        //登录,这里是发起登录请求
+        if(R.id.btn_login_login == v.getId())
+        {
+            //隐藏键盘
+            InputMethodManager imm = (InputMethodManager) v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+            if(imm.isActive())
+            {
+                imm.hideSoftInputFromWindow(v.getApplicationWindowToken(), 0);
+            }
+            if(Pattern.matches(REGEXUSERNAME, m_editText_userName.getText().toString()))
+            {
+                m_editText_userName.setError(null);
+            }
+            else
+            {
+                m_editText_userName.setError("用户名非法");
+            }
+            if(Pattern.matches(REGEXPASSWORD, m_editText_password.getText().toString()))
+            {
+                m_editText_password.setError(null);
+            }
+            else
+            {
+                m_editText_password.setError("密码非法");
+            }
+            if(m_editText_userName.getError() == null && m_editText_password.getError() == null)
+            {
+                Login();
+            }
+        }
+        //注册,这里是跳转至注册页面
+        else if(R.id.btn_register_login == v.getId())
+        {
+            Fragment loginFragment = getFragmentManager().getFragments().get(0);
+            Fragment registerFragment = getFragmentManager().getFragments().get(1);
+            Fragment forgetFragment = getFragmentManager().getFragments().get(2);
+            getFragmentManager().beginTransaction().hide(loginFragment).commitAllowingStateLoss();
+            getFragmentManager().beginTransaction().hide(forgetFragment).commitAllowingStateLoss();
+            getFragmentManager().beginTransaction().show(registerFragment).commitAllowingStateLoss();
+        }
+        //忘记密码,这里是跳转至找回密码页
+        else if(R.id.btn_forget_login == v.getId())
+        {
+            Fragment loginFragment = getFragmentManager().getFragments().get(0);
+            Fragment registerFragment = getFragmentManager().getFragments().get(1);
+            Fragment forgetFragment = getFragmentManager().getFragments().get(2);
+            getFragmentManager().beginTransaction().hide(loginFragment).commitAllowingStateLoss();
+            getFragmentManager().beginTransaction().hide(registerFragment).commitAllowingStateLoss();
+            getFragmentManager().beginTransaction().show(forgetFragment).commitAllowingStateLoss();
+        }
+    }
+
+    @Override
+    public void onFocusChange(View v, boolean hasFocus)
+    {
+        if(R.id.editTextUserName_login == v.getId())
+        {
+            if(hasFocus)
+            {
+                m_editText_userName.setError(null);
+            }
+            else
+            {
+                if(Pattern.matches(REGEXUSERNAME, m_editText_userName.getText().toString()))
+                {
+                    m_editText_userName.setError(null);
+                }
+                else
+                {
+                    m_editText_userName.setError("用户名非法");
+                }
+            }
+        }
+        if(R.id.editTextPassword_login == v.getId())
+        {
+            if(hasFocus)
+            {
+                m_editText_password.setError(null);
+            }
+            else
+            {
+                if(Pattern.matches(REGEXPASSWORD, m_editText_password.getText().toString()))
+                {
+                    m_editText_password.setError(null);
+                }
+                else
+                {
+                    m_editText_password.setError("密码非法");
+                }
+            }
+        }
+    }
+
 }
