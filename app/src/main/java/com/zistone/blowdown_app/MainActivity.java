@@ -19,16 +19,20 @@ import com.zistone.blowdown_app.fragment.MapFragment;
 import com.zistone.blowdown_app.fragment.RegisterFragment;
 import com.zistone.blowdown_app.fragment.UserFragment;
 
-public class MainActivity extends AppCompatActivity implements MapFragment.OnFragmentInteractionListener, DeviceFragment.OnFragmentInteractionListener, UserFragment.OnFragmentInteractionListener, LoginFragment.OnFragmentInteractionListener, RegisterFragment.OnFragmentInteractionListener, ForgetFragment.OnFragmentInteractionListener
+import java.io.Serializable;
+
+public class MainActivity extends AppCompatActivity implements MapFragment.OnFragmentInteractionListener, DeviceFragment.OnFragmentInteractionListener, UserFragment.OnFragmentInteractionListener, LoginFragment.OnFragmentInteractionListener, RegisterFragment.OnFragmentInteractionListener, ForgetFragment.OnFragmentInteractionListener, Serializable
 {
     //当前页,用来切换
-    private Fragment m_currentFragment;
+    public Fragment m_currentFragment;
     //地图页
-    private MapFragment m_mapFragment;
+    public MapFragment m_mapFragment;
     //设备页
-    private DeviceFragment m_deviceFragment;
+    public DeviceFragment m_deviceFragment;
     //用户页
-    private UserFragment m_userFragment;
+    public UserFragment m_userFragment;
+    //底部导航栏
+    public BottomNavigationView m_bottomNavigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -40,16 +44,15 @@ public class MainActivity extends AppCompatActivity implements MapFragment.OnFra
 
     private void InitData()
     {
-        //底部导航栏
-        BottomNavigationView bottomNavigationView = findViewById(R.id.nav_view);
+        m_bottomNavigationView = findViewById(R.id.nav_view);
         //启动时如果已经登录过则在设备页,否则在用户页的登录界面
         if(!"".equals(UserSharedPreference.GetRealName(this)) && 1 == UserSharedPreference.GetState(this))
         {
-            bottomNavigationView.setSelectedItemId(bottomNavigationView.getMenu().getItem(1).getItemId());
+            m_bottomNavigationView.setSelectedItemId(m_bottomNavigationView.getMenu().getItem(1).getItemId());
             //实例化设备页
             if(m_deviceFragment == null)
             {
-                m_deviceFragment = DeviceFragment.newInstance("", "");
+                m_deviceFragment = DeviceFragment.newInstance(this, "");
             }
             //该碎片不在管理器中则添加进去
             if(!m_deviceFragment.isAdded())
@@ -64,7 +67,7 @@ public class MainActivity extends AppCompatActivity implements MapFragment.OnFra
         }
         else
         {
-            bottomNavigationView.setSelectedItemId(bottomNavigationView.getMenu().getItem(2).getItemId());
+            m_bottomNavigationView.setSelectedItemId(m_bottomNavigationView.getMenu().getItem(2).getItemId());
             if(m_userFragment == null)
             {
                 m_userFragment = UserFragment.newInstance("", "");
@@ -80,7 +83,7 @@ public class MainActivity extends AppCompatActivity implements MapFragment.OnFra
             m_currentFragment = m_userFragment;
         }
         //因为启动时有默认选中页,防止事件重复触发,所以在后面注册监听事件
-        bottomNavigationView.setOnNavigationItemSelectedListener(onNavigationItemSeletecListener);
+        m_bottomNavigationView.setOnNavigationItemSelectedListener(onNavigationItemSeletecListener);
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener onNavigationItemSeletecListener = new BottomNavigationView.OnNavigationItemSelectedListener()
@@ -117,7 +120,7 @@ public class MainActivity extends AppCompatActivity implements MapFragment.OnFra
     {
         if(m_deviceFragment == null)
         {
-            m_deviceFragment = DeviceFragment.newInstance("", "");
+            m_deviceFragment = DeviceFragment.newInstance(this, "");
         }
         AddOrShowFragment(getSupportFragmentManager().beginTransaction(), m_deviceFragment);
     }

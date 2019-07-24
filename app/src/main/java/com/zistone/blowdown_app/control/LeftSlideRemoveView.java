@@ -19,7 +19,6 @@ import com.zistone.blowdown_app.R;
 
 public class LeftSlideRemoveView extends RecyclerView
 {
-    private static final String TAG = "LeftSlideRemoveView";
     //滑动最大、最小距离
     private int m_touchMax, m_touchMin;
     //当前按下的坐标、移动距离

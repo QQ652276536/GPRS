@@ -128,7 +128,6 @@ public class UserFragment extends Fragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         m_userView = inflater.inflate(R.layout.fragment_user, container, false);
-        m_userView.setTag(2);
         InitData();
         return m_userView;
     }

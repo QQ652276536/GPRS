@@ -1,5 +1,6 @@
 package com.zistone.blowdown_app.fragment;
 
+import android.app.Activity;
 import android.app.Service;
 import android.content.Context;
 import android.graphics.Color;
@@ -18,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.zistone.blowdown_app.MainActivity;
 import com.zistone.blowdown_app.R;
 import com.zistone.blowdown_app.control.LeftSlideRemoveAdapter;
 import com.zistone.blowdown_app.control.LeftSlideRemoveView;
@@ -30,9 +32,6 @@ import java.util.List;
 
 public class DeviceFragment extends Fragment
 {
-    private static final String ARG_PARAM1 = "";
-    private static final String ARG_PARAM2 = "";
-
     private String[] titles = {
             "设备A", "设备B", "设备C", "设备D", "设备E", "设备F", "设备G", "设备H"
     };
@@ -55,8 +54,8 @@ public class DeviceFragment extends Fragment
     private List<DeviceInfo> m_deviceList = new ArrayList<>();
     private ItemTouchHelper m_itemTouchHelper;
     private LeftSlideRemoveAdapter m_leftSlideRemoveAdapter;
-
     private OnFragmentInteractionListener mListener;
+    private MainActivity m_mainActivity;
 
     public DeviceFragment()
     {
@@ -65,16 +64,15 @@ public class DeviceFragment extends Fragment
     /**
      * 使用工厂方法创建新的实例
      *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment DeviceFragment.
+     * @param activity
+     * @param param2
+     * @return
      */
-    public static DeviceFragment newInstance(String param1, String param2)
+    public static DeviceFragment newInstance(MainActivity activity, String param2)
     {
         DeviceFragment fragment = new DeviceFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putSerializable("MainActivityClass", activity);
         fragment.setArguments(args);
         return fragment;
     }
@@ -99,6 +97,7 @@ public class DeviceFragment extends Fragment
     public void InitView()
     {
         m_context = m_deviceView.getContext();
+        m_mainActivity = (MainActivity) getArguments().getSerializable("MainActivityClass");
         m_leftSlideRemoveView = m_deviceView.findViewById(R.id.recyclerView);
         m_leftSlideRemoveView.setLayoutManager(new LinearLayoutManager(getContext()));
         //添加自定义分割线
@@ -113,27 +112,7 @@ public class DeviceFragment extends Fragment
             {
                 DeviceInfo deviceInfo = m_deviceList.get(viewHolder.getLayoutPosition());
                 Toast.makeText(m_context, deviceInfo.getM_deviceName(), Toast.LENGTH_SHORT).show();
-                List<Fragment> fragmentList = getFragmentManager().getFragments();
-                //注意:一个FragmentTransaction只能Commit一次,不要用全局或共享一个FragmentTransaction对象,多个Fragment则多次get
-                boolean isInitMapFragment = false;
-                for(Fragment fragment : fragmentList)
-                {
-                    String tagStr = fragment.getTag();
-                    //显示地图碎片
-                    if("MAPFRAGMENT".equals(tagStr))
-                    {
-                        getFragmentManager().beginTransaction().show(fragment).commitAllowingStateLoss();
-                        isInitMapFragment = true;
-                    }
-                    else
-                    {
-                        getFragmentManager().beginTransaction().hide(fragment).commitAllowingStateLoss();
-                    }
-                }
-                if(!isInitMapFragment)
-                {
-                    getFragmentManager().beginTransaction().add(R.id.fragment_current, MapFragment.newInstance("", "")).commitAllowingStateLoss();
-                }
+                m_mainActivity.m_bottomNavigationView.setSelectedItemId(m_mainActivity.m_bottomNavigationView.getMenu().getItem(0).getItemId());
             }
 
             @Override
@@ -274,8 +253,6 @@ public class DeviceFragment extends Fragment
         super.onCreate(savedInstanceState);
         if(getArguments() != null)
         {
-            getArguments().getString(ARG_PARAM1);
-            getArguments().getString(ARG_PARAM2);
         }
     }
 
@@ -283,7 +260,7 @@ public class DeviceFragment extends Fragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         m_deviceView = inflater.inflate(R.layout.fragment_device, container, false);
-        m_deviceView.setTag(1);
+
         InitView();
         InitDeviceData();
         return m_deviceView;

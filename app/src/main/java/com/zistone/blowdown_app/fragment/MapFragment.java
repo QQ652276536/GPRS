@@ -57,19 +57,15 @@ import com.baidu.mapapi.search.geocode.ReverseGeoCodeOption;
 import com.baidu.mapapi.search.geocode.ReverseGeoCodeResult;
 import com.zistone.blowdown_app.R;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import static android.content.Context.SENSOR_SERVICE;
 
-public class MapFragment extends Fragment implements View.OnClickListener, SensorEventListener, OnGetGeoCoderResultListener
+public class MapFragment extends Fragment implements View.OnClickListener, SensorEventListener, OnGetGeoCoderResultListener, Serializable
 {
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
     private static final BitmapDescriptor ICON_MARKER = BitmapDescriptorFactory.fromResource(R.drawable.icon_mark);
-
-    private String mParam1;
-    private String mParam2;
 
     private MyLocationListener m_locationListener = new MyLocationListener();
     private LocationClient m_locationClient;
@@ -120,8 +116,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
     {
         MapFragment fragment = new MapFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putSerializable("MapFragmentClass", fragment);
         fragment.setArguments(args);
         return fragment;
     }
@@ -685,8 +680,6 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
         super.onCreate(savedInstanceState);
         if(getArguments() != null)
         {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
 
@@ -702,7 +695,6 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         m_mapView = inflater.inflate(R.layout.fragment_map, container, false);
-        m_mapView.setTag(0);
         m_latLng = getArguments().getParcelable("DEVICE");
         InitView();
         InitData();
