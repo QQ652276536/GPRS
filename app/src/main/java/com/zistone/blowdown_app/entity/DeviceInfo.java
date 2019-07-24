@@ -24,8 +24,8 @@ public class DeviceInfo implements Parcelable
             deviceInfo.setM_id(bundle.getInt("m_id"));
             deviceInfo.setM_deviceName(bundle.getString("m_deviceName"));
             deviceInfo.setM_deviceType(bundle.getString("m_deviceType"));
-            deviceInfo.setM_lat(bundle.getFloat("m_lat"));
-            deviceInfo.setM_lot(bundle.getFloat("m_lot"));
+            deviceInfo.setM_lat(bundle.getDouble("m_lat"));
+            deviceInfo.setM_lot(bundle.getDouble("m_lot"));
             deviceInfo.setM_state(bundle.getInt("m_state"));
             return deviceInfo;
         }
@@ -91,14 +91,14 @@ public class DeviceInfo implements Parcelable
     /**
      * 纬度
      */
-    private float m_lat;
+    private double m_lat;
 
-    public float getM_lat()
+    public double getM_lat()
     {
         return m_lat;
     }
 
-    public void setM_lat(float m_lat)
+    public void setM_lat(double m_lat)
     {
         this.m_lat = m_lat;
     }
@@ -106,14 +106,14 @@ public class DeviceInfo implements Parcelable
     /**
      * 经度
      */
-    private float m_lot;
+    private double m_lot;
 
-    public float getM_lot()
+    public double getM_lot()
     {
         return m_lot;
     }
 
-    public void setM_lot(float m_lot)
+    public void setM_lot(double m_lot)
     {
         this.m_lot = m_lot;
     }
@@ -145,8 +145,8 @@ public class DeviceInfo implements Parcelable
         dest.writeInt(m_id);
         dest.writeString(m_deviceName);
         dest.writeString(m_deviceType);
-        dest.writeFloat(m_lat);
-        dest.writeFloat(m_lot);
+        dest.writeDouble(m_lat);
+        dest.writeDouble(m_lot);
         dest.writeInt(m_state);
     }
 }

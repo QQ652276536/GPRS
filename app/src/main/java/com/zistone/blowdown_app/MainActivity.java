@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.zistone.blowdown_app.R;
+import com.zistone.blowdown_app.entity.DeviceInfo;
 import com.zistone.blowdown_app.fragment.DeviceFragment;
 import com.zistone.blowdown_app.fragment.ForgetFragment;
 import com.zistone.blowdown_app.fragment.LoginFragment;
@@ -33,6 +34,8 @@ public class MainActivity extends AppCompatActivity implements MapFragment.OnFra
     public UserFragment m_userFragment;
     //底部导航栏
     public BottomNavigationView m_bottomNavigationView;
+    //设备信息
+    public DeviceInfo m_deviceInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -83,10 +86,10 @@ public class MainActivity extends AppCompatActivity implements MapFragment.OnFra
             m_currentFragment = m_userFragment;
         }
         //因为启动时有默认选中页,防止事件重复触发,所以在后面注册监听事件
-        m_bottomNavigationView.setOnNavigationItemSelectedListener(onNavigationItemSeletecListener);
+        m_bottomNavigationView.setOnNavigationItemSelectedListener(OnNavigationItemSeletecListener);
     }
 
-    private BottomNavigationView.OnNavigationItemSelectedListener onNavigationItemSeletecListener = new BottomNavigationView.OnNavigationItemSelectedListener()
+    private BottomNavigationView.OnNavigationItemSelectedListener OnNavigationItemSeletecListener = new BottomNavigationView.OnNavigationItemSelectedListener()
     {
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem menuItem)
@@ -129,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements MapFragment.OnFra
     {
         if(m_mapFragment == null)
         {
-            m_mapFragment = MapFragment.newInstance("", "");
+            m_mapFragment = MapFragment.newInstance(m_deviceInfo, "");
         }
         AddOrShowFragment(getSupportFragmentManager().beginTransaction(), m_mapFragment);
     }

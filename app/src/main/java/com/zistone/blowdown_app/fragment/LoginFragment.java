@@ -315,7 +315,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
     public void onStop()
     {
         super.onStop();
-        m_loginTimer.cancel();
+        //m_loginTimer.cancel();
     }
 
     /**

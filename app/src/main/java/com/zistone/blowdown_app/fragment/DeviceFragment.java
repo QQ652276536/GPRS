@@ -41,11 +41,11 @@ public class DeviceFragment extends Fragment
     private int[] states = {
             1, 0, 0, 1, 1, 0, 0, 1
     };
-    private float[] lats = {
-            (float) 114.003481, (float) 121.506377, (float) 37.023537, (float) 111.377191, (float) 121.326997, 0, 0, 0
+    private double[] lats = {
+            22.52837, 31.245105, 37.023537, 30.66441, 31.200547, 0, 0, 0
     };
-    private float[] lots = {
-            (float) 22.52837, (float) 31.245105, (float) 116.289429, (float) 30.66441, (float) 31.200547, 0, 0, 0
+    private double[] lots = {
+            114.003481, 121.506377, 116.289429, 111.377191, 121.326997, 0, 0, 0
     };
 
     private Context m_context;
@@ -110,8 +110,13 @@ public class DeviceFragment extends Fragment
             @Override
             public void OnItemClick(RecyclerView.ViewHolder viewHolder)
             {
-                DeviceInfo deviceInfo = m_deviceList.get(viewHolder.getLayoutPosition());
-                Toast.makeText(m_context, deviceInfo.getM_deviceName(), Toast.LENGTH_SHORT).show();
+                DeviceInfo tempDevice = m_deviceList.get(viewHolder.getLayoutPosition());
+                Toast.makeText(m_context, tempDevice.getM_deviceName(), Toast.LENGTH_SHORT).show();
+                int a = m_mainActivity.getSupportFragmentManager().getFragments().size();
+                //重新实例化地图碎片以达到重新加载设备位置
+                getFragmentManager().beginTransaction().remove(m_mainActivity.m_mapFragment);
+                m_mainActivity.m_mapFragment = null;
+                m_mainActivity.m_deviceInfo = tempDevice;
                 m_mainActivity.m_bottomNavigationView.setSelectedItemId(m_mainActivity.m_bottomNavigationView.getMenu().getItem(0).getItemId());
             }
 

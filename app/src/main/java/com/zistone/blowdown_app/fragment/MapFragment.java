@@ -56,6 +56,7 @@ import com.baidu.mapapi.search.geocode.OnGetGeoCoderResultListener;
 import com.baidu.mapapi.search.geocode.ReverseGeoCodeOption;
 import com.baidu.mapapi.search.geocode.ReverseGeoCodeResult;
 import com.zistone.blowdown_app.R;
+import com.zistone.blowdown_app.entity.DeviceInfo;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -87,15 +88,16 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
     private float m_currentAccracy;
     private boolean m_isPermissionRequested;
     private SDKReceiver m_sdkReceiver;
-    //标记
+    //设备标记
     private Marker m_marker;
-    //标记的经纬度
-    private LatLng m_latLng = new LatLng(37.023537, 116.289429);
-    //private LatLng m_latLng;
-    //标记的经纬度对应的详细信息
+    //经纬度对应的详细信息
     private String m_latLngStr = "";
     //地理编码搜索
     private GeoCoder m_geoCoder;
+    //设备的经纬度
+    private LatLng m_latLng;
+    //设备信息
+    private DeviceInfo m_deviceInfo;
 
     private OnFragmentInteractionListener mListener;
 
@@ -103,25 +105,15 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
     {
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment MapFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static MapFragment newInstance(String param1, String param2)
+    public static MapFragment newInstance(DeviceInfo deviceInfo, String param2)
     {
         MapFragment fragment = new MapFragment();
         Bundle args = new Bundle();
-        args.putSerializable("MapFragmentClass", fragment);
+        args.putParcelable("DEVICEINFO", deviceInfo);
         fragment.setArguments(args);
         return fragment;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri)
     {
         if(mListener != null)
@@ -443,6 +435,10 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
      */
     private void SetMapStateAndMarkOptions()
     {
+        if(null == m_latLng)
+        {
+            return;
+        }
         //设置标记的位置和图标
         MarkerOptions markerOptions = new MarkerOptions().position(m_latLng).icon(ICON_MARKER);
         //标记添加至地图中
@@ -471,7 +467,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
      */
     private void DrawMarkerText(LatLng latLng, String str, int foreColor, int backColor)
     {
-        if(null == latLng || latLng.latitude == 0 || latLng.longitude == 0 || "".equals(str))
+        if(null == latLng || "".equals(str))
         {
             return;
         }
@@ -498,6 +494,12 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
 
     private void InitData()
     {
+        //获取设备信息
+        m_deviceInfo = getArguments().getParcelable("DEVICEINFO");
+        if(null != m_deviceInfo)
+        {
+            m_latLng = new LatLng(m_deviceInfo.getM_lat(), m_deviceInfo.getM_lot());
+        }
         //获取传感器管理服务
         m_sensorManager = (SensorManager) getContext().getSystemService(SENSOR_SERVICE);
         //地图初始化
@@ -505,7 +507,16 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
         MapStatus.Builder builder = new MapStatus.Builder();
         //设置地图仰角
         builder.overlook(0);
-        /*********************************以下为调用定位该设备的的代码,这里并未使用,需求是实现定位其它设备*********************************/
+        //地理编码
+        m_geoCoder = GeoCoder.newInstance();
+        m_geoCoder.setOnGetGeoCodeResultListener(this);
+        //根据经纬度搜索出对应地理位置
+        if(null != m_latLng)
+        {
+            m_geoCoder.reverseGeoCode(new ReverseGeoCodeOption().location(m_latLng).newVersion(1).radius(500));
+        }
+
+        /**********************以下为调用定位该设备的的代码,这里并未使用,需求是实现定位其它设备**********************/
         //        m_baiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(builder.build()));
         //        //定位模式:罗盘
         //        MyLocationConfiguration locationConfiguration = new MyLocationConfiguration(MyLocationConfiguration.LocationMode.COMPASS, true, null);
@@ -519,17 +530,9 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
         //        LocationClientOption option = SetLocationClientOption(new LocationClientOption());
         //        m_locationClient.setLocOption(option);
         //        m_locationClient.start();
-        /*********************************以上为调用定位该设备的的代码,这里并未使用,需求是实现定位其它设备*********************************/
+        /************************************************************************************************/
 
         /*********************************以下为根据提供的经纬度实现定位其它设备*********************************/
-        if(null == m_latLng || m_latLng.latitude == 0 || m_latLng.longitude == 0)
-        {
-            Toast.makeText(getContext(), "请提供该设备正确的经纬度信息", Toast.LENGTH_SHORT);
-            return;
-        }
-        //地理编码
-        m_geoCoder = GeoCoder.newInstance();
-        m_geoCoder.setOnGetGeoCodeResultListener(this);
         //地图加载完毕回调
         m_baiduMap.setOnMapLoadedCallback(new BaiduMap.OnMapLoadedCallback()
         {
@@ -537,11 +540,9 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
             public void onMapLoaded()
             {
                 SetMapStateAndMarkOptions();
-                //根据经纬度搜索出对应地理位置
-                m_geoCoder.reverseGeoCode(new ReverseGeoCodeOption().location(m_latLng).newVersion(1).radius(500));
             }
         });
-        /*********************************以上为根据提供的经纬度实现定位其它设备*********************************/
+        /*************************************************************************************************/
 
     }
 
@@ -560,36 +561,6 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
         iFilter.addAction(SDKInitializer.SDK_BROADCAST_ACTION_STRING_NETWORK_ERROR);
         m_sdkReceiver = new SDKReceiver();
         getContext().registerReceiver(m_sdkReceiver, iFilter);
-    }
-
-    /**
-     * 第一次显示要在onResume()里判断
-     *
-     * @param hidden
-     */
-    @Override
-    public void onHiddenChanged(boolean hidden)
-    {
-        super.onHiddenChanged(hidden);
-        //隐藏
-        if(hidden)
-        {
-        }
-        //显示
-        else
-        {
-            m_latLng = getArguments().getParcelable("DEVICE");
-            if(null == m_latLng || m_latLng.latitude == 0 || m_latLng.longitude == 0)
-            {
-                Toast.makeText(getContext(), "请提供该设备正确的经纬度信息", Toast.LENGTH_SHORT);
-                return;
-            }
-            //清除所有覆盖物
-            m_baiduMap.clear();
-            SetMapStateAndMarkOptions();
-            //根据经纬度搜索出对应地理位置
-            m_geoCoder.reverseGeoCode(new ReverseGeoCodeOption().location(m_latLng).newVersion(1).radius(500));
-        }
     }
 
     /**
@@ -695,7 +666,6 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         m_mapView = inflater.inflate(R.layout.fragment_map, container, false);
-        m_latLng = getArguments().getParcelable("DEVICE");
         InitView();
         InitData();
         return m_mapView;
