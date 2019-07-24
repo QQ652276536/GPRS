@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,6 +31,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -417,9 +419,12 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
         //注册,这里是跳转至注册页面
         else if(R.id.btn_register_login == v.getId())
         {
-            Fragment loginFragment = getFragmentManager().getFragments().get(0);
-            Fragment registerFragment = getFragmentManager().getFragments().get(1);
-            Fragment forgetFragment = getFragmentManager().getFragments().get(2);
+            //注意这里的下标顺序,哪个Fragment先加载哪个在前
+            List<Fragment> fragmentList = getFragmentManager().getFragments();
+            Fragment loginFragment = fragmentList.get(0);
+            Fragment registerFragment = fragmentList.get(1);
+            Fragment forgetFragment = fragmentList.get(2);
+            //注意:一个FragmentTransaction只能Commit一次,不要用全局或共享一个FragmentTransaction对象,多个Fragment则多次get
             getFragmentManager().beginTransaction().hide(loginFragment).commitAllowingStateLoss();
             getFragmentManager().beginTransaction().hide(forgetFragment).commitAllowingStateLoss();
             getFragmentManager().beginTransaction().show(registerFragment).commitAllowingStateLoss();

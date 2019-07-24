@@ -583,6 +583,12 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
         //显示
         else
         {
+            m_latLng = getArguments().getParcelable("DEVICE");
+            if(null == m_latLng || m_latLng.latitude == 0 || m_latLng.longitude == 0)
+            {
+                Toast.makeText(getContext(), "请提供该设备正确的经纬度信息", Toast.LENGTH_SHORT);
+                return;
+            }
             //清除所有覆盖物
             m_baiduMap.clear();
             SetMapStateAndMarkOptions();
@@ -696,6 +702,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         m_mapView = inflater.inflate(R.layout.fragment_map, container, false);
+        m_mapView.setTag(0);
         m_latLng = getArguments().getParcelable("DEVICE");
         InitView();
         InitData();

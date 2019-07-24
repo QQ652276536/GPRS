@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -52,7 +53,7 @@ public class DeviceFragment extends Fragment
     private View m_deviceView;
     private LeftSlideRemoveView m_leftSlideRemoveView;
     private List<DeviceInfo> m_deviceList = new ArrayList<>();
-    private ItemTouchHelper mItemTouchHelper;
+    private ItemTouchHelper m_itemTouchHelper;
     private LeftSlideRemoveAdapter m_leftSlideRemoveAdapter;
 
     private OnFragmentInteractionListener mListener;
@@ -108,28 +109,48 @@ public class DeviceFragment extends Fragment
         m_leftSlideRemoveView.addOnItemTouchListener(new OnRecyclerItemClickListener(m_leftSlideRemoveView)
         {
             @Override
-            public void OnItemClick(RecyclerView.ViewHolder vh)
+            public void OnItemClick(RecyclerView.ViewHolder viewHolder)
             {
-                DeviceInfo deviceInfo = m_deviceList.get(vh.getLayoutPosition());
+                DeviceInfo deviceInfo = m_deviceList.get(viewHolder.getLayoutPosition());
                 Toast.makeText(m_context, deviceInfo.getM_deviceName(), Toast.LENGTH_SHORT).show();
-
+                List<Fragment> fragmentList = getFragmentManager().getFragments();
+                //注意:一个FragmentTransaction只能Commit一次,不要用全局或共享一个FragmentTransaction对象,多个Fragment则多次get
+                boolean isInitMapFragment = false;
+                for(Fragment fragment : fragmentList)
+                {
+                    String tagStr = fragment.getTag();
+                    //显示地图碎片
+                    if("MAPFRAGMENT".equals(tagStr))
+                    {
+                        getFragmentManager().beginTransaction().show(fragment).commitAllowingStateLoss();
+                        isInitMapFragment = true;
+                    }
+                    else
+                    {
+                        getFragmentManager().beginTransaction().hide(fragment).commitAllowingStateLoss();
+                    }
+                }
+                if(!isInitMapFragment)
+                {
+                    getFragmentManager().beginTransaction().add(R.id.fragment_current, MapFragment.newInstance("", "")).commitAllowingStateLoss();
+                }
             }
 
             @Override
             public void OnItemLongClick(RecyclerView.ViewHolder vh)
             {
-                //判断被拖拽的是否是前两个，如果不是则执行拖拽
+                //判断被拖拽的是否是前两个,如果不是则执行拖拽
                 if(vh.getLayoutPosition() != 0 && vh.getLayoutPosition() != 1)
                 {
-                    mItemTouchHelper.startDrag(vh);
+                    m_itemTouchHelper.startDrag(vh);
                     //TODO:获取系统震动服务
                 }
             }
         });
-        mItemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.Callback()
+        m_itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.Callback()
         {
             /**
-             * 是否处理滑动事件 以及拖拽和滑动的方向 如果是列表类型的RecyclerView的只存在UP和DOWN，如果是网格类RecyclerView则还应该多有LEFT和RIGHT
+             * 是否处理滑动事件以及拖拽和滑动的方向,如果是列表类型的RecyclerView的只存在UP和DOWN,如果是网格类RecyclerView则还应该多有LEFT和RIGHT
              * @param recyclerView
              * @param viewHolder
              * @return
@@ -219,7 +240,7 @@ public class DeviceFragment extends Fragment
                 viewHolder.itemView.setBackgroundColor(0);
             }
         });
-        mItemTouchHelper.attachToRecyclerView(m_leftSlideRemoveView);
+        m_itemTouchHelper.attachToRecyclerView(m_leftSlideRemoveView);
         //隐藏部分(删除)点击事件的具体实现
         m_leftSlideRemoveView.m_rightListener = new LeftSlideRemoveView.OnRightClickListener()
         {
@@ -262,6 +283,7 @@ public class DeviceFragment extends Fragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         m_deviceView = inflater.inflate(R.layout.fragment_device, container, false);
+        m_deviceView.setTag(1);
         InitView();
         InitDeviceData();
         return m_deviceView;

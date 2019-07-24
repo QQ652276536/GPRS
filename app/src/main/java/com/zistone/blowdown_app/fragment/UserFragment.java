@@ -58,6 +58,7 @@ public class UserFragment extends Fragment
         {
             m_loginFragment = LoginFragment.newInstance("", "");
         }
+        //这里注意子Fragment的add顺序,后面在切换子Fragment时会用到
         if(!m_loginFragment.isAdded())
         {
             getChildFragmentManager().beginTransaction().add(R.id.fragment_current_user, m_loginFragment).commitAllowingStateLoss();
@@ -127,6 +128,7 @@ public class UserFragment extends Fragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         m_userView = inflater.inflate(R.layout.fragment_user, container, false);
+        m_userView.setTag(2);
         InitData();
         return m_userView;
     }

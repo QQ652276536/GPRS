@@ -17,7 +17,6 @@ import java.util.List;
 
 public class LeftSlideRemoveAdapter extends RecyclerView.Adapter<LeftSlideRemoveAdapter.ViewHolder>
 {
-
     private List<DeviceInfo> m_deviceList;
     private Context m_context;
     private LayoutInflater m_layoutInflater;
