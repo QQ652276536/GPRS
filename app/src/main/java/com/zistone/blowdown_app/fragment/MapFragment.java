@@ -601,13 +601,16 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
     @Override
     public void onDestroy()
     {
-        m_marker.cancelAnimation();
-        //MapView的生命周期与Fragment同步,当Fragment销毁时需调用MapView.destroy()
-        m_baiduMapView.onDestroy();
-        m_marker.remove();
+        //        if(m_marker != null)
+        //        {
+        //            m_marker.cancelAnimation();
+        //            m_marker.remove();
+        //        }
+        //        //MapView的生命周期与Fragment同步,当Fragment销毁时需调用MapView.destroy()
+        //        m_baiduMapView.onDestroy();
         super.onDestroy();
-        //回收Bitmap资源
-        ICON_MARKER.recycle();
+        //        //回收Bitmap资源
+        //        ICON_MARKER.recycle();
     }
 
     @Override

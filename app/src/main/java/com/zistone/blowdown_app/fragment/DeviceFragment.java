@@ -42,10 +42,10 @@ public class DeviceFragment extends Fragment
             1, 0, 0, 1, 1, 0, 0, 1
     };
     private double[] lats = {
-            22.52837, 31.245105, 37.023537, 30.66441, 31.200547, 0, 0, 0
+            22.52837, 31.245105, 37.023537, 30.66441, 31.200547, 22.295899, 29.50457, 23.021089
     };
     private double[] lots = {
-            114.003481, 121.506377, 116.289429, 111.377191, 121.326997, 0, 0, 0
+            114.003481, 121.506377, 116.289429, 111.377191, 121.326997, 114.185284, 106.452347, 113.779967
     };
 
     private Context m_context;
@@ -113,10 +113,22 @@ public class DeviceFragment extends Fragment
                 DeviceInfo tempDevice = m_deviceList.get(viewHolder.getLayoutPosition());
                 Toast.makeText(m_context, tempDevice.getM_deviceName(), Toast.LENGTH_SHORT).show();
                 int a = m_mainActivity.getSupportFragmentManager().getFragments().size();
-                //重新实例化地图碎片以达到重新加载设备位置
-                getFragmentManager().beginTransaction().remove(m_mainActivity.m_mapFragment);
-                m_mainActivity.m_mapFragment = null;
                 m_mainActivity.m_deviceInfo = tempDevice;
+                //重新实例化地图碎片以达到重新加载设备位置
+                MapFragment mapFragment = MapFragment.newInstance(tempDevice, "");
+                Fragment currentFragment = getFragmentManager().findFragmentByTag("deviceFragment");
+                if(m_mainActivity.m_mapFragment == null)
+                {
+                    m_mainActivity.m_mapFragment = mapFragment;
+                    getFragmentManager().beginTransaction().hide(currentFragment).commitAllowingStateLoss();
+                }
+                else
+                {
+                    Fragment oldMapFragment = getFragmentManager().findFragmentByTag("mapFragment");
+                    getFragmentManager().beginTransaction().remove(oldMapFragment).commitAllowingStateLoss();
+                    //getFragmentManager().beginTransaction().replace(R.id.fragment_current, mapFragment).commitAllowingStateLoss();
+                    m_mainActivity.m_mapFragment = null;
+                }
                 m_mainActivity.m_bottomNavigationView.setSelectedItemId(m_mainActivity.m_bottomNavigationView.getMenu().getItem(0).getItemId());
             }
 

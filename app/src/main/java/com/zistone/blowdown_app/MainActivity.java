@@ -116,7 +116,7 @@ public class MainActivity extends AppCompatActivity implements MapFragment.OnFra
         {
             m_userFragment = UserFragment.newInstance("", "");
         }
-        AddOrShowFragment(getSupportFragmentManager().beginTransaction(), m_userFragment);
+        AddOrShowFragment(getSupportFragmentManager().beginTransaction(), m_userFragment, "userFragment");
     }
 
     private void ClickDeviceItem()
@@ -125,7 +125,7 @@ public class MainActivity extends AppCompatActivity implements MapFragment.OnFra
         {
             m_deviceFragment = DeviceFragment.newInstance(this, "");
         }
-        AddOrShowFragment(getSupportFragmentManager().beginTransaction(), m_deviceFragment);
+        AddOrShowFragment(getSupportFragmentManager().beginTransaction(), m_deviceFragment, "deviceFragment");
     }
 
     private void ClickMapItem()
@@ -134,10 +134,10 @@ public class MainActivity extends AppCompatActivity implements MapFragment.OnFra
         {
             m_mapFragment = MapFragment.newInstance(m_deviceInfo, "");
         }
-        AddOrShowFragment(getSupportFragmentManager().beginTransaction(), m_mapFragment);
+        AddOrShowFragment(getSupportFragmentManager().beginTransaction(), m_mapFragment, "mapFragment");
     }
 
-    private void AddOrShowFragment(FragmentTransaction transaction, Fragment fragment)
+    private void AddOrShowFragment(FragmentTransaction transaction, Fragment fragment, String tagStr)
     {
         if(m_currentFragment == null)
         {
@@ -146,7 +146,7 @@ public class MainActivity extends AppCompatActivity implements MapFragment.OnFra
         //如果当前的Fragment未被添加到管理器中
         if(!fragment.isAdded())
         {
-            transaction.hide(m_currentFragment).add(R.id.fragment_current, fragment).commitAllowingStateLoss();
+            transaction.hide(m_currentFragment).add(R.id.fragment_current, fragment, tagStr).commitAllowingStateLoss();
         }
         //否则就显示
         else
