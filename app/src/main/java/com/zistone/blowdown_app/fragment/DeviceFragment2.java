@@ -249,6 +249,7 @@ public class DeviceFragment2 extends Fragment
         };
         materialRefreshLayout = m_deviceView.findViewById(R.id.refresh);
         materialRefreshLayout.setLoadMore(true);
+        // 结束上拉刷新...
         materialRefreshLayout.finishRefreshLoadMore();
         materialRefreshLayout.setMaterialRefreshListener(new MaterialRefreshListener()
         {
@@ -260,6 +261,7 @@ public class DeviceFragment2 extends Fragment
                     @Override
                     public void run()
                     {
+                        // 结束下拉刷新...
                         materialRefreshLayout.finishRefresh();
 
                     }
