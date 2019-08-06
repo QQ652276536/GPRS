@@ -42,7 +42,8 @@ public class DeviceFragment extends Fragment
 {
     private static final int MESSAGE_GETRESPONSE_SUCCESS = 0;
     private static final int MESSAGE_GETRESPONSE_FAIL = 1;
-    private static final String URL = "http://10.0.2.2:8080/Blowdown_Web/DeviceInfo/FindAll";
+    //private static final String URL = "http://10.0.2.2:8080/Blowdown_Web/DeviceInfo/FindAll";
+    private static final String URL = "http://192.168.10.197:8080/Blowdown_Web/DeviceInfo/FindAll";
     private Context m_context;
     private View m_deviceView;
     private List<DeviceInfo> m_deviceList = new ArrayList<>();
@@ -99,27 +100,27 @@ public class DeviceFragment extends Fragment
         m_mainActivity = (MainActivity) getArguments().getSerializable("MainActivityClass");
         //下拉刷新控件
         m_materialRefreshLayout = m_deviceView.findViewById(R.id.refresh);
-        m_materialRefreshLayout.setLoadMore(true);
-        //结束上拉刷新
-        m_materialRefreshLayout.finishRefreshLoadMore();
+        //禁用加载更多
+        m_materialRefreshLayout.setLoadMore(false);
         m_materialRefreshLayout.setMaterialRefreshListener(new MaterialRefreshListener()
         {
             /**
              * 下拉刷新
-             * @param m_materialRefreshLayout
+             * @param materialRefreshLayout
              */
             @Override
-            public void onRefresh(final MaterialRefreshLayout m_materialRefreshLayout)
+            public void onRefresh(final MaterialRefreshLayout materialRefreshLayout)
             {
-                m_materialRefreshLayout.postDelayed(new Runnable()
+                materialRefreshLayout.postDelayed(new Runnable()
                 {
                     @Override
                     public void run()
                     {
+                        SendWithOkHttp();
                         //结束下拉刷新
-                        m_materialRefreshLayout.finishRefresh();
+                        materialRefreshLayout.finishRefresh();
                     }
-                }, 3000);
+                }, 2000);
             }
 
             /**
@@ -133,14 +134,16 @@ public class DeviceFragment extends Fragment
 
             /**
              * 加载更多
-             * @param m_materialRefreshLayout
+             * @param materialRefreshLayout
              */
             @Override
-            public void onRefreshLoadMore(MaterialRefreshLayout m_materialRefreshLayout)
+            public void onRefreshLoadMore(MaterialRefreshLayout materialRefreshLayout)
             {
                 Toast.makeText(m_context, "别滑了,到底了", Toast.LENGTH_LONG).show();
             }
         });
+        //自动刷新
+        m_materialRefreshLayout.autoRefresh();
         m_recyclerView = m_deviceView.findViewById(R.id.device_recycler);
         //使用线性布局
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(m_context);
@@ -187,6 +190,10 @@ public class DeviceFragment extends Fragment
                 case MESSAGE_GETRESPONSE_SUCCESS:
                 {
                     String responseStr = (String) message.obj;
+                    if(null == responseStr || "".equals(responseStr))
+                    {
+                        return;
+                    }
                     //不同环境SimpleDateFormat模式取到的字符串不一样
                     Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
                     m_deviceList = gson.fromJson(responseStr, new TypeToken<List<DeviceInfo>>()

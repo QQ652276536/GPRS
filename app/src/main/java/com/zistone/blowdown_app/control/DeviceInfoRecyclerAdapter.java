@@ -54,7 +54,7 @@ public class DeviceInfoRecyclerAdapter extends RecyclerView.Adapter<DeviceInfoRe
     {
         DeviceInfo deviceInfo = m_list.get(i);
         String state = deviceInfo.getM_state() == 1 ? "在线" : "离线";
-        deviceInfoViewHolder.m_textView.setText(deviceInfo.getM_deviceName() + "\n" + deviceInfo.getM_deviceType() + "\t" + state);
+        deviceInfoViewHolder.m_textView.setText(deviceInfo.getM_deviceName() + "(" + state + ")" + "\n" + deviceInfo.getM_deviceType());
         if(state.equals("在线"))
         {
             deviceInfoViewHolder.m_imageView.setImageResource(R.drawable.device4);
