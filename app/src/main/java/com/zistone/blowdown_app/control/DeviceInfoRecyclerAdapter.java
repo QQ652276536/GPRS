@@ -20,6 +20,14 @@ public class DeviceInfoRecyclerAdapter extends RecyclerView.Adapter<DeviceInfoRe
     private Context m_context;
     private List<DeviceInfo> m_list;
     private View m_inflater;
+    private OnItemClickListener m_onItemClickListener;
+
+    public interface OnItemClickListener
+    {
+        void OnClick(int position);
+
+        void OnLongClick(int position);
+    }
 
     public DeviceInfoRecyclerAdapter(Context context, List<DeviceInfo> list)
     {
@@ -27,8 +35,18 @@ public class DeviceInfoRecyclerAdapter extends RecyclerView.Adapter<DeviceInfoRe
         m_list = list;
     }
 
+    public void AddData(int position)
+    {
+
+    }
+
+    public void SetOnItemClickListener(OnItemClickListener onItemClickListener)
+    {
+        this.m_onItemClickListener = onItemClickListener;
+    }
+
     /**
-     * 返回每一项布局
+     * 承载每个子项的布局
      *
      * @param viewGroup
      * @param i
@@ -44,13 +62,13 @@ public class DeviceInfoRecyclerAdapter extends RecyclerView.Adapter<DeviceInfoRe
     }
 
     /**
-     * 将数据和控件绑定
+     * 将每个子项绑定数据
      *
      * @param deviceInfoViewHolder
      * @param i
      */
     @Override
-    public void onBindViewHolder(@NonNull DeviceInfoViewHolder deviceInfoViewHolder, int i)
+    public void onBindViewHolder(@NonNull DeviceInfoViewHolder deviceInfoViewHolder, final int i)
     {
         DeviceInfo deviceInfo = m_list.get(i);
         String state = deviceInfo.getM_state() == 1 ? "在线" : "离线";
@@ -58,10 +76,31 @@ public class DeviceInfoRecyclerAdapter extends RecyclerView.Adapter<DeviceInfoRe
         if(state.equals("在线"))
         {
             deviceInfoViewHolder.m_imageView.setImageResource(R.drawable.device4);
+            deviceInfoViewHolder.m_textView.setTextColor(m_context.getColor(R.color.material_green));
         }
         else
         {
             deviceInfoViewHolder.m_imageView.setImageResource(R.drawable.device3);
+        }
+        if(m_onItemClickListener != null)
+        {
+            deviceInfoViewHolder.itemView.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    m_onItemClickListener.OnClick(i);
+                }
+            });
+            deviceInfoViewHolder.itemView.setOnLongClickListener(new View.OnLongClickListener()
+            {
+                @Override
+                public boolean onLongClick(View v)
+                {
+                    m_onItemClickListener.OnLongClick(i);
+                    return false;
+                }
+            });
         }
     }
 

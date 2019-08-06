@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -144,6 +145,7 @@ public class DeviceFragment extends Fragment
         });
         //自动刷新
         m_materialRefreshLayout.autoRefresh();
+        //RecyclerView
         m_recyclerView = m_deviceView.findViewById(R.id.device_recycler);
         //使用线性布局
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(m_context);
