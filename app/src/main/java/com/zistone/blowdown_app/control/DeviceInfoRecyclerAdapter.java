@@ -75,12 +75,12 @@ public class DeviceInfoRecyclerAdapter extends RecyclerView.Adapter<DeviceInfoRe
         deviceInfoViewHolder.m_textView.setText(deviceInfo.getM_deviceName() + "(" + state + ")" + "\n" + deviceInfo.getM_deviceType());
         if(state.equals("在线"))
         {
-            deviceInfoViewHolder.m_imageView.setImageResource(R.drawable.device4);
-            deviceInfoViewHolder.m_textView.setTextColor(m_context.getColor(R.color.material_green));
+            deviceInfoViewHolder.m_imageView.setImageResource(R.drawable.device3);
+            deviceInfoViewHolder.m_textView.setTextColor(m_context.getColor(R.color.colorPrimary));
         }
         else
         {
-            deviceInfoViewHolder.m_imageView.setImageResource(R.drawable.device3);
+            deviceInfoViewHolder.m_imageView.setImageResource(R.drawable.device4);
         }
         if(m_onItemClickListener != null)
         {
