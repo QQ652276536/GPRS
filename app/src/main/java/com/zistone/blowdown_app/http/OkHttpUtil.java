@@ -108,7 +108,7 @@ public class OkHttpUtil
      * @param map
      * @param listener
      */
-    public void AsynSendByPost(String url, Map<String, String> map, LoginCallBackListener listener)
+    public void AsynSendByPost(String url, Map<String, String> map, Callback listener)
     {
         //实例化并设置连接超时时间、读取超时时间
         OkHttpClient okHttpClient = new OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS)

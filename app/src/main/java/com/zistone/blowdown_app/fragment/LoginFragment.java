@@ -20,7 +20,6 @@ import android.widget.Toast;
 import com.zistone.blowdown_app.R;
 import com.zistone.blowdown_app.UserSharedPreference;
 import com.zistone.blowdown_app.entity.UserInfo;
-import com.zistone.blowdown_app.http.LoginCallBackListener;
 import com.zistone.blowdown_app.http.OkHttpUtil;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -36,13 +35,14 @@ import java.util.TimerTask;
 import java.util.regex.Pattern;
 
 import okhttp3.Call;
+import okhttp3.Callback;
 import okhttp3.Response;
 
 public class LoginFragment extends Fragment implements View.OnClickListener, View.OnFocusChangeListener
 {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    private static final String URL = "http://10.0.2.2:8080/Blowdown/UserInfo/Login";
+    private static final String URL = "http://10.0.2.2:8080/Blowdown_Web/UserInfo/Login";
     private static final int MESSAGE_GETRESPONSE_SUCCESS = 0;
     private static final int MESSAGE_GETRESPONSE_FAIL = 1;
     //6~12位字母数字组合
@@ -143,7 +143,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
                 map.put("m_password", m_editText_password.getText().toString());
                 OkHttpUtil okHttpUtil = new OkHttpUtil();
                 //异步方式发起请求
-                okHttpUtil.AsynSendByPost(URL, map, new LoginCallBackListener()
+                okHttpUtil.AsynSendByPost(URL, map, new Callback()
                 {
                     @Override
                     public void onFailure(@NotNull Call call, @NotNull IOException e)
@@ -159,17 +159,15 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
                     @Override
                     public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException
                     {
+                        String responseStr = response.body().string();
+                        Log.i("LoginLog", "请求响应:" + responseStr);
                         if(response.isSuccessful())
                         {
-                            String responseStr = response.body().string();
-                            Log.i("LoginLog", "收到Post请求的响应内容:" + responseStr);
                             Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_SUCCESS, responseStr);
                             handler.sendMessage(message);
                         }
                         else
                         {
-                            String responseStr = response.body().string();
-                            Log.i("LoginLog", "收到Post请求的响应内容:" + responseStr);
                             Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_FAIL, responseStr);
                             handler.sendMessage(message);
                         }
@@ -232,7 +230,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
     {
         m_loginTimer = new Timer();
         IsLogining();
-        //SendWithHttpClient();
         SendWithOkHttp();
         //重置超时时间
         TIMELENGTH = 5;

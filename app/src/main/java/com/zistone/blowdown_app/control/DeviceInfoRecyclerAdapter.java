@@ -1,11 +1,13 @@
 package com.zistone.blowdown_app.control;
 
 import android.content.Context;
+import android.media.Image;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.zistone.blowdown_app.R;
@@ -50,7 +52,17 @@ public class DeviceInfoRecyclerAdapter extends RecyclerView.Adapter<DeviceInfoRe
     @Override
     public void onBindViewHolder(@NonNull DeviceInfoViewHolder deviceInfoViewHolder, int i)
     {
-        deviceInfoViewHolder.m_textView.setText("---------------");
+        DeviceInfo deviceInfo = m_list.get(i);
+        String state = deviceInfo.getM_state() == 1 ? "在线" : "离线";
+        deviceInfoViewHolder.m_textView.setText(deviceInfo.getM_deviceName() + "\n" + deviceInfo.getM_deviceType() + "\t" + state);
+        if(state.equals("在线"))
+        {
+            deviceInfoViewHolder.m_imageView.setImageResource(R.drawable.device4);
+        }
+        else
+        {
+            deviceInfoViewHolder.m_imageView.setImageResource(R.drawable.device3);
+        }
     }
 
     @Override
@@ -65,11 +77,13 @@ public class DeviceInfoRecyclerAdapter extends RecyclerView.Adapter<DeviceInfoRe
     class DeviceInfoViewHolder extends RecyclerView.ViewHolder
     {
         TextView m_textView;
+        ImageView m_imageView;
 
         public DeviceInfoViewHolder(@NonNull View itemView)
         {
             super(itemView);
             m_textView = itemView.findViewById(R.id.text_view);
+            m_imageView = itemView.findViewById(R.id.img);
         }
     }
 
