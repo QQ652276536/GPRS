@@ -13,11 +13,9 @@
     app:wave_height_type="normal"
     app:wave_show="true">
 
-
-    <com.zistone.blowdown_app.control.LeftSlideRemoveView
-        android:id="@+id/recyclerView"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/device_recycler"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
-
 
 </com.zistone.material_refresh_layout.MaterialRefreshLayout>

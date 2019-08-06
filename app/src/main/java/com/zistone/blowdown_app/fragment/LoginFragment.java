@@ -7,7 +7,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,7 +20,6 @@ import android.widget.Toast;
 import com.zistone.blowdown_app.R;
 import com.zistone.blowdown_app.UserSharedPreference;
 import com.zistone.blowdown_app.entity.UserInfo;
-import com.zistone.blowdown_app.http.HttpClientUtil;
 import com.zistone.blowdown_app.http.LoginCallBackListener;
 import com.zistone.blowdown_app.http.OkHttpUtil;
 import com.google.gson.Gson;
@@ -177,31 +175,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
                         }
                     }
                 });
-                Looper.loop();
-            }
-        }).start();
-    }
-
-    /**
-     * 用HttpClient发送网络请求,并在里面开启线程
-     */
-    private void SendWithHttpClient()
-    {
-        new Thread(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                Looper.prepare();
-                Map<String, String> map = new HashMap<>();
-                map.put("m_userName", m_editText_userName.getText().toString());
-                map.put("m_password", m_editText_password.getText().toString());
-                HttpClientUtil httpClientUtil = new HttpClientUtil();
-                String responseStr = httpClientUtil.SendByPost(URL, map);
-                Log.i("LoginLog", "收到Post请求的响应内容:" + responseStr);
-                //从MessagePool中获取一个Message实例
-                Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_SUCCESS, responseStr);
-                handler.sendMessage(message);
                 Looper.loop();
             }
         }).start();

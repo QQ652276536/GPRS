@@ -19,7 +19,6 @@ import android.widget.Toast;
 
 import com.zistone.blowdown_app.R;
 import com.zistone.blowdown_app.entity.UserInfo;
-import com.zistone.blowdown_app.http.HttpClientUtil;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -285,34 +284,6 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
             {
                 Looper.prepare();
 
-                Looper.loop();
-            }
-        }).start();
-    }
-
-    /**
-     * 用HttpClient发送网络请求,并在里面开启线程
-     */
-    private void SendWithHttpClient()
-    {
-        new Thread(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                Looper.prepare();
-                Map<String, String> map = new HashMap<>();
-                map.put("m_userName", m_editText_userName.getText().toString());
-                map.put("", m_editText_userRealName.getText().toString());
-                map.put("", m_editText_userPhone.getText().toString());
-                map.put("", m_editText_password.getText().toString());
-                map.put("", m_editText_rePassword.getText().toString());
-                HttpClientUtil httpClientUtil = new HttpClientUtil();
-                String responseStr = httpClientUtil.SendByPost(URL, map);
-                Log.i("RegisterLog", "收到Post请求的响应内容:" + responseStr);
-                //从MessagePool中获取一个Message实例
-                Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_SUCCESS, responseStr);
-                handler.sendMessage(message);
                 Looper.loop();
             }
         }).start();
