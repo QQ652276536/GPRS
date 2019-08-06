@@ -1,6 +1,5 @@
 package com.zistone.blowdown_app;
 
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -11,10 +10,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.zistone.blowdown_app.R;
 import com.zistone.blowdown_app.entity.DeviceInfo;
 import com.zistone.blowdown_app.fragment.DeviceFragment;
-import com.zistone.blowdown_app.fragment.DeviceFragment2;
 import com.zistone.blowdown_app.fragment.ForgetFragment;
 import com.zistone.blowdown_app.fragment.LoginFragment;
 import com.zistone.blowdown_app.fragment.MapFragment;
@@ -23,14 +20,14 @@ import com.zistone.blowdown_app.fragment.UserFragment;
 
 import java.io.Serializable;
 
-public class MainActivity extends AppCompatActivity implements MapFragment.OnFragmentInteractionListener, DeviceFragment2.OnFragmentInteractionListener, UserFragment.OnFragmentInteractionListener, LoginFragment.OnFragmentInteractionListener, RegisterFragment.OnFragmentInteractionListener, ForgetFragment.OnFragmentInteractionListener, Serializable
+public class MainActivity extends AppCompatActivity implements MapFragment.OnFragmentInteractionListener, DeviceFragment.OnFragmentInteractionListener, UserFragment.OnFragmentInteractionListener, LoginFragment.OnFragmentInteractionListener, RegisterFragment.OnFragmentInteractionListener, ForgetFragment.OnFragmentInteractionListener, Serializable
 {
     //当前页,用来切换
     public Fragment m_currentFragment;
     //地图页
     public MapFragment m_mapFragment;
     //设备页
-    public DeviceFragment2 m_deviceFragment;
+    public DeviceFragment m_deviceFragment;
     //用户页
     public UserFragment m_userFragment;
     //底部导航栏
@@ -56,7 +53,7 @@ public class MainActivity extends AppCompatActivity implements MapFragment.OnFra
             //实例化设备页
             if(m_deviceFragment == null)
             {
-                m_deviceFragment = DeviceFragment2.newInstance(this, "");
+                m_deviceFragment = DeviceFragment.newInstance(this, "");
             }
             //该碎片不在管理器中则添加进去
             if(!m_deviceFragment.isAdded())
@@ -124,7 +121,7 @@ public class MainActivity extends AppCompatActivity implements MapFragment.OnFra
     {
         if(m_deviceFragment == null)
         {
-            m_deviceFragment = DeviceFragment2.newInstance(this, "");
+            m_deviceFragment = DeviceFragment.newInstance(this, "");
         }
         AddOrShowFragment(getSupportFragmentManager().beginTransaction(), m_deviceFragment, "deviceFragment");
     }

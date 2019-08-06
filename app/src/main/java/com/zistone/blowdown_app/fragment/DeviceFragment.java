@@ -25,6 +25,8 @@ import com.zistone.blowdown_app.control.LeftSlideRemoveAdapter;
 import com.zistone.blowdown_app.control.LeftSlideRemoveView;
 import com.zistone.blowdown_app.control.OnRecyclerItemClickListener;
 import com.zistone.blowdown_app.entity.DeviceInfo;
+import com.zistone.material_refresh_layout.MaterialRefreshLayout;
+import com.zistone.material_refresh_layout.MaterialRefreshListener;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -52,10 +54,14 @@ public class DeviceFragment extends Fragment
     private View m_deviceView;
     private LeftSlideRemoveView m_leftSlideRemoveView;
     private List<DeviceInfo> m_deviceList = new ArrayList<>();
+    //长按拖拽控件
     private ItemTouchHelper m_itemTouchHelper;
+    //左滑删除控件
     private LeftSlideRemoveAdapter m_leftSlideRemoveAdapter;
-    private OnFragmentInteractionListener mListener;
     private MainActivity m_mainActivity;
+    //下拉刷新控件
+    private MaterialRefreshLayout materialRefreshLayout;
+    private OnFragmentInteractionListener mListener;
 
     public DeviceFragment()
     {
@@ -98,6 +104,51 @@ public class DeviceFragment extends Fragment
     {
         m_context = m_deviceView.getContext();
         m_mainActivity = (MainActivity) getArguments().getSerializable("MainActivityClass");
+        //下拉刷新控件
+        materialRefreshLayout = m_deviceView.findViewById(R.id.refresh);
+        materialRefreshLayout.setLoadMore(true);
+        //结束上拉刷新
+        materialRefreshLayout.finishRefreshLoadMore();
+        materialRefreshLayout.setMaterialRefreshListener(new MaterialRefreshListener()
+        {
+            /**
+             * 下拉刷新
+             * @param materialRefreshLayout
+             */
+            @Override
+            public void onRefresh(final MaterialRefreshLayout materialRefreshLayout)
+            {
+                materialRefreshLayout.postDelayed(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        //结束下拉刷新
+                        materialRefreshLayout.finishRefresh();
+                    }
+                }, 3000);
+            }
+
+            /**
+             * 加载完毕
+             */
+            @Override
+            public void onfinish()
+            {
+                Toast.makeText(m_context, "完成", Toast.LENGTH_LONG).show();
+            }
+
+            /**
+             * 加载更多
+             * @param materialRefreshLayout
+             */
+            @Override
+            public void onRefreshLoadMore(MaterialRefreshLayout materialRefreshLayout)
+            {
+                Toast.makeText(m_context, "别滑了,到底了", Toast.LENGTH_LONG).show();
+            }
+        });
+        //左滑删除控件
         m_leftSlideRemoveView = m_deviceView.findViewById(R.id.recyclerView);
         m_leftSlideRemoveView.setLayoutManager(new LinearLayoutManager(getContext()));
         //添加自定义分割线
@@ -138,7 +189,7 @@ public class DeviceFragment extends Fragment
                 //判断被拖拽的是否是前两个,如果不是则执行拖拽
                 if(vh.getLayoutPosition() != 0 && vh.getLayoutPosition() != 1)
                 {
-                    m_itemTouchHelper.startDrag(vh);
+                    //m_itemTouchHelper.startDrag(vh);
                     //TODO:获取系统震动服务
                 }
             }
@@ -146,7 +197,7 @@ public class DeviceFragment extends Fragment
         m_itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.Callback()
         {
             /**
-             * 是否处理滑动事件以及拖拽和滑动的方向,如果是列表类型的RecyclerView的只存在UP和DOWN,如果是网格类RecyclerView则还应该多有LEFT和RIGHT
+             * 是否处理滑动事件以及拖拽和滑动的方向,如果是列表类型的RecyclerView的只存在UP和DOWN,如果是网格类RecyclerView则还有LEFT和RIGHT
              * @param recyclerView
              * @param viewHolder
              * @return

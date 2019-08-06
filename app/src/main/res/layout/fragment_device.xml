@@ -1,12 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent">
+<com.zistone.material_refresh_layout.MaterialRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/refresh"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:overlay="false"
+    app:progress_backgroud_color="#FFFAFAFA"
+    app:progress_colors="@array/material_colors"
+    app:progress_show_arrow="true"
+    app:progress_show_circle_backgroud="true"
+    app:wave_color="#20ff2020"
+    app:wave_height_type="normal"
+    app:wave_show="true">
+
 
     <com.zistone.blowdown_app.control.LeftSlideRemoveView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
-</LinearLayout>
+
+
+</com.zistone.material_refresh_layout.MaterialRefreshLayout>

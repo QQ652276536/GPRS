@@ -219,7 +219,7 @@ public class MaterialRefreshLayout extends FrameLayout {
 
     private void soveLoadMoreLogic() {
         isLoadMoreing = true;
-        mMaterialFooterView.setVisibility(View.VISIBLE);
+        mMaterialFooterView.setVisibility(View.GONE);
         mMaterialFooterView.onBegin(this);
         mMaterialFooterView.onRefreshing(this);
         if (refreshListener != null) {
