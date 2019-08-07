@@ -57,6 +57,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
     private String mParam1;
     private String mParam2;
 
+    private Context m_context;
     private View m_userView;
     private EditText m_editText_userName;
     private EditText m_editText_password;
@@ -118,7 +119,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
                 {
                     IsLoginEd();
                     String responseStr = (String) message.obj;
-                    Toast.makeText(m_userView.getContext(), "登录超时,请检查网络环境", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(m_context, "登录超时,请检查网络环境", Toast.LENGTH_SHORT).show();
                     break;
                 }
                 default:
@@ -187,16 +188,16 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
         if(userInfo != null)
         {
             Log.i("LoginLog", "登录成功:用户真实姓名为:" + userInfo.getM_realName());
-            UserSharedPreference.SetUserName(m_userView.getContext(), userInfo.getM_userName());
-            UserSharedPreference.SetPassword(m_userView.getContext(), userInfo.getM_password());
-            UserSharedPreference.SetRealName(m_userView.getContext(), userInfo.getM_realName());
-            UserSharedPreference.SetLevel(m_userView.getContext(), userInfo.getM_level());
+            UserSharedPreference.SetUserName(m_context, userInfo.getM_userName());
+            UserSharedPreference.SetPassword(m_context, userInfo.getM_password());
+            UserSharedPreference.SetRealName(m_context, userInfo.getM_realName());
+            UserSharedPreference.SetLevel(m_context, userInfo.getM_level());
             //TODO:跳转至设备页面
         }
         else
         {
             Log.i("LoginLog", "登录失败:用户名或密码错误");
-            Toast.makeText(m_userView.getContext(), "用户名或密码错误", Toast.LENGTH_SHORT).show();
+            Toast.makeText(m_context, "用户名或密码错误", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -250,7 +251,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
                             IsLoginEd();
                             //从任务队列中取消任务
                             m_loginTimer.cancel();
-                            Toast.makeText(m_userView.getContext(), "登录失败,请检查网络", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(m_context, "登录失败,请检查网络", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -263,6 +264,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
 
     private void InitData()
     {
+        m_context = m_userView.getContext();
         m_editText_userName = m_userView.findViewById(R.id.editTextUserName_login);
         m_editText_userName.setOnFocusChangeListener(this);
         m_editText_password = m_userView.findViewById(R.id.editTextPassword_login);

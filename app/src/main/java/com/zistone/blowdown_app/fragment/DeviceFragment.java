@@ -153,32 +153,49 @@ public class DeviceFragment extends Fragment
         //设置布局
         m_recyclerView.setLayoutManager(linearLayoutManager);
         SendWithOkHttp();
+    }
 
-        //            @Override
-        //            public void OnItemClick(RecyclerView.ViewHolder viewHolder)
-        //            {
-        //                DeviceInfo tempDevice = m_deviceList.get(viewHolder.getLayoutPosition());
-        //                Toast.makeText(m_context, tempDevice.getM_deviceName(), Toast.LENGTH_SHORT).show();
-        //                int a = m_mainActivity.getSupportFragmentManager().getFragments().size();
-        //                m_mainActivity.m_deviceInfo = tempDevice;
-        //                //重新实例化地图碎片以达到重新加载设备位置
-        //                MapFragment mapFragment = MapFragment.newInstance(tempDevice, "");
-        //                Fragment currentFragment = getFragmentManager().findFragmentByTag("deviceFragment");
-        //                if(m_mainActivity.m_mapFragment == null)
-        //                {
-        //                    m_mainActivity.m_mapFragment = mapFragment;
-        //                    getFragmentManager().beginTransaction().hide(currentFragment).commitAllowingStateLoss();
-        //                }
-        //                else
-        //                {
-        //                    Fragment oldMapFragment = getFragmentManager().findFragmentByTag("mapFragment");
-        //                    getFragmentManager().beginTransaction().remove(oldMapFragment).commitAllowingStateLoss();
-        //                    //getFragmentManager().beginTransaction().replace(R.id.fragment_current, mapFragment).commitAllowingStateLoss();
-        //                    m_mainActivity.m_mapFragment = null;
-        //                }
-        //                m_mainActivity.m_bottomNavigationView.setSelectedItemId(m_mainActivity.m_bottomNavigationView.getMenu().getItem(0).getItemId());
-        //            }
+    /**
+     * 给下拉控件设置点击事件
+     */
+    private void SetDeviceInfoRecyclerAdapterListener()
+    {
+        if(null != m_deviceInfoRecyclerAdapter)
+        {
+            m_deviceInfoRecyclerAdapter.SetOnItemClickListener(new DeviceInfoRecyclerAdapter.OnItemClickListener()
+            {
+                @Override
+                public void OnClick(int position)
+                {
+                    DeviceInfo tempDevice = m_deviceList.get(position);
+                    Toast.makeText(m_context, tempDevice.getM_name(), Toast.LENGTH_SHORT).show();
+                    int a = m_mainActivity.getSupportFragmentManager().getFragments().size();
+                    m_mainActivity.m_deviceInfo = tempDevice;
+                    //重新实例化地图碎片以达到重新加载设备位置
+                    MapFragment mapFragment = MapFragment.newInstance(tempDevice, "");
+                    Fragment currentFragment = getFragmentManager().findFragmentByTag("deviceFragment");
+                    if(m_mainActivity.m_mapFragment == null)
+                    {
+                        m_mainActivity.m_mapFragment = mapFragment;
+                        getFragmentManager().beginTransaction().hide(currentFragment).commitAllowingStateLoss();
+                    }
+                    else
+                    {
+                        Fragment oldMapFragment = getFragmentManager().findFragmentByTag("mapFragment");
+                        getFragmentManager().beginTransaction().remove(oldMapFragment).commitAllowingStateLoss();
+                        //getFragmentManager().beginTransaction().replace(R.id.fragment_current, mapFragment).commitAllowingStateLoss();
+                        m_mainActivity.m_mapFragment = null;
+                    }
+                    m_mainActivity.m_bottomNavigationView.setSelectedItemId(m_mainActivity.m_bottomNavigationView.getMenu().getItem(0).getItemId());
+                }
 
+                @Override
+                public void OnLongClick(int position)
+                {
+                    Toast.makeText(m_context, "当前长按 " + position, Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
     }
 
     private Handler handler = new Handler()
@@ -204,12 +221,13 @@ public class DeviceFragment extends Fragment
                     //设置适配器
                     m_deviceInfoRecyclerAdapter = new DeviceInfoRecyclerAdapter(m_context, m_deviceList);
                     m_recyclerView.setAdapter(m_deviceInfoRecyclerAdapter);
+                    SetDeviceInfoRecyclerAdapterListener();
                     break;
                 }
                 case MESSAGE_GETRESPONSE_FAIL:
                 {
                     String responseStr = (String) message.obj;
-                    Toast.makeText(m_deviceView.getContext(), "请求超时,请检查网络环境", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(m_context, "请求超时,请检查网络环境", Toast.LENGTH_SHORT).show();
                     break;
                 }
                 default:

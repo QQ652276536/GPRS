@@ -41,7 +41,8 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
     private String mParam1;
     private String mParam2;
 
-    private View m_userView;
+    private Context m_context;
+    private View m_registerView;
     private EditText m_editText_userName;
     private EditText m_editText_userRealName;
     private EditText m_editText_userPhone;
@@ -95,7 +96,7 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null)
+        if(getArguments() != null)
         {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -113,15 +114,15 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        m_userView = inflater.inflate(R.layout.fragment_register, container, false);
+        m_registerView = inflater.inflate(R.layout.fragment_register, container, false);
         InitData();
-        return m_userView;
+        return m_registerView;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri)
     {
-        if (mListener != null)
+        if(mListener != null)
         {
             mListener.onFragmentInteraction(uri);
         }
@@ -131,7 +132,7 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
     public void onAttach(Context context)
     {
         super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener)
+        if(context instanceof OnFragmentInteractionListener)
         {
             mListener = (OnFragmentInteractionListener) context;
         }
@@ -155,7 +156,7 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
     public void onClick(View v)
     {
         //登录,这里是跳转至登录页面
-        if (R.id.btn_login_register == v.getId())
+        if(R.id.btn_login_register == v.getId())
         {
             Fragment loginFragment = getFragmentManager().getFragments().get(0);
             Fragment registerFragment = getFragmentManager().getFragments().get(1);
@@ -165,15 +166,15 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
             getFragmentManager().beginTransaction().show(loginFragment).commitAllowingStateLoss();
         }
         //注册,这里是发起注册请求
-        else if (R.id.btn_register_register == v.getId())
+        else if(R.id.btn_register_register == v.getId())
         {
             //隐藏键盘
             InputMethodManager imm = (InputMethodManager) v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-            if (imm.isActive())
+            if(imm.isActive())
             {
                 imm.hideSoftInputFromWindow(v.getApplicationWindowToken(), 0);
             }
-            if (Pattern.matches(REGEXUSERNAME, m_editText_userName.getText().toString()))
+            if(Pattern.matches(REGEXUSERNAME, m_editText_userName.getText().toString()))
             {
                 m_editText_userName.setError(null);
             }
@@ -181,7 +182,7 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
             {
                 m_editText_userName.setError("用户名非法");
             }
-            if (Pattern.matches(REGEXPASSWORD, m_editText_password.getText().toString()))
+            if(Pattern.matches(REGEXPASSWORD, m_editText_password.getText().toString()))
             {
                 m_editText_password.setError(null);
             }
@@ -189,7 +190,7 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
             {
                 m_editText_password.setError("密码非法");
             }
-            if (m_editText_userName.getError() == null && m_editText_password.getError() == null)
+            if(m_editText_userName.getError() == null && m_editText_password.getError() == null)
             {
                 Register();
             }
@@ -199,15 +200,15 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
     @Override
     public void onFocusChange(View v, boolean hasFocus)
     {
-        if (R.id.editTextUserName_register == v.getId())
+        if(R.id.editTextUserName_register == v.getId())
         {
-            if (hasFocus)
+            if(hasFocus)
             {
                 m_editText_userName.setError(null);
             }
             else
             {
-                if (Pattern.matches(REGEXUSERNAME, m_editText_userName.getText().toString()))
+                if(Pattern.matches(REGEXUSERNAME, m_editText_userName.getText().toString()))
                 {
                     m_editText_userName.setError(null);
                 }
@@ -217,15 +218,15 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
                 }
             }
         }
-        if (R.id.editTextPassword_register == v.getId())
+        if(R.id.editTextPassword_register == v.getId())
         {
-            if (hasFocus)
+            if(hasFocus)
             {
                 m_editText_password.setError(null);
             }
             else
             {
-                if (Pattern.matches(REGEXPASSWORD, m_editText_password.getText().toString()))
+                if(Pattern.matches(REGEXPASSWORD, m_editText_password.getText().toString()))
                 {
                     m_editText_password.setError(null);
                 }
@@ -248,7 +249,7 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
         public void handleMessage(Message message)
         {
             super.handleMessage(message);
-            switch (message.what)
+            switch(message.what)
             {
                 case MESSAGE_GETRESPONSE_SUCCESS:
                 {
@@ -263,7 +264,7 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
                 {
                     IsRegisterEd();
                     String responseStr = (String) message.obj;
-                    Toast.makeText(m_userView.getContext(), "注册超时,请检查网络环境", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(m_context, "注册超时,请检查网络环境", Toast.LENGTH_SHORT).show();
                     break;
                 }
                 default:
@@ -295,7 +296,7 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
     private void RegisterResult(UserInfo userInfo)
     {
         IsRegisterEd();
-        if (userInfo != null)
+        if(userInfo != null)
         {
             Log.i("RegisterLog", "注册成功:用户真实姓名为:" + userInfo.getM_realName());
             //TODO:跳转至登录页面并将用户名填至输入框
@@ -303,7 +304,7 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
         else
         {
             Log.i("RegisterLog", "注册失败:用户名或密码错误");
-            Toast.makeText(m_userView.getContext(), "用户名或密码错误", Toast.LENGTH_SHORT).show();
+            Toast.makeText(m_context, "用户名或密码错误", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -346,20 +347,21 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
 
     private void InitData()
     {
-        m_editText_userName = m_userView.findViewById(R.id.editTextUserName_register);
+        m_context = m_registerView.getContext();
+        m_editText_userName = m_registerView.findViewById(R.id.editTextUserName_register);
         m_editText_userName.setOnFocusChangeListener(this);
-        m_editText_userRealName = m_userView.findViewById(R.id.editTextRealName_register);
+        m_editText_userRealName = m_registerView.findViewById(R.id.editTextRealName_register);
         m_editText_userRealName.setOnFocusChangeListener(this);
-        m_editText_userPhone = m_userView.findViewById(R.id.editTextPhone_register);
+        m_editText_userPhone = m_registerView.findViewById(R.id.editTextPhone_register);
         m_editText_userPhone.setOnFocusChangeListener(this);
-        m_editText_password = m_userView.findViewById(R.id.editTextPassword_register);
+        m_editText_password = m_registerView.findViewById(R.id.editTextPassword_register);
         m_editText_password.setOnFocusChangeListener(this);
-        m_editText_rePassword = m_userView.findViewById(R.id.editTextRePassword_register);
+        m_editText_rePassword = m_registerView.findViewById(R.id.editTextRePassword_register);
         m_editText_rePassword.setOnFocusChangeListener(this);
-        m_btnLogin = m_userView.findViewById(R.id.btn_login_register);
+        m_btnLogin = m_registerView.findViewById(R.id.btn_login_register);
         m_btnLogin.setOnClickListener(this);
-        m_btnRegister = m_userView.findViewById(R.id.btn_register_register);
+        m_btnRegister = m_registerView.findViewById(R.id.btn_register_register);
         m_btnRegister.setOnClickListener(this);
-        m_registerProgressBar = m_userView.findViewById(R.id.progressBar_register);
+        m_registerProgressBar = m_registerView.findViewById(R.id.progressBar_register);
     }
 }

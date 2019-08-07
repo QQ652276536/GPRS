@@ -22,8 +22,8 @@ public class DeviceInfo implements Parcelable
             Bundle bundle = in.readBundle();
             DeviceInfo deviceInfo = new DeviceInfo();
             deviceInfo.setM_id(bundle.getInt("m_id"));
-            deviceInfo.setM_deviceName(bundle.getString("m_deviceName"));
-            deviceInfo.setM_deviceType(bundle.getString("m_deviceType"));
+            deviceInfo.setM_name(bundle.getString("m_name"));
+            deviceInfo.setM_type(bundle.getString("m_type"));
             deviceInfo.setM_lat(bundle.getDouble("m_lat"));
             deviceInfo.setM_lot(bundle.getDouble("m_lot"));
             deviceInfo.setM_state(bundle.getInt("m_state"));
@@ -40,7 +40,7 @@ public class DeviceInfo implements Parcelable
     @Override
     public String toString()
     {
-        return "DeviceInfo{" + "m_id=" + m_id + ", m_deviceName='" + m_deviceName + '\'' + ", m_deviceType='" + m_deviceType + '\'' + ", m_lat=" + m_lat + ", m_lot=" + m_lot + ", m_state=" + m_state + '}';
+        return "DeviceInfo{" + "m_id=" + m_id + ", m_name='" + m_name + '\'' + ", m_type='" + m_type + '\'' + ", m_lat=" + m_lat + ", m_lot=" + m_lot + ", m_state=" + m_state + '}';
     }
 
     /**
@@ -61,31 +61,31 @@ public class DeviceInfo implements Parcelable
     /**
      * 设备名
      */
-    private String m_deviceName;
+    private String m_name;
 
-    public String getM_deviceName()
+    public String getM_name()
     {
-        return m_deviceName;
+        return m_name;
     }
 
-    public void setM_deviceName(String m_deviceName)
+    public void setM_name(String m_name)
     {
-        this.m_deviceName = m_deviceName;
+        this.m_name = m_name;
     }
 
     /**
      * 设备型号
      */
-    private String m_deviceType;
+    private String m_type;
 
-    public String getM_deviceType()
+    public String getM_type()
     {
-        return m_deviceType;
+        return m_type;
     }
 
-    public void setM_deviceType(String m_deviceType)
+    public void setM_type(String m_type)
     {
-        this.m_deviceType = m_deviceType;
+        this.m_type = m_type;
     }
 
     /**
@@ -143,8 +143,8 @@ public class DeviceInfo implements Parcelable
     public void writeToParcel(Parcel dest, int flags)
     {
         dest.writeInt(m_id);
-        dest.writeString(m_deviceName);
-        dest.writeString(m_deviceType);
+        dest.writeString(m_name);
+        dest.writeString(m_type);
         dest.writeDouble(m_lat);
         dest.writeDouble(m_lot);
         dest.writeInt(m_state);

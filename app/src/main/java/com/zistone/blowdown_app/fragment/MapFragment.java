@@ -68,6 +68,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
 {
     private static final BitmapDescriptor ICON_MARKER = BitmapDescriptorFactory.fromResource(R.drawable.icon_mark);
 
+    private Context m_context;
     private MyLocationListener m_locationListener = new MyLocationListener();
     private LocationClient m_locationClient;
     private View m_mapView;
@@ -417,7 +418,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
             };
             for(String perm : permissions)
             {
-                if(PackageManager.PERMISSION_GRANTED != getContext().checkSelfPermission(perm))
+                if(PackageManager.PERMISSION_GRANTED != m_context.checkSelfPermission(perm))
                 {
                     //进入到这里代表没有权限
                     permissionsList.add(perm);
@@ -501,7 +502,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
             m_latLng = new LatLng(m_deviceInfo.getM_lat(), m_deviceInfo.getM_lot());
         }
         //获取传感器管理服务
-        m_sensorManager = (SensorManager) getContext().getSystemService(SENSOR_SERVICE);
+        m_sensorManager = (SensorManager) m_context.getSystemService(SENSOR_SERVICE);
         //地图初始化
         m_baiduMap = m_baiduMapView.getMap();
         MapStatus.Builder builder = new MapStatus.Builder();
@@ -524,7 +525,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
         //        //开启定位图层
         //        m_baiduMap.setMyLocationEnabled(true);
         //        //定位初始化
-        //        m_locationClient = new LocationClient(getContext());
+        //        m_locationClient = new LocationClient(m_context);
         //        m_locationClient.registerLocationListener(m_locationListener);
         //        //设置坐标各项参数
         //        LocationClientOption option = SetLocationClientOption(new LocationClientOption());
@@ -548,6 +549,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
 
     private void InitView()
     {
+        m_context = m_mapView.getContext();
         m_textView = m_mapView.findViewById(R.id.textView);
         //支持TextView内容滑动
         m_textView.setMovementMethod(ScrollingMovementMethod.getInstance());
@@ -560,7 +562,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
         iFilter.addAction(SDKInitializer.SDK_BROADTCAST_ACTION_STRING_PERMISSION_CHECK_ERROR);
         iFilter.addAction(SDKInitializer.SDK_BROADCAST_ACTION_STRING_NETWORK_ERROR);
         m_sdkReceiver = new SDKReceiver();
-        getContext().registerReceiver(m_sdkReceiver, iFilter);
+        m_context.registerReceiver(m_sdkReceiver, iFilter);
     }
 
     /**
@@ -573,7 +575,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
     {
         if(null == geoCodeResult || SearchResult.ERRORNO.NO_ERROR != geoCodeResult.error)
         {
-            Toast.makeText(getContext(), "未能找到结果", Toast.LENGTH_SHORT);
+            Toast.makeText(m_context, "未能找到结果", Toast.LENGTH_SHORT);
             return;
         }
     }
@@ -588,7 +590,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
     {
         if(null == reverseGeoCodeResult || SearchResult.ERRORNO.NO_ERROR != reverseGeoCodeResult.error)
         {
-            Toast.makeText(getContext(), "未能找到结果", Toast.LENGTH_SHORT);
+            Toast.makeText(m_context, "未能找到结果", Toast.LENGTH_SHORT);
             return;
         }
         else
@@ -601,6 +603,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
     @Override
     public void onDestroy()
     {
+        //因为采用显示隐藏的方式来切换,资源暂时不能销毁
         //        if(m_marker != null)
         //        {
         //            m_marker.cancelAnimation();
