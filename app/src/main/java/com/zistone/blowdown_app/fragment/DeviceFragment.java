@@ -231,7 +231,7 @@ public class DeviceFragment extends Fragment
                 Looper.prepare();
                 Map<String, String> map = new HashMap<>();
                 OkHttpUtil okHttpUtil = new OkHttpUtil();
-                //异步方式发起请求
+                //异步方式发起请求,回调处理信息
                 okHttpUtil.AsynSendByPost(URL, map, new Callback()
                 {
                     @Override

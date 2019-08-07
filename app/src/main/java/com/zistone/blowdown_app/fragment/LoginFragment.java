@@ -142,7 +142,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
                 map.put("m_userName", m_editText_userName.getText().toString());
                 map.put("m_password", m_editText_password.getText().toString());
                 OkHttpUtil okHttpUtil = new OkHttpUtil();
-                //异步方式发起请求
+                //异步方式发起请求,回调处理信息
                 okHttpUtil.AsynSendByPost(URL, map, new Callback()
                 {
                     @Override
