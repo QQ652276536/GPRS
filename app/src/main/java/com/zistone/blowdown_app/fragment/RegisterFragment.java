@@ -30,7 +30,7 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
 {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    private static final String URL = "http://10.0.2.2:8080/Blowdown_Web/UserInfo/Register";
+    private static final String URL = "http://192.168.10.197:8080/Blowdown_Web/UserInfo/Register";
     private static final int MESSAGE_GETRESPONSE_SUCCESS = 0;
     private static final int MESSAGE_GETRESPONSE_FAIL = 1;
     //6~12位字母数字组合
@@ -341,7 +341,6 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
     private void Register()
     {
         IsRegistering();
-        //SendWithHttpClient();
         SendWithOkHttp();
     }
 
