@@ -46,43 +46,19 @@ public class MainActivity extends AppCompatActivity implements MapFragment.OnFra
     private void InitData()
     {
         m_bottomNavigationView = findViewById(R.id.nav_view);
-        //启动时如果已经登录过则在设备页,否则在用户页的登录界面
+        //启动时如果已经登录过则在设备页,否则跳转至用户页的登录界面
         if(!"".equals(UserSharedPreference.GetRealName(this)) && 1 == UserSharedPreference.GetState(this))
         {
+            //传this是为了方便传DeviceInfo
+            m_currentFragment = DeviceFragment.newInstance(this, "");
             m_bottomNavigationView.setSelectedItemId(m_bottomNavigationView.getMenu().getItem(1).getItemId());
-            //实例化设备页
-            if(m_deviceFragment == null)
-            {
-                m_deviceFragment = DeviceFragment.newInstance(this, "");
-            }
-            //该碎片不在管理器中则添加进去
-            if(!m_deviceFragment.isAdded())
-            {
-                getSupportFragmentManager().beginTransaction().add(R.id.fragment_current, m_deviceFragment).commitAllowingStateLoss();
-            }
-            else
-            {
-                getSupportFragmentManager().beginTransaction().show(m_deviceFragment).commitAllowingStateLoss();
-            }
-            m_currentFragment = m_deviceFragment;
         }
         else
         {
+            m_currentFragment = UserFragment.newInstance("", "");
             m_bottomNavigationView.setSelectedItemId(m_bottomNavigationView.getMenu().getItem(2).getItemId());
-            if(m_userFragment == null)
-            {
-                m_userFragment = UserFragment.newInstance("", "");
-            }
-            if(!m_userFragment.isAdded())
-            {
-                getSupportFragmentManager().beginTransaction().add(R.id.fragment_current, m_userFragment).commitAllowingStateLoss();
-            }
-            else
-            {
-                getSupportFragmentManager().beginTransaction().show(m_userFragment).commitAllowingStateLoss();
-            }
-            m_currentFragment = m_userFragment;
         }
+        getSupportFragmentManager().beginTransaction().add(R.id.fragment_current, m_currentFragment).show(m_currentFragment).commitAllowingStateLoss();
         //因为启动时有默认选中页,防止事件重复触发,所以在后面注册监听事件
         m_bottomNavigationView.setOnNavigationItemSelectedListener(OnNavigationItemSeletecListener);
     }
