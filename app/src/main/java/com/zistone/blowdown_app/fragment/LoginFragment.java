@@ -42,17 +42,15 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
 {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    private static final String URL = "http://10.0.2.2:8080/Blowdown_Web/UserInfo/Login";
+    private static final String URL = "http://192.168.10.197:8080/Blowdown_Web/UserInfo/Login";
     private static final int MESSAGE_GETRESPONSE_SUCCESS = 0;
     private static final int MESSAGE_GETRESPONSE_FAIL = 1;
+    //间隔时间
+    private static int TIMEINTERVAL = 5 * 1000;
     //6~12位字母数字组合
     private static final String REGEXUSERNAME = "([a-zA-Z0-9]{6,12})";
     //首位不能是数字,不能全为数字或字母,6~16位
     private static final String REGEXPASSWORD = "^(?![0-9])(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,16}$";
-    //请求响应时间
-    private static int TIMELENGTH = 5;
-    //倒讲间隔时间,毫秒
-    private static int TIMEINTERVAL = 1000;
 
     private String mParam1;
     private String mParam2;
@@ -230,10 +228,9 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
     private void Login()
     {
         m_loginTimer = new Timer();
+        TIMEINTERVAL = 5 * 1000;
         IsLogining();
         SendWithOkHttp();
-        //重置超时时间
-        TIMELENGTH = 5;
         TimerTask loginTask = new TimerTask()
         {
             @Override
@@ -245,21 +242,17 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
                     @Override
                     public void run()
                     {
-                        TIMELENGTH--;
-                        if(TIMELENGTH <= 0)
-                        {
-                            IsLoginEd();
-                            //从任务队列中取消任务
-                            m_loginTimer.cancel();
-                            Toast.makeText(m_context, "登录失败,请检查网络", Toast.LENGTH_SHORT).show();
-                        }
+                        IsLoginEd();
+                        //从任务队列中取消任务
+                        m_loginTimer.cancel();
+                        Toast.makeText(m_context, "登录失败,请检查网络", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
         };
-        //指定定时任务、时间、间隔
-        //请求超时已由Http请求设置,这里留作笔记,后续可能会用得上
-        //m_loginTimer.schedule(loginTask, TIMEINTERVAL, TIMEINTERVAL);
+        //请求超时已由Http请求设置,该定时器已弃用
+        //任务、延迟执行时间
+        //m_loginTimer.schedule(loginTask, TIMEINTERVAL);
     }
 
     private void InitData()

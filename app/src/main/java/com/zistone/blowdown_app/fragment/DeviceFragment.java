@@ -34,6 +34,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -41,6 +43,7 @@ import okhttp3.Response;
 
 public class DeviceFragment extends Fragment
 {
+    private static final int TIMEINTERVAL = 30 * 1000;
     private static final int MESSAGE_GETRESPONSE_SUCCESS = 0;
     private static final int MESSAGE_GETRESPONSE_FAIL = 1;
     //private static final String URL = "http://10.0.2.2:8080/Blowdown_Web/DeviceInfo/FindAll";
@@ -55,6 +58,7 @@ public class DeviceFragment extends Fragment
     private RecyclerView m_recyclerView;
     //适配器
     private DeviceInfoRecyclerAdapter m_deviceInfoRecyclerAdapter;
+    private Timer m_refreshTimer;
 
     private OnFragmentInteractionListener mListener;
 
@@ -95,6 +99,32 @@ public class DeviceFragment extends Fragment
         }
     }
 
+    /**
+     * 定时刷新设备列表
+     */
+    private void RefreshDeviceList()
+    {
+        m_refreshTimer = new Timer();
+        TimerTask refreshTask = new TimerTask()
+        {
+            @Override
+            public void run()
+            {
+                //返回到UI线程,两种更新UI的方法之一
+                getActivity().runOnUiThread(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        SendWithOkHttp();
+                    }
+                });
+            }
+        };
+        //任务、延迟执行时间、重复调用间隔
+        m_refreshTimer.schedule(refreshTask, 0, TIMEINTERVAL);
+    }
+
     public void InitView()
     {
         m_context = m_deviceView.getContext();
@@ -121,7 +151,7 @@ public class DeviceFragment extends Fragment
                         //结束下拉刷新
                         materialRefreshLayout.finishRefresh();
                     }
-                }, 2000);
+                }, 1 * 1000);
             }
 
             /**
@@ -152,7 +182,7 @@ public class DeviceFragment extends Fragment
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         //设置布局
         m_recyclerView.setLayoutManager(linearLayoutManager);
-        SendWithOkHttp();
+        RefreshDeviceList();
     }
 
     /**

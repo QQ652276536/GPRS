@@ -66,7 +66,7 @@ import static android.content.Context.SENSOR_SERVICE;
 
 public class MapFragment extends Fragment implements View.OnClickListener, SensorEventListener, OnGetGeoCoderResultListener, Serializable
 {
-    private static final BitmapDescriptor ICON_MARKER = BitmapDescriptorFactory.fromResource(R.drawable.icon_mark);
+    private static final BitmapDescriptor ICON_MARKER = BitmapDescriptorFactory.fromResource(R.drawable.icon_mark2);
 
     private Context m_context;
     private MyLocationListener m_locationListener = new MyLocationListener();
