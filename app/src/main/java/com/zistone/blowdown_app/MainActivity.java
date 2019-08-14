@@ -1,11 +1,13 @@
 package com.zistone.blowdown_app;
 
+import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -78,8 +80,29 @@ public class MainActivity extends AppCompatActivity implements MapFragment.OnFra
                         m_isFromClickDevice = true;
                     }
                     return true;
+                //如果已经登录过则允许跳转至设备页,否则跳转至用户页的登录界面
                 case R.id.navigation_device:
-                    ClickDeviceItem();
+                    String realName = UserSharedPreference.GetRealName(getApplicationContext());
+                    int state = UserSharedPreference.GetState(getApplicationContext());
+                    if(!"".equals(realName) && 1 == state)
+                    {
+                        ClickDeviceItem();
+                    }
+                    else
+                    {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                        builder.setPositiveButton("确定", new DialogInterface.OnClickListener()
+                        {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which)
+                            {
+                                dialog.dismiss();
+                                ClickUserItem();
+                            }
+                        });
+                        builder.setMessage("您还没有登录");
+                        builder.show();
+                    }
                     return true;
                 case R.id.navigation_user:
                     ClickUserItem();
