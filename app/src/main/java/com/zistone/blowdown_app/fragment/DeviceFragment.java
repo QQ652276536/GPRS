@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -30,6 +31,7 @@ import com.zistone.material_refresh_layout.MaterialRefreshListener;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -51,7 +53,6 @@ public class DeviceFragment extends Fragment
     private Context m_context;
     private View m_deviceView;
     private List<DeviceInfo> m_deviceList = new ArrayList<>();
-    private MainActivity m_mainActivity;
     //下拉刷新控件
     private MaterialRefreshLayout m_materialRefreshLayout;
     //RecyclerView
@@ -59,6 +60,8 @@ public class DeviceFragment extends Fragment
     //适配器
     private DeviceInfoRecyclerAdapter m_deviceInfoRecyclerAdapter;
     private Timer m_refreshTimer;
+    //底部导航栏
+    public BottomNavigationView m_bottomNavigationView;
 
     private OnFragmentInteractionListener mListener;
 
@@ -66,20 +69,10 @@ public class DeviceFragment extends Fragment
     {
     }
 
-    /**
-     * 使用工厂方法创建新的实例
-     *
-     * @param activity
-     * @param param2
-     * @return
-     */
-    public static DeviceFragment newInstance(MainActivity activity, String param2)
+    public static DeviceFragment newInstance()
     {
-        DeviceFragment fragment = new DeviceFragment();
-        Bundle args = new Bundle();
-        args.putSerializable("MainActivityClass", activity);
-        fragment.setArguments(args);
-        return fragment;
+        DeviceFragment tempFragment = new DeviceFragment();
+        return tempFragment;
     }
 
     /**
@@ -128,7 +121,6 @@ public class DeviceFragment extends Fragment
     public void InitView()
     {
         m_context = m_deviceView.getContext();
-        m_mainActivity = (MainActivity) getArguments().getSerializable("MainActivityClass");
         //下拉刷新控件
         m_materialRefreshLayout = m_deviceView.findViewById(R.id.refresh);
         //禁用加载更多
@@ -182,6 +174,7 @@ public class DeviceFragment extends Fragment
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         //设置布局
         m_recyclerView.setLayoutManager(linearLayoutManager);
+        //TODO:设置适配器是在异步回调里设的,所以启动时会有No adapter attached; skipping layout异常
         RefreshDeviceList();
     }
 
@@ -199,24 +192,21 @@ public class DeviceFragment extends Fragment
                 {
                     DeviceInfo tempDevice = m_deviceList.get(position);
                     Toast.makeText(m_context, tempDevice.getM_name(), Toast.LENGTH_SHORT).show();
-                    int a = m_mainActivity.getSupportFragmentManager().getFragments().size();
-                    m_mainActivity.m_deviceInfo = tempDevice;
-                    //重新实例化地图碎片以达到重新加载设备位置
-                    MapFragment mapFragment = MapFragment.newInstance(tempDevice, "");
-                    Fragment currentFragment = getFragmentManager().findFragmentByTag("deviceFragment");
-                    if(m_mainActivity.m_mapFragment == null)
+                    int fragmentSize = getFragmentManager().getFragments().size();
+                    //隐藏当前设备页
+                    Fragment deviceFragment = getFragmentManager().findFragmentByTag("deviceFragment");
+                    getFragmentManager().beginTransaction().hide(deviceFragment).commitAllowingStateLoss();
+                    //地图页已经实例化过则从管理器中移除之前的地图页
+                    Fragment oldMapFragment = getFragmentManager().findFragmentByTag("mapFragment");
+                    if(oldMapFragment != null)
                     {
-                        m_mainActivity.m_mapFragment = mapFragment;
-                        getFragmentManager().beginTransaction().hide(currentFragment).commitAllowingStateLoss();
-                    }
-                    else
-                    {
-                        Fragment oldMapFragment = getFragmentManager().findFragmentByTag("mapFragment");
                         getFragmentManager().beginTransaction().remove(oldMapFragment).commitAllowingStateLoss();
-                        //getFragmentManager().beginTransaction().replace(R.id.fragment_current, mapFragment).commitAllowingStateLoss();
-                        m_mainActivity.m_mapFragment = null;
                     }
-                    m_mainActivity.m_bottomNavigationView.setSelectedItemId(m_mainActivity.m_bottomNavigationView.getMenu().getItem(0).getItemId());
+                    //重新实例化地图碎片实现重新加载设备位置
+                    MapFragment newMapFragment = MapFragment.newInstance(tempDevice);
+                    getFragmentManager().beginTransaction().add(R.id.fragment_current, newMapFragment, "mapFragment").show(newMapFragment).commitAllowingStateLoss();
+                    //通过点击设备列表切换到地图时修改bottomNavigation控件的选中效果
+                    m_bottomNavigationView.setSelectedItemId(m_bottomNavigationView.getMenu().getItem(0).getItemId());
                 }
 
                 @Override
@@ -313,6 +303,13 @@ public class DeviceFragment extends Fragment
                 Looper.loop();
             }
         }).start();
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState)
+    {
+        super.onActivityCreated(savedInstanceState);
+        m_bottomNavigationView = getActivity().findViewById(R.id.nav_view);
     }
 
     @Override

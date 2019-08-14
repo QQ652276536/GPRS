@@ -106,7 +106,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
     {
     }
 
-    public static MapFragment newInstance(DeviceInfo deviceInfo, String param2)
+    public static MapFragment newInstance(DeviceInfo deviceInfo)
     {
         MapFragment fragment = new MapFragment();
         Bundle args = new Bundle();

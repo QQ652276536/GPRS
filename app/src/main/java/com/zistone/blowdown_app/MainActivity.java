@@ -32,8 +32,8 @@ public class MainActivity extends AppCompatActivity implements MapFragment.OnFra
     public UserFragment m_userFragment;
     //底部导航栏
     public BottomNavigationView m_bottomNavigationView;
-    //设备信息
-    public DeviceInfo m_deviceInfo;
+    //点击设备列表显示对应设备位置信息时需要将底部导航栏的选中样式修改,也使用了选中事件,避免重复触发
+    public boolean m_isFromClickDevice = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -49,8 +49,7 @@ public class MainActivity extends AppCompatActivity implements MapFragment.OnFra
         //启动时如果已经登录过则在设备页,否则跳转至用户页的登录界面
         if(!"".equals(UserSharedPreference.GetRealName(this)) && 1 == UserSharedPreference.GetState(this))
         {
-            //传this是为了方便传DeviceInfo
-            m_currentFragment = DeviceFragment.newInstance(this, "");
+            m_currentFragment = DeviceFragment.newInstance();
             m_bottomNavigationView.setSelectedItemId(m_bottomNavigationView.getMenu().getItem(1).getItemId());
         }
         else
@@ -71,7 +70,11 @@ public class MainActivity extends AppCompatActivity implements MapFragment.OnFra
             switch(menuItem.getItemId())
             {
                 case R.id.navigation_map:
-                    ClickMapItem();
+                    if(!m_isFromClickDevice)
+                    {
+                        ClickMapItem();
+                        m_isFromClickDevice = true;
+                    }
                     return true;
                 case R.id.navigation_device:
                     ClickDeviceItem();
@@ -97,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements MapFragment.OnFra
     {
         if(m_deviceFragment == null)
         {
-            m_deviceFragment = DeviceFragment.newInstance(this, "");
+            m_deviceFragment = DeviceFragment.newInstance();
         }
         AddOrShowFragment(getSupportFragmentManager().beginTransaction(), m_deviceFragment, "deviceFragment");
     }
@@ -106,7 +109,7 @@ public class MainActivity extends AppCompatActivity implements MapFragment.OnFra
     {
         if(m_mapFragment == null)
         {
-            m_mapFragment = MapFragment.newInstance(m_deviceInfo, "");
+            m_mapFragment = MapFragment.newInstance(null);
         }
         AddOrShowFragment(getSupportFragmentManager().beginTransaction(), m_mapFragment, "mapFragment");
     }
