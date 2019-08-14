@@ -47,7 +47,9 @@ public class MainActivity extends AppCompatActivity implements MapFragment.OnFra
     {
         m_bottomNavigationView = findViewById(R.id.nav_view);
         //启动时如果已经登录过则在设备页,否则跳转至用户页的登录界面
-        if(!"".equals(UserSharedPreference.GetRealName(this)) && 1 == UserSharedPreference.GetState(this))
+        String realName = UserSharedPreference.GetRealName(this);
+        int state = UserSharedPreference.GetState(this);
+        if(!"".equals(realName) && 1 == state)
         {
             m_currentFragment = DeviceFragment.newInstance();
             m_bottomNavigationView.setSelectedItemId(m_bottomNavigationView.getMenu().getItem(1).getItemId());

@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -64,7 +65,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
     private Button m_btn_forget;
     private ProgressBar m_loginProgressBar;
     private Timer m_loginTimer;
-    private RegisterFragment m_registerFragment;
+    //底部导航栏
+    public BottomNavigationView m_bottomNavigationView;
 
     private OnFragmentInteractionListener mListener;
 
@@ -190,7 +192,10 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
             UserSharedPreference.SetPassword(m_context, userInfo.getM_password());
             UserSharedPreference.SetRealName(m_context, userInfo.getM_realName());
             UserSharedPreference.SetLevel(m_context, userInfo.getM_level());
-            //TODO:跳转至设备页面
+            UserSharedPreference.SetState(m_context, userInfo.getM_state());
+            //TODO:登录页切换为用户信息页
+            //跳转至设备页面
+            m_bottomNavigationView.setSelectedItemId(m_bottomNavigationView.getMenu().getItem(1).getItemId());
         }
         else
         {
@@ -271,6 +276,13 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
         m_btn_forget = m_userView.findViewById(R.id.btn_forget_login);
         m_btn_forget.setOnClickListener(this);
         m_loginProgressBar = m_userView.findViewById(R.id.progressBar_login);
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState)
+    {
+        super.onActivityCreated(savedInstanceState);
+        m_bottomNavigationView = getActivity().findViewById(R.id.nav_view);
     }
 
     /**
