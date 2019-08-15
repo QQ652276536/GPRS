@@ -17,12 +17,12 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.alibaba.fastjson.JSON;
 import com.zistone.blowdown_app.R;
 import com.zistone.blowdown_app.entity.UserInfo;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -158,12 +158,19 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
         //登录,这里是跳转至登录页面
         if(R.id.btn_login_register == v.getId())
         {
-            Fragment loginFragment = getFragmentManager().getFragments().get(0);
-            Fragment registerFragment = getFragmentManager().getFragments().get(1);
-            Fragment forgetFragment = getFragmentManager().getFragments().get(2);
-            getFragmentManager().beginTransaction().hide(registerFragment).commitAllowingStateLoss();
-            getFragmentManager().beginTransaction().hide(forgetFragment).commitAllowingStateLoss();
-            getFragmentManager().beginTransaction().show(loginFragment).commitAllowingStateLoss();
+            List<Fragment> fragmentList = getFragmentManager().getFragments();
+            for(Fragment fragment : fragmentList)
+            {
+                //注意:一个FragmentTransaction只能Commit一次,不要用全局或共享一个FragmentTransaction对象,多个Fragment则多次get
+                if(!"loginFragment".equals(fragment.getTag()))
+                {
+                    getFragmentManager().beginTransaction().hide(fragment).commitNow();
+                }
+                else
+                {
+                    getFragmentManager().beginTransaction().show(fragment).commitNow();
+                }
+            }
         }
         //注册,这里是发起注册请求
         else if(R.id.btn_register_register == v.getId())
@@ -254,9 +261,7 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
                 case MESSAGE_GETRESPONSE_SUCCESS:
                 {
                     String responseStr = (String) message.obj;
-                    //不同环境SimpleDateFormat模式取到的字符串不一样
-                    Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
-                    UserInfo userInfo = gson.fromJson(responseStr, UserInfo.class);
+                    UserInfo userInfo = JSON.parseObject(responseStr, UserInfo.class);
                     RegisterResult(userInfo);
                     break;
                 }

@@ -13,11 +13,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.alibaba.fastjson.JSON;
 import com.zistone.blowdown_app.R;
 import com.zistone.blowdown_app.entity.UserInfo;
 
@@ -39,16 +39,15 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
     private String mParam2;
 
     private Context m_context;
-    private View m_logoutView;
-    private EditText m_editText_userName;
+    private View m_userInfoView;
     private EditText m_editText_userRealName;
     private EditText m_editText_userPhone;
     private EditText m_editText_password;
     private EditText m_editText_rePassword;
-    private Button m_btnLogin;
-    private Button m_btnRegister;
-    private ProgressBar m_logoutProgressBar;
-    private LoginFragment m_loginFragment;
+    private Button m_btnUpdate;
+    private Button m_btnLogout;
+    private ProgressBar m_updateUserInfoProgressBar;
+    private ImageView m_imageView;
 
     private OnFragmentInteractionListener mListener;
 
@@ -111,9 +110,9 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        m_logoutView = inflater.inflate(R.layout.fragment_userinfo, container, false);
-        InitData();
-        return m_logoutView;
+        m_userInfoView = inflater.inflate(R.layout.fragment_userinfo, container, false);
+        InitView();
+        return m_userInfoView;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -157,40 +156,49 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
     @Override
     public void onFocusChange(View v, boolean hasFocus)
     {
-        if(R.id.editTextUserName_logout == v.getId())
+        if(R.id.editText_userRealName_userInfo == v.getId())
         {
             if(hasFocus)
             {
-                m_editText_userName.setError(null);
+                m_editText_userRealName.setError(null);
             }
             else
             {
-                if(Pattern.matches(REGEXUSERNAME, m_editText_userName.getText().toString()))
+                if(Pattern.matches(REGEXUSERNAME, m_editText_userRealName.getText().toString()))
                 {
-                    m_editText_userName.setError(null);
+                    m_editText_userRealName.setError(null);
                 }
                 else
                 {
-                    m_editText_userName.setError("用户名非法");
+                    m_editText_userRealName.setError("姓名非法");
                 }
             }
         }
-        if(R.id.editTextPassword_logout == v.getId())
+        else if(R.id.editText_userPhone_userInfo == v.getId())
         {
             if(hasFocus)
             {
-                m_editText_password.setError(null);
             }
             else
             {
-                if(Pattern.matches(REGEXPASSWORD, m_editText_password.getText().toString()))
-                {
-                    m_editText_password.setError(null);
-                }
-                else
-                {
-                    m_editText_password.setError("密码非法");
-                }
+            }
+        }
+        else if(R.id.editText_password_userInfo == v.getId())
+        {
+            if(hasFocus)
+            {
+            }
+            else
+            {
+            }
+        }
+        else if(R.id.editText_rePassword_userInfo == v.getId())
+        {
+            if(hasFocus)
+            {
+            }
+            else
+            {
             }
         }
     }
@@ -211,17 +219,13 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
                 case MESSAGE_GETRESPONSE_SUCCESS:
                 {
                     String responseStr = (String) message.obj;
-                    //不同环境SimpleDateFormat模式取到的字符串不一样
-                    Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
-                    UserInfo userInfo = gson.fromJson(responseStr, UserInfo.class);
-                    RegisterResult(userInfo);
+                    UserInfo userInfo = JSON.parseObject(responseStr, UserInfo.class);
                     break;
                 }
                 case MESSAGE_GETRESPONSE_FAIL:
                 {
-                    IsRegisterEd();
                     String responseStr = (String) message.obj;
-                    Toast.makeText(m_context, "注册超时,请检查网络环境", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(m_context, "请求超时,请检查网络环境", Toast.LENGTH_SHORT).show();
                     break;
                 }
                 default:
@@ -247,75 +251,23 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
         }).start();
     }
 
-    /**
-     * 注册成功与否
-     */
-    private void RegisterResult(UserInfo userInfo)
+    private void InitView()
     {
-        IsRegisterEd();
-        if(userInfo != null)
-        {
-            Log.i("RegisterLog", "注册成功:用户真实姓名为:" + userInfo.getM_realName());
-            //TODO:跳转至登录页面并将用户名填至输入框
-        }
-        else
-        {
-            Log.i("RegisterLog", "注册失败:用户名或密码错误");
-            Toast.makeText(m_context, "用户名或密码错误", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    /**
-     * 注册完成,用于释放控件
-     */
-    private void IsRegisterEd()
-    {
-        m_logoutProgressBar.setVisibility(View.INVISIBLE);
-        m_editText_userName.setEnabled(true);
-        m_editText_userRealName.setEnabled(true);
-        m_editText_userPhone.setEnabled(true);
-        m_editText_password.setEnabled(true);
-        m_editText_rePassword.setEnabled(true);
-        m_btnLogin.setEnabled(true);
-        m_btnRegister.setEnabled(true);
-    }
-
-    /**
-     * 正在注册,用于禁止控件
-     */
-    private void IsRegistering()
-    {
-        m_logoutProgressBar.setVisibility(View.VISIBLE);
-        m_editText_userName.setEnabled(false);
-        m_editText_userRealName.setEnabled(false);
-        m_editText_userPhone.setEnabled(false);
-        m_editText_password.setEnabled(false);
-        m_editText_rePassword.setEnabled(false);
-        m_btnLogin.setEnabled(false);
-        m_btnRegister.setEnabled(false);
-    }
-
-    private void Register()
-    {
-        IsRegistering();
-        SendWithOkHttp();
-    }
-
-    private void InitData()
-    {
-        m_context = m_logoutView.getContext();
-        m_editText_userName = m_logoutView.findViewById(R.id.editTextUserName_logout);
-        m_editText_userName.setOnFocusChangeListener(this);
-        m_editText_userRealName = m_logoutView.findViewById(R.id.editTextRealName_logout);
+        m_context = m_userInfoView.getContext();
+        m_editText_userRealName = m_userInfoView.findViewById(R.id.editText_userRealName_userInfo);
         m_editText_userRealName.setOnFocusChangeListener(this);
-        m_editText_userPhone = m_logoutView.findViewById(R.id.editTextPhone_logout);
+        m_editText_userPhone = m_userInfoView.findViewById(R.id.editText_userPhone_userInfo);
         m_editText_userPhone.setOnFocusChangeListener(this);
-        m_editText_password = m_logoutView.findViewById(R.id.editTextPassword_logout);
+        m_editText_password = m_userInfoView.findViewById(R.id.editText_password_userInfo);
         m_editText_password.setOnFocusChangeListener(this);
-        m_editText_rePassword = m_logoutView.findViewById(R.id.editTextRePassword_logout);
+        m_editText_rePassword = m_userInfoView.findViewById(R.id.editText_rePassword_userInfo);
         m_editText_rePassword.setOnFocusChangeListener(this);
-        m_btnLogin = m_logoutView.findViewById(R.id.btn_login_logout);
-        m_btnLogin.setOnClickListener(this);
-        m_logoutProgressBar = m_logoutView.findViewById(R.id.progressBar_logout);
+        m_btnUpdate = m_userInfoView.findViewById(R.id.btnUpdate_userInfo);
+        m_btnUpdate.setOnClickListener(this);
+        m_btnLogout = m_userInfoView.findViewById(R.id.btnLogout_userInfo);
+        m_btnLogout.setOnClickListener(this);
+        m_imageView = m_userInfoView.findViewById(R.id.imageView);
+        m_imageView.setOnClickListener(this);
+        m_updateUserInfoProgressBar = m_userInfoView.findViewById(R.id.progressBar_updateUserInfo);
     }
 }

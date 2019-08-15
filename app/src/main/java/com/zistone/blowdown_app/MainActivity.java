@@ -19,10 +19,11 @@ import com.zistone.blowdown_app.fragment.LoginFragment;
 import com.zistone.blowdown_app.fragment.MapFragment;
 import com.zistone.blowdown_app.fragment.RegisterFragment;
 import com.zistone.blowdown_app.fragment.UserFragment;
+import com.zistone.blowdown_app.fragment.UserInfoFragment;
 
 import java.io.Serializable;
 
-public class MainActivity extends AppCompatActivity implements MapFragment.OnFragmentInteractionListener, DeviceFragment.OnFragmentInteractionListener, UserFragment.OnFragmentInteractionListener, LoginFragment.OnFragmentInteractionListener, RegisterFragment.OnFragmentInteractionListener, ForgetFragment.OnFragmentInteractionListener, Serializable
+public class MainActivity extends AppCompatActivity implements MapFragment.OnFragmentInteractionListener, DeviceFragment.OnFragmentInteractionListener, UserFragment.OnFragmentInteractionListener, LoginFragment.OnFragmentInteractionListener, RegisterFragment.OnFragmentInteractionListener, ForgetFragment.OnFragmentInteractionListener, UserInfoFragment.OnFragmentInteractionListener, Serializable
 {
     //当前页,用来切换
     public Fragment m_currentFragment;
@@ -61,7 +62,7 @@ public class MainActivity extends AppCompatActivity implements MapFragment.OnFra
             m_currentFragment = UserFragment.newInstance("", "");
             m_bottomNavigationView.setSelectedItemId(m_bottomNavigationView.getMenu().getItem(2).getItemId());
         }
-        getSupportFragmentManager().beginTransaction().add(R.id.fragment_current, m_currentFragment).show(m_currentFragment).commitAllowingStateLoss();
+        getSupportFragmentManager().beginTransaction().add(R.id.fragment_current, m_currentFragment).show(m_currentFragment).commitNow();
         //因为启动时有默认选中页,防止事件重复触发,所以在后面注册监听事件
         m_bottomNavigationView.setOnNavigationItemSelectedListener(OnNavigationItemSeletecListener);
     }
@@ -148,12 +149,12 @@ public class MainActivity extends AppCompatActivity implements MapFragment.OnFra
         //如果当前的Fragment未被添加到管理器中
         if(!fragment.isAdded())
         {
-            transaction.hide(m_currentFragment).add(R.id.fragment_current, fragment, tagStr).commitAllowingStateLoss();
+            transaction.hide(m_currentFragment).add(R.id.fragment_current, fragment, tagStr).commitNow();
         }
         //否则就显示
         else
         {
-            transaction.hide(m_currentFragment).show(fragment).commitAllowingStateLoss();
+            transaction.hide(m_currentFragment).show(fragment).commitNow();
         }
         m_currentFragment = fragment;
     }

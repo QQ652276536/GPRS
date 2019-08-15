@@ -17,9 +17,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
+import com.alibaba.fastjson.JSON;
 import com.zistone.blowdown_app.MainActivity;
 import com.zistone.blowdown_app.R;
 import com.zistone.blowdown_app.control.DeviceInfoRecyclerAdapter;
@@ -195,16 +193,16 @@ public class DeviceFragment extends Fragment
                     int fragmentSize = getFragmentManager().getFragments().size();
                     //隐藏当前设备页
                     Fragment deviceFragment = getFragmentManager().findFragmentByTag("deviceFragment");
-                    getFragmentManager().beginTransaction().hide(deviceFragment).commitAllowingStateLoss();
+                    getFragmentManager().beginTransaction().hide(deviceFragment).commitNow();
                     //地图页已经实例化过则从管理器中移除之前的地图页
                     Fragment oldMapFragment = getFragmentManager().findFragmentByTag("mapFragment");
                     if(oldMapFragment != null)
                     {
-                        getFragmentManager().beginTransaction().remove(oldMapFragment).commitAllowingStateLoss();
+                        getFragmentManager().beginTransaction().remove(oldMapFragment).commitNow();
                     }
                     //重新实例化地图碎片实现重新加载设备位置
                     MapFragment newMapFragment = MapFragment.newInstance(tempDevice);
-                    getFragmentManager().beginTransaction().add(R.id.fragment_current, newMapFragment, "mapFragment").show(newMapFragment).commitAllowingStateLoss();
+                    getFragmentManager().beginTransaction().add(R.id.fragment_current, newMapFragment, "mapFragment").show(newMapFragment).commitNow();
                     //通过点击设备列表切换到地图时修改bottomNavigation控件的选中效果
                     m_bottomNavigationView.setSelectedItemId(m_bottomNavigationView.getMenu().getItem(0).getItemId());
                 }
@@ -233,11 +231,7 @@ public class DeviceFragment extends Fragment
                     {
                         return;
                     }
-                    //不同环境SimpleDateFormat模式取到的字符串不一样
-                    Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
-                    m_deviceList = gson.fromJson(responseStr, new TypeToken<List<DeviceInfo>>()
-                    {
-                    }.getType());
+                    m_deviceList = JSON.parseArray(responseStr, DeviceInfo.class);
                     //设置适配器
                     m_deviceInfoRecyclerAdapter = new DeviceInfoRecyclerAdapter(m_context, m_deviceList);
                     m_recyclerView.setAdapter(m_deviceInfoRecyclerAdapter);

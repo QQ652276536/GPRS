@@ -1,5 +1,7 @@
 package com.zistone.blowdown_app.entity;
 
+import com.alibaba.fastjson.annotation.JSONField;
+
 import java.util.Date;
 
 public class UserInfo
@@ -108,6 +110,7 @@ public class UserInfo
     /**
      * 创建时间
      */
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     private Date m_craeteTime;
 
     public Date getM_craeteTime()
@@ -123,6 +126,7 @@ public class UserInfo
     /**
      * 修改时间
      */
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     private Date m_updateTime;
 
     public Date getM_updateTime()

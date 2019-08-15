@@ -4,6 +4,8 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +13,9 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.zistone.blowdown_app.R;
+import com.zistone.blowdown_app.UserSharedPreference;
+
+import java.util.List;
 
 public class UserFragment extends Fragment
 {
@@ -20,11 +25,12 @@ public class UserFragment extends Fragment
     private String mParam1;
     private String mParam2;
 
+    private Context m_context;
     private View m_userView;
-    //登录页
     private LoginFragment m_loginFragment;
     private RegisterFragment m_registerFragment;
     private ForgetFragment m_forgetFragment;
+    private UserInfoFragment m_userInfoFragment;
 
     private OnFragmentInteractionListener mListener;
 
@@ -51,38 +57,77 @@ public class UserFragment extends Fragment
         return fragment;
     }
 
-    private void InitData()
+    private void InitView()
     {
-        //子碎片不在管理器中则添加进去
+        m_context = getContext();
+        //注意:一个FragmentTransaction只能Commit一次,不要用全局或共享一个FragmentTransaction对象,多个Fragment则多次get
+        //用户信息
+        if(m_userInfoFragment == null)
+        {
+            m_userInfoFragment = UserInfoFragment.newInstance("", "");
+        }
+        if(!m_userInfoFragment.isAdded())
+        {
+            getChildFragmentManager().beginTransaction().add(R.id.fragment_current_user, m_userInfoFragment, "userInfoFragment").commitNow();
+        }
+        //登录
         if(m_loginFragment == null)
         {
             m_loginFragment = LoginFragment.newInstance("", "");
         }
-        //这里注意子Fragment的add顺序,后面在切换子Fragment时会用到
         if(!m_loginFragment.isAdded())
         {
-            getChildFragmentManager().beginTransaction().add(R.id.fragment_current_user, m_loginFragment).commitAllowingStateLoss();
+            getChildFragmentManager().beginTransaction().add(R.id.fragment_current_user, m_loginFragment, "loginFragment").commitNow();
         }
-        //用户碎片的默认子碎片为登录
-        else
-        {
-            getChildFragmentManager().beginTransaction().show(m_loginFragment).commitAllowingStateLoss();
-        }
+        //注册
         if(m_registerFragment == null)
         {
             m_registerFragment = RegisterFragment.newInstance("", "");
         }
         if(!m_registerFragment.isAdded())
         {
-            getChildFragmentManager().beginTransaction().add(R.id.fragment_current_user, m_registerFragment).commitAllowingStateLoss();
+            getChildFragmentManager().beginTransaction().add(R.id.fragment_current_user, m_registerFragment, "registerFragment").commitNow();
         }
+        //找回密码
         if(m_forgetFragment == null)
         {
             m_forgetFragment = ForgetFragment.newInstance("", "");
         }
         if(!m_forgetFragment.isAdded())
         {
-            getChildFragmentManager().beginTransaction().add(R.id.fragment_current_user, m_forgetFragment).commitAllowingStateLoss();
+            getChildFragmentManager().beginTransaction().add(R.id.fragment_current_user, m_forgetFragment, "forgetFragment").commitNow();
+        }
+        List<Fragment> fragmentList = getChildFragmentManager().getFragments();
+        //已经登录过则显示用户信息页面,否则显示登录页面
+        String realName = UserSharedPreference.GetRealName(m_context);
+        int state = UserSharedPreference.GetState(m_context);
+        if(!"".equals(realName) && 1 == state)
+        {
+            for(Fragment fragment : fragmentList)
+            {
+                if(!"userInfoFragment".equals(fragment.getTag()))
+                {
+                    getChildFragmentManager().beginTransaction().hide(fragment).commitNow();
+                }
+                else
+                {
+                    getChildFragmentManager().beginTransaction().show(fragment).commitNow();
+                }
+            }
+        }
+        else
+        {
+            for(Fragment fragment : fragmentList)
+            {
+                if(!"loginFragment".equals(fragment.getTag()))
+                {
+                    getChildFragmentManager().beginTransaction().hide(fragment).commitNow();
+                }
+                else
+                {
+                    getChildFragmentManager().beginTransaction().show(fragment).commitNow();
+                }
+            }
         }
     }
 
@@ -128,7 +173,7 @@ public class UserFragment extends Fragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         m_userView = inflater.inflate(R.layout.fragment_user, container, false);
-        InitData();
+        InitView();
         return m_userView;
     }
 

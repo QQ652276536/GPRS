@@ -4,7 +4,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
-import com.google.gson.Gson;
+import com.alibaba.fastjson.JSON;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -37,7 +37,7 @@ public class OkHttpUtil
         public void handleMessage(Message message)
         {
             super.handleMessage(message);
-            switch (message.what)
+            switch(message.what)
             {
                 case MESSAGE_GETRESPONSE_SUCCESS:
                     m_resultStr = (String) message.obj;
@@ -60,10 +60,8 @@ public class OkHttpUtil
     public void AsynSendByPost(String url, Map<String, String> map)
     {
         //实例化并设置连接超时时间、读取超时时间
-        OkHttpClient okHttpClient = new OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS)
-                .readTimeout(10, TimeUnit.SECONDS).build();
-        Gson gson = new Gson();
-        String data = gson.toJson(map);
+        OkHttpClient okHttpClient = new OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS).readTimeout(10, TimeUnit.SECONDS).build();
+        String data = JSON.toJSONString(map);
         RequestBody requestBody = FormBody.create(data, MediaType.parse("application/json; charset=utf-8"));
         //创建Post请求的方式
         Request request = new Request.Builder().post(requestBody).url(url).build();
@@ -83,7 +81,7 @@ public class OkHttpUtil
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException
             {
-                if (response.isSuccessful())
+                if(response.isSuccessful())
                 {
                     String tempStr = response.body().string();
                     Log.i("LoginLog", "收到Post请求的响应内容:" + tempStr);
@@ -111,10 +109,8 @@ public class OkHttpUtil
     public void AsynSendByPost(String url, Map<String, String> map, Callback listener)
     {
         //实例化并设置连接超时时间、读取超时时间
-        OkHttpClient okHttpClient = new OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS)
-                .readTimeout(10, TimeUnit.SECONDS).build();
-        Gson gson = new Gson();
-        String data = gson.toJson(map);
+        OkHttpClient okHttpClient = new OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS).readTimeout(10, TimeUnit.SECONDS).build();
+        String data = JSON.toJSONString(map);
         RequestBody requestBody = FormBody.create(data, MediaType.parse("application/json; charset=utf-8"));
         //创建Post请求的方式
         Request request = new Request.Builder().post(requestBody).url(url).build();

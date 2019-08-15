@@ -18,12 +18,11 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.alibaba.fastjson.JSON;
 import com.zistone.blowdown_app.R;
 import com.zistone.blowdown_app.UserSharedPreference;
 import com.zistone.blowdown_app.entity.UserInfo;
 import com.zistone.blowdown_app.http.OkHttpUtil;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -109,9 +108,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
                 case MESSAGE_GETRESPONSE_SUCCESS:
                 {
                     String responseStr = (String) message.obj;
-                    //不同环境SimpleDateFormat模式取到的字符串不一样
-                    Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
-                    UserInfo userInfo = gson.fromJson(responseStr, UserInfo.class);
+                    UserInfo userInfo = JSON.parseObject(responseStr, UserInfo.class);
                     LoginResult(userInfo);
                     break;
                 }
@@ -396,25 +393,34 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
         //注册,这里是跳转至注册页面
         else if(R.id.btn_register_login == v.getId())
         {
-            //注意这里的下标顺序,哪个Fragment先加载哪个在前
             List<Fragment> fragmentList = getFragmentManager().getFragments();
-            Fragment loginFragment = fragmentList.get(0);
-            Fragment registerFragment = fragmentList.get(1);
-            Fragment forgetFragment = fragmentList.get(2);
-            //注意:一个FragmentTransaction只能Commit一次,不要用全局或共享一个FragmentTransaction对象,多个Fragment则多次get
-            getFragmentManager().beginTransaction().hide(loginFragment).commitAllowingStateLoss();
-            getFragmentManager().beginTransaction().hide(forgetFragment).commitAllowingStateLoss();
-            getFragmentManager().beginTransaction().show(registerFragment).commitAllowingStateLoss();
+            for(Fragment fragment : fragmentList)
+            {
+                if(!"registerFragment".equals(fragment.getTag()))
+                {
+                    getFragmentManager().beginTransaction().hide(fragment).commitNow();
+                }
+                else
+                {
+                    getFragmentManager().beginTransaction().show(fragment).commitNow();
+                }
+            }
         }
         //忘记密码,这里是跳转至找回密码页
         else if(R.id.btn_forget_login == v.getId())
         {
-            Fragment loginFragment = getFragmentManager().getFragments().get(0);
-            Fragment registerFragment = getFragmentManager().getFragments().get(1);
-            Fragment forgetFragment = getFragmentManager().getFragments().get(2);
-            getFragmentManager().beginTransaction().hide(loginFragment).commitAllowingStateLoss();
-            getFragmentManager().beginTransaction().hide(registerFragment).commitAllowingStateLoss();
-            getFragmentManager().beginTransaction().show(forgetFragment).commitAllowingStateLoss();
+            List<Fragment> fragmentList = getFragmentManager().getFragments();
+            for(Fragment fragment : fragmentList)
+            {
+                if(!"forgetFragment".equals(fragment.getTag()))
+                {
+                    getFragmentManager().beginTransaction().hide(fragment).commitNow();
+                }
+                else
+                {
+                    getFragmentManager().beginTransaction().show(fragment).commitNow();
+                }
+            }
         }
     }
 
