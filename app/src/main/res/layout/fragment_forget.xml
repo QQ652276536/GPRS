@@ -1,76 +1,161 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical">
 
-    <EditText
-        android:id="@+id/editTextUserName_forget"
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="75dp"
-        android:layout_marginEnd="24dp"
-        android:ems="10"
-        android:hint="@string/prompt_email"
-        android:inputType="textEmailAddress"
-        android:selectAllOnFocus="true"
-        android:text="LiXiaoWei" />
+        android:background="@color/transparent">
 
-    <EditText
-        android:id="@+id/editTextPhone_forget"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="24dp"
-        android:ems="10"
-        android:hint="@string/prompt_phone"
-        android:inputType="numberSigned"
-        android:text="13477855544" />
+        <ImageButton
+            android:id="@+id/btn_return_forget"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/btn_return" />
 
-    <EditText
-        android:id="@+id/editTextPassword_forget"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="24dp"
-        android:ems="10"
-        android:hint="@string/prompt_password"
-        android:inputType="textPassword"
-        android:text="a123456" />
+        <TextView
+            android:id="@+id/textView6"
+            android:layout_width="100dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:text="@string/title_forget"
+            android:textColor="@color/colorPrimary"
+            android:textSize="18sp" />
+    </android.support.v7.widget.Toolbar>
 
-    <EditText
-        android:id="@+id/editTextRePassword_forget"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="24dp"
-        android:ems="10"
-        android:hint="@string/prompt_rePassword"
-        android:inputType="textPassword"
-        android:text="a123456" />
+        android:layout_height="50dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="100dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_marginLeft="32dp"
+            android:gravity="center_vertical"
+            android:text="姓名"
+            android:textSize="18sp" />
+
+        <EditText
+            android:id="@+id/editText_userRealName_forget"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:ems="6"
+            android:gravity="center_vertical"
+            android:inputType="textPostalAddress"
+            android:text="李小伟"
+            android:textSize="18sp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="100dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_marginLeft="32dp"
+            android:gravity="center_vertical"
+            android:text="手机"
+            android:textSize="18sp" />
+
+        <EditText
+            android:id="@+id/editText_userPhone_forget"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:ems="6"
+            android:gravity="center_vertical"
+            android:inputType="phone"
+            android:text="13477855544"
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/btn_getCode"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="@string/btn_getCode" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/textView4"
+            android:layout_width="100dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_marginLeft="32dp"
+            android:gravity="center_vertical"
+            android:text="验证码"
+            android:textSize="18sp" />
+
+        <EditText
+            android:id="@+id/editText_password_forget"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:ems="6"
+            android:gravity="center_vertical"
+            android:text="a123456"
+            android:textSize="18sp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/textView5"
+            android:layout_width="100dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_marginLeft="32dp"
+            android:gravity="center_vertical"
+            android:text="新密码"
+            android:textSize="18sp" />
+
+        <EditText
+            android:id="@+id/editText_rePassword_forget"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:ems="6"
+            android:gravity="center_vertical"
+            android:text="a123456"
+            android:textSize="18sp" />
+
+    </LinearLayout>
 
     <ProgressBar
-        android:id="@+id/progressBar_forget"
+        android:id="@+id/progressBar_updateUserInfo"
         style="@android:style/Widget.DeviceDefault.Light.ProgressBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="16dp"
         android:indeterminateTint="@color/colorPrimary"
         android:visibility="invisible" />
 
     <Button
-        android:id="@+id/btn_confirm_forget"
-        android:layout_width="match_parent"
+        android:id="@+id/btnUpdate_forget"
+        android:layout_width="100dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="96dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="96dp"
-        android:layout_marginBottom="16dp"
-        android:text="@string/title_confirm" />
+        android:layout_gravity="center"
+        android:text="确认" />
 
 </LinearLayout>
