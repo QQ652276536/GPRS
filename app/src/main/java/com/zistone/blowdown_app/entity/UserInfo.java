@@ -18,6 +18,21 @@ public class UserInfo
     }
 
     /**
+     * 用户头像
+     */
+    private byte[] m_userImage;
+
+    public byte[] getM_userImage()
+    {
+        return m_userImage;
+    }
+
+    public void setM_userImage(byte[] m_userImage)
+    {
+        this.m_userImage = m_userImage;
+    }
+
+    /**
      * 用户编号(由数据库生成)
      */
     private int m_id;

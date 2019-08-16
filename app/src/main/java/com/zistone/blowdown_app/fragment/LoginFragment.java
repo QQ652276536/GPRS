@@ -185,13 +185,22 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
         if(userInfo != null)
         {
             Log.i("LoginLog", "登录成功:用户真实姓名为:" + userInfo.getM_realName());
-            UserSharedPreference.SetUserName(m_context, userInfo.getM_userName());
-            UserSharedPreference.SetPassword(m_context, userInfo.getM_password());
-            UserSharedPreference.SetRealName(m_context, userInfo.getM_realName());
-            UserSharedPreference.SetLevel(m_context, userInfo.getM_level());
-            UserSharedPreference.SetState(m_context, userInfo.getM_state());
-            //TODO:登录页切换为用户信息页
-            //跳转至设备页面
+            UserSharedPreference.LoginSuccess(m_context, userInfo);
+            //用户碎片显示用户信息的子碎片
+            List<Fragment> fragmentList = getFragmentManager().getFragments();
+            for(Fragment fragment : fragmentList)
+            {
+                //注意:一个FragmentTransaction只能Commit一次,不要用全局或共享一个FragmentTransaction对象,多个Fragment则多次get
+                if(!"userInfoFragment".equals(fragment.getTag()))
+                {
+                    getFragmentManager().beginTransaction().hide(fragment).commitNow();
+                }
+                else
+                {
+                    getFragmentManager().beginTransaction().show(fragment).commitNow();
+                }
+            }
+            //当前碎片切换为设备碎片
             m_bottomNavigationView.setSelectedItemId(m_bottomNavigationView.getMenu().getItem(1).getItemId());
         }
         else

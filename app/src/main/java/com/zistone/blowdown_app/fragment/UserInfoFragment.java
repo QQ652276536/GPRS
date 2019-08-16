@@ -32,10 +32,12 @@ import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
 import com.zistone.blowdown_app.R;
+import com.zistone.blowdown_app.UserSharedPreference;
 import com.zistone.blowdown_app.entity.UserInfo;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 
 public class UserInfoFragment extends Fragment implements View.OnClickListener, View.OnFocusChangeListener
@@ -78,15 +80,6 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
     {
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment RegisterFragment.
-     */
-    // TODO: Rename and change types and number of parameters
     public static UserInfoFragment newInstance(String param1, String param2)
     {
         UserInfoFragment fragment = new UserInfoFragment();
@@ -395,9 +388,33 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
     @Override
     public void onClick(View v)
     {
+        //选择图片
         if(R.id.imageView == v.getId())
         {
             ShowChoosePhotoDialog();
+        }
+        //更新信息
+        else if(R.id.btnUpdate_userInfo == v.getId())
+        {
+        }
+        //退出登录
+        else if(R.id.btnLogout_userInfo == v.getId())
+        {
+            UserSharedPreference.LogoutSuccess(m_context);
+            //用户碎片的子碎片切换至登录碎片
+            List<Fragment> fragmentList = getFragmentManager().getFragments();
+            for(Fragment fragment : fragmentList)
+            {
+                //注意:一个FragmentTransaction只能Commit一次,不要用全局或共享一个FragmentTransaction对象,多个Fragment则多次get
+                if(!"loginFragment".equals(fragment.getTag()))
+                {
+                    getFragmentManager().beginTransaction().hide(fragment).commitNow();
+                }
+                else
+                {
+                    getFragmentManager().beginTransaction().show(fragment).commitNow();
+                }
+            }
         }
     }
 

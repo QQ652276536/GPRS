@@ -2,15 +2,37 @@ package com.zistone.blowdown_app;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
+
+import com.zistone.blowdown_app.entity.DeviceInfo;
+import com.zistone.blowdown_app.entity.UserInfo;
 
 public class UserSharedPreference
 {
+    public static void LogoutSuccess(Context context)
+    {
+        UserSharedPreference.SetUserName(context, "");
+        UserSharedPreference.SetPassword(context, "");
+        UserSharedPreference.SetRealName(context, "");
+        UserSharedPreference.SetLevel(context, 1);
+        UserSharedPreference.SetState(context, 2);
+    }
+
+    public static void LoginSuccess(Context context, UserInfo userInfo)
+    {
+        UserSharedPreference.SetUserName(context, userInfo.getM_userName());
+        UserSharedPreference.SetPassword(context, userInfo.getM_password());
+        UserSharedPreference.SetRealName(context, userInfo.getM_realName());
+        UserSharedPreference.SetLevel(context, userInfo.getM_level());
+        UserSharedPreference.SetState(context, userInfo.getM_state());
+    }
+
     public static SharedPreferences Share(Context context)
     {
         return context.getSharedPreferences("USER", Context.MODE_PRIVATE);
     }
 
-    public static Object GetUserName(Context context)
+    public static String GetUserName(Context context)
     {
         return Share(context).getString("userName", null);
     }
@@ -22,7 +44,7 @@ public class UserSharedPreference
         return editor.commit();
     }
 
-    public static Object GetPassword(Context context)
+    public static String GetPassword(Context context)
     {
         return Share(context).getString("password", null);
     }
