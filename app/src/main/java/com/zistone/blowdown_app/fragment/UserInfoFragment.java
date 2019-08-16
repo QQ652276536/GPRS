@@ -20,6 +20,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,14 +32,25 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
+import com.zistone.blowdown_app.ImageUtil;
 import com.zistone.blowdown_app.R;
 import com.zistone.blowdown_app.UserSharedPreference;
 import com.zistone.blowdown_app.entity.UserInfo;
+import com.zistone.blowdown_app.http.OkHttpUtil;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
 
 public class UserInfoFragment extends Fragment implements View.OnClickListener, View.OnFocusChangeListener
 {
@@ -57,8 +69,9 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
     private static final int TAKE_PICTURE = 1;
     //裁剪图片回传
     private static final int CROP_SMALL_PICTURE = 2;
-    //图片的存储位置
+    //用户头像
     private Uri m_imageUri;
+    private Bitmap m_bitmap;
 
     private String mParam1;
     private String mParam2;
@@ -103,8 +116,8 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
             return;
         }
         Bundle bundle = data.getExtras();
-        Bitmap bitmap = bundle.getParcelable("data");
-        m_imageView.setImageBitmap(bitmap);
+        m_bitmap = bundle.getParcelable("userImage");
+        m_imageView.setImageBitmap(m_bitmap);
     }
 
     /**
@@ -112,7 +125,7 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
      *
      * @param imageUri
      */
-    private void StartPhotoZoom(Uri imageUri)
+    private void SetPhotoZoom(Uri imageUri)
     {
         if(null == imageUri)
         {
@@ -253,7 +266,44 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
             public void run()
             {
                 Looper.prepare();
+                Map<String, String> map = new HashMap<>();
+                byte[] bytes = ImageUtil.BitmapToByteArray(m_bitmap);
+                map.put("m_userImage", Base64.encodeToString(bytes, Base64.DEFAULT));
+                map.put("m_realName", m_editText_userRealName.getText().toString());
+                map.put("m_phoneNumber", m_editText_userPhone.getText().toString());
+                map.put("m_password", m_editText_rePassword.getText().toString());
+                OkHttpUtil okHttpUtil = new OkHttpUtil();
+                //异步方式发起请求,回调处理信息
+                okHttpUtil.AsynSendByPost(URL, map, new Callback()
+                {
+                    @Override
+                    public void onFailure(@NotNull Call call, @NotNull IOException e)
+                    {
+                        Log.e("UserInfoFragment", "请求失败:" + e.toString());
+                        Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_FAIL, "请求失败:" + e.toString());
+                        handler.sendMessage(message);
+                    }
 
+                    //获得请求响应的字符串:response.body().string()该方法只能被调用一次!另:toString()返回的是对象地址
+                    //获得请求响应的二进制字节数组:response.body().bytes()
+                    //获得请求响应的inputStream:response.body().byteStream()
+                    @Override
+                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException
+                    {
+                        String responseStr = response.body().string();
+                        Log.i("UserInfoFragment", "请求响应:" + responseStr);
+                        if(response.isSuccessful())
+                        {
+                            Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_SUCCESS, responseStr);
+                            handler.sendMessage(message);
+                        }
+                        else
+                        {
+                            Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_FAIL, responseStr);
+                            handler.sendMessage(message);
+                        }
+                    }
+                });
                 Looper.loop();
             }
         }).start();
@@ -306,10 +356,10 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
         switch(requestCode)
         {
             case CHOOSE_PICTURE:
-                StartPhotoZoom(data.getData());
+                SetPhotoZoom(data.getData());
                 break;
             case TAKE_PICTURE:
-                StartPhotoZoom(m_imageUri);
+                SetPhotoZoom(m_imageUri);
                 break;
             case CROP_SMALL_PICTURE:
                 SetImageToView(data);
@@ -396,6 +446,7 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
         //更新信息
         else if(R.id.btnUpdate_userInfo == v.getId())
         {
+            SendWithOkHttp();
         }
         //退出登录
         else if(R.id.btnLogout_userInfo == v.getId())

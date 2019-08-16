@@ -146,7 +146,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
                     @Override
                     public void onFailure(@NotNull Call call, @NotNull IOException e)
                     {
-                        Log.e("LoginLog", "请求失败:" + e.toString());
+                        Log.e("LoginFragment", "请求失败:" + e.toString());
                         Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_FAIL, "请求失败:" + e.toString());
                         handler.sendMessage(message);
                     }
@@ -158,7 +158,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
                     public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException
                     {
                         String responseStr = response.body().string();
-                        Log.i("LoginLog", "请求响应:" + responseStr);
+                        Log.i("LoginFragment", "请求响应:" + responseStr);
                         if(response.isSuccessful())
                         {
                             Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_SUCCESS, responseStr);
@@ -184,7 +184,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
         IsLoginEd();
         if(userInfo != null)
         {
-            Log.i("LoginLog", "登录成功:用户真实姓名为:" + userInfo.getM_realName());
+            Log.i("LoginFragment", "登录成功:用户真实姓名为:" + userInfo.getM_realName());
             UserSharedPreference.LoginSuccess(m_context, userInfo);
             //用户碎片显示用户信息的子碎片
             List<Fragment> fragmentList = getFragmentManager().getFragments();
@@ -205,7 +205,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
         }
         else
         {
-            Log.i("LoginLog", "登录失败:用户名或密码错误");
+            Log.i("LoginFragment", "登录失败:用户名或密码错误");
             Toast.makeText(m_context, "用户名或密码错误", Toast.LENGTH_SHORT).show();
         }
     }
