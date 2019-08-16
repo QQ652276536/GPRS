@@ -107,11 +107,11 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
                 switch(which)
                 {
                     //选择本地照片
-                    case GALLERY_REQUEST_CODE:
+                    case 0:
                         ChoosePhoto();
                         break;
                     //拍照
-                    case CAMERA_REQUEST_CODE:
+                    case 1:
                         TakePhoto();
                         break;
                     default:
