@@ -5,7 +5,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -32,6 +34,7 @@ import com.zistone.blowdown_app.R;
 import com.zistone.blowdown_app.entity.UserInfo;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 public class UserInfoFragment extends Fragment implements View.OnClickListener, View.OnFocusChangeListener
@@ -45,13 +48,14 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
     private static final String REGEXUSERNAME = "([a-zA-Z0-9]{6,12})";
     //首位不能是数字,不能全为数字或字母,6~16位
     private static final String REGEXPASSWORD = "^(?![0-9])(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,16}$";
-    //拍照回传码
-    public final static int CAMERA_REQUEST_CODE = 0;
-    //相册选择回传码
-    public final static int GALLERY_REQUEST_CODE = 1;
-    //拍照的照片的存储位置
-    private String m_photoPath;
-    //照片所在的Uri地址
+    //本地照片回传
+    private static final int CHOOSE_PICTURE = 0;
+    //系统相机回传
+    private static final int TAKE_PICTURE = 1;
+    //裁剪图片回传
+    private static final int CROP_SMALL_PICTURE = 2;
+    //图片的存储位置
+    private Uri m_photoUri;
     private Uri m_imageUri;
 
     private String mParam1;
@@ -93,6 +97,48 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
         return fragment;
     }
 
+    /**
+     * 将选取的图片设置到ImageView控件
+     *
+     * @param data
+     */
+    private void SetImageToView(Intent data)
+    {
+        if(null == data)
+        {
+            Log.i("UserInfoFragment", ">>>图片为Null");
+            return;
+        }
+        Bundle bundle = data.getExtras();
+        Bitmap bitmap = bundle.getParcelable("data");
+        m_imageView.setImageBitmap(bitmap);
+    }
+
+    /**
+     * 裁剪图片
+     *
+     * @param imageUri
+     */
+    private void StartPhotoZoom(Uri imageUri)
+    {
+        if(null == imageUri)
+        {
+            Log.i("UserInfoFragment", ">>>图片路径为Null");
+        }
+        Intent intent = new Intent("com.android.camera.action.CROP");
+        intent.setDataAndType(imageUri, "image/*");
+        // 设置裁剪
+        intent.putExtra("crop", "true");
+        // aspectX aspectY 是宽高的比例
+        intent.putExtra("aspectX", 1);
+        intent.putExtra("aspectY", 1);
+        // outputX outputY 是裁剪图片宽高
+        intent.putExtra("outputX", 80);
+        intent.putExtra("outputY", 80);
+        intent.putExtra("return-data", true);
+        startActivityForResult(intent, CROP_SMALL_PICTURE);
+    }
+
     private void ShowChoosePhotoDialog()
     {
         AlertDialog.Builder builder = new AlertDialog.Builder(m_context);
@@ -107,11 +153,11 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
                 switch(which)
                 {
                     //选择本地照片
-                    case 0:
+                    case CHOOSE_PICTURE:
                         ChoosePhoto();
                         break;
                     //拍照
-                    case 1:
+                    case TAKE_PICTURE:
                         TakePhoto();
                         break;
                     default:
@@ -123,14 +169,15 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
     }
 
     /**
-     * 系统相册
+     * 本地照片
      */
     private void ChoosePhoto()
     {
-        Intent intentToPickPic = new Intent(Intent.ACTION_PICK, null);
+        //调用图库,获取本地所有图片
+        Intent intentToPickPic = new Intent(Intent.ACTION_GET_CONTENT, null);
         //如果限制上传到服务器的图片类型:"image/jpeg、image/png"等的类型,所有类型则写"image/*"
         intentToPickPic.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
-        startActivityForResult(intentToPickPic, GALLERY_REQUEST_CODE);
+        startActivityForResult(intentToPickPic, CHOOSE_PICTURE);
     }
 
     /**
@@ -138,17 +185,12 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
      */
     private void TakePhoto()
     {
-        //跳转到系统的拍照界面
-        Intent intentToTakePhoto = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        //指定照片存储位置为SD卡本目录下
-        //这里设置为固定名字,这样就只会只有一张temp图
-        m_photoPath = Environment.getExternalStorageDirectory() + File.separator + "blowdown_userimage.jpeg";
-        //获取图片所在位置的Uri路径
-        //m_imageUri = Uri.fromFile(new File(m_photoPath));
-        m_imageUri = FileProvider.getUriForFile(getActivity(), getActivity().getApplicationContext().getPackageName() + ".my.provider", new File(m_photoPath));
+        //从相机中获取一张图片
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        m_photoUri = Uri.fromFile(new File(Environment.getExternalStorageDirectory(), "blowdown_userimage.jpeg"));
         //下面这句指定调用相机拍照后的照片存储的路径
-        intentToTakePhoto.putExtra(MediaStore.EXTRA_OUTPUT, m_imageUri);
-        startActivityForResult(intentToTakePhoto, CAMERA_REQUEST_CODE);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, m_imageUri);
+        startActivityForResult(intent, TAKE_PICTURE);
     }
 
     /**
@@ -156,24 +198,26 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
      */
     private void RequestPermission()
     {
-        //系统拍照权限
-        if(ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
         {
-            //第二个参数是一个字符串数组,里面是你需要申请的权限,可以设置申请多个权限
-            //最后一个参数是标志你这次申请的权限,该常量在onRequestPermissionsResult中使用到
-            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, CAMERA_REQUEST_CODE);
-
+            ArrayList<String> permissionsList = new ArrayList<>();
+            String[] permissions = {
+                    Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE
+            };
+            for(String perm : permissions)
+            {
+                if(PackageManager.PERMISSION_GRANTED != m_context.checkSelfPermission(perm))
+                {
+                    //进入到这里代表没有权限
+                    permissionsList.add(perm);
+                }
+            }
+            //授权
+            if(!permissionsList.isEmpty())
+            {
+                requestPermissions(permissionsList.toArray(new String[permissionsList.size()]), 0);
+            }
         }
-        //本地相册权限
-        if(ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
-        {
-            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, CAMERA_REQUEST_CODE);
-        }
-    }
-
-    public interface OnFragmentInteractionListener
-    {
-        void onFragmentInteraction(Uri uri);
     }
 
     private Handler handler = new Handler()
@@ -245,6 +289,40 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
         m_updateUserInfoProgressBar = m_userInfoView.findViewById(R.id.progressBar_updateUserInfo);
     }
 
+    public interface OnFragmentInteractionListener
+    {
+        void onFragmentInteraction(Uri uri);
+    }
+
+    // TODO: Rename method, update argument and hook method into UI event
+    public void onButtonPressed(Uri uri)
+    {
+        if(mListener != null)
+        {
+            mListener.onFragmentInteraction(uri);
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch(requestCode)
+        {
+            case CHOOSE_PICTURE:
+                StartPhotoZoom(m_imageUri);
+                break;
+            case TAKE_PICTURE:
+                StartPhotoZoom(data.getData());
+                break;
+            case CROP_SMALL_PICTURE:
+                SetImageToView(data);
+                break;
+            default:
+                break;
+        }
+    }
+
     /**
      * 停止Fragment时被回调
      */
@@ -285,15 +363,6 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
         InitView();
         InitData();
         return m_userInfoView;
-    }
-
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri)
-    {
-        if(mListener != null)
-        {
-            mListener.onFragmentInteraction(uri);
-        }
     }
 
     @Override
