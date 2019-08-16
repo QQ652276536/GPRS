@@ -2,14 +2,40 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar_register"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@color/transparent">
+
+        <ImageButton
+            android:id="@+id/btn_return_register"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="32dp"
+            android:background="@color/transparent"
+            app:srcCompat="@drawable/btn_return" />
+
+        <TextView
+            android:id="@+id/textView6"
+            android:layout_width="80dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:text="@string/title_register"
+            android:textColor="@color/colorPrimary"
+            android:textSize="18sp" />
+    </android.support.v7.widget.Toolbar>
 
     <EditText
         android:id="@+id/editTextUserName_register"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
-        android:layout_marginTop="75dp"
+        android:layout_marginTop="24dp"
         android:layout_marginEnd="24dp"
         android:ems="10"
         android:hint="@string/prompt_email"
@@ -25,7 +51,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="24dp"
         android:ems="10"
-        android:hint="@string/prompt_realName"
+        android:hint="@string/text_realName"
         android:inputType="textPersonName"
         android:text="李小伟" />
 
@@ -37,7 +63,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="24dp"
         android:ems="10"
-        android:hint="@string/prompt_phone"
+        android:hint="@string/text_phone"
         android:inputType="numberSigned"
         android:text="13477855544" />
 
@@ -61,7 +87,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="24dp"
         android:ems="10"
-        android:hint="@string/prompt_rePassword"
+        android:hint="@string/text_confirmPwd"
         android:inputType="textPassword"
         android:text="a123456" />
 
@@ -73,28 +99,11 @@
         android:indeterminateTint="@color/colorPrimary"
         android:visibility="invisible" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/btn_login_register"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="32dp"
-            android:layout_marginRight="32dp"
-            android:layout_weight="1"
-            android:text="@string/title_login" />
-
         <Button
             android:id="@+id/btn_register_register"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="32dp"
-            android:layout_marginRight="32dp"
-            android:layout_weight="1"
-            android:text="@string/title_register" />
-    </LinearLayout>
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/btn_register" />
 
 </LinearLayout>

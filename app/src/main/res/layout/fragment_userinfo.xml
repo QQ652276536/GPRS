@@ -10,7 +10,7 @@
         android:id="@+id/imageView"
         android:layout_width="match_parent"
         android:layout_height="80dp"
-        app:srcCompat="@mipmap/ic_launcher_round" />
+        app:srcCompat="@drawable/default_userimage" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -163,14 +163,14 @@
         android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:text="更改信息" />
+        android:text="@string/btn_update" />
 
     <Button
         android:id="@+id/btnLogout_userInfo"
         android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:text="退出登录"
+        android:text="@string/btn_logout"
         android:textColor="#FF0000" />
 
 </LinearLayout>

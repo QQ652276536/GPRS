@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -48,10 +49,9 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
     private EditText m_editText_userPhone;
     private EditText m_editText_password;
     private EditText m_editText_rePassword;
-    private Button m_btnLogin;
+    private ImageButton m_btnReturn;
     private Button m_btnRegister;
     private ProgressBar m_registerProgressBar;
-    private LoginFragment m_loginFragment;
 
     private OnFragmentInteractionListener mListener;
 
@@ -156,7 +156,7 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
     public void onClick(View v)
     {
         //登录,这里是跳转至登录页面
-        if(R.id.btn_login_register == v.getId())
+        if(R.id.btn_return_register == v.getId())
         {
             List<Fragment> fragmentList = getFragmentManager().getFragments();
             for(Fragment fragment : fragmentList)
@@ -324,7 +324,7 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
         m_editText_userPhone.setEnabled(true);
         m_editText_password.setEnabled(true);
         m_editText_rePassword.setEnabled(true);
-        m_btnLogin.setEnabled(true);
+        m_btnReturn.setEnabled(true);
         m_btnRegister.setEnabled(true);
     }
 
@@ -339,7 +339,7 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
         m_editText_userPhone.setEnabled(false);
         m_editText_password.setEnabled(false);
         m_editText_rePassword.setEnabled(false);
-        m_btnLogin.setEnabled(false);
+        //m_btnReturn.setEnabled(false);
         m_btnRegister.setEnabled(false);
     }
 
@@ -362,8 +362,8 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
         m_editText_password.setOnFocusChangeListener(this);
         m_editText_rePassword = m_registerView.findViewById(R.id.editTextRePassword_register);
         m_editText_rePassword.setOnFocusChangeListener(this);
-        m_btnLogin = m_registerView.findViewById(R.id.btn_login_register);
-        m_btnLogin.setOnClickListener(this);
+        m_btnReturn = m_registerView.findViewById(R.id.btn_return_register);
+        m_btnReturn.setOnClickListener(this);
         m_btnRegister = m_registerView.findViewById(R.id.btn_register_register);
         m_btnRegister.setOnClickListener(this);
         m_registerProgressBar = m_registerView.findViewById(R.id.progressBar_register);

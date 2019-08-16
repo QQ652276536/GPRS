@@ -6,7 +6,7 @@
     android:orientation="vertical">
 
     <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar"
+        android:id="@+id/toolbar_forget"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
@@ -84,12 +84,6 @@
             android:text="13477855544"
             android:textSize="18sp" />
 
-        <Button
-            android:id="@+id/btn_getCode"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:text="@string/btn_getCode" />
-
     </LinearLayout>
 
     <LinearLayout
@@ -116,6 +110,12 @@
             android:gravity="center_vertical"
             android:text="a123456"
             android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/btn_getCode"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="@string/btn_getCode" />
 
     </LinearLayout>
 
