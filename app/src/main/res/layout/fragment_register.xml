@@ -22,12 +22,12 @@
 
         <TextView
             android:id="@+id/textView6"
-            android:layout_width="80dp"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="center"
             android:text="@string/title_register"
             android:textColor="@color/colorPrimary"
-            android:textSize="18sp" />
+            android:textSize="24sp" />
     </android.support.v7.widget.Toolbar>
 
     <EditText

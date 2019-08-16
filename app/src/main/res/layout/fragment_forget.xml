@@ -22,12 +22,12 @@
 
         <TextView
             android:id="@+id/textView6"
-            android:layout_width="80dp"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="center"
             android:text="@string/title_forget"
             android:textColor="@color/colorPrimary"
-            android:textSize="18sp" />
+            android:textSize="24sp" />
     </android.support.v7.widget.Toolbar>
 
     <LinearLayout
@@ -50,7 +50,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:ems="6"
+            android:ems="10"
             android:gravity="center_vertical"
             android:inputType="textPostalAddress"
             android:text="李小伟"
@@ -78,7 +78,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:ems="6"
+            android:ems="10"
             android:gravity="center_vertical"
             android:inputType="phone"
             android:text="13477855544"
@@ -106,7 +106,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:ems="6"
+            android:ems="10"
             android:gravity="center_vertical"
             android:text="a123456"
             android:textSize="18sp" />
@@ -139,7 +139,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:ems="6"
+            android:ems="10"
             android:gravity="center_vertical"
             android:text="a123456"
             android:textSize="18sp" />

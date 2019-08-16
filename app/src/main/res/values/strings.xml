@@ -13,6 +13,7 @@
     <string name="title_register">用户注册</string>
     <string name="title_forget">找回密码</string>
     <string name="title_login">用户登录</string>
+    <string name="title_userInfo">用户信息</string>
 
     <string name="btn_confirm">确认</string>
     <string name="btn_register">注册</string>
@@ -23,5 +24,5 @@
     <string name="btn_device">设备</string>
     <string name="btn_user">用户</string>
     <string name="btn_login">登录</string>
-    <string name="btn_update">确认更新</string>
+    <string name="btn_update">更新信息</string>
 </resources>
