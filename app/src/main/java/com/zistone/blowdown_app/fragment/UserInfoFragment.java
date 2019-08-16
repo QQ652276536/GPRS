@@ -13,6 +13,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.os.StrictMode;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -55,7 +56,6 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
     //裁剪图片回传
     private static final int CROP_SMALL_PICTURE = 2;
     //图片的存储位置
-    private Uri m_photoUri;
     private Uri m_imageUri;
 
     private String mParam1;
@@ -174,10 +174,10 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
     private void ChoosePhoto()
     {
         //调用图库,获取本地所有图片
-        Intent intentToPickPic = new Intent(Intent.ACTION_GET_CONTENT, null);
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         //如果限制上传到服务器的图片类型:"image/jpeg、image/png"等的类型,所有类型则写"image/*"
-        intentToPickPic.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
-        startActivityForResult(intentToPickPic, CHOOSE_PICTURE);
+        intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
+        startActivityForResult(intent, CHOOSE_PICTURE);
     }
 
     /**
@@ -187,7 +187,7 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
     {
         //从相机中获取一张图片
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        m_photoUri = Uri.fromFile(new File(Environment.getExternalStorageDirectory(), "blowdown_userimage.jpeg"));
+        m_imageUri = Uri.fromFile(new File(Environment.getExternalStorageDirectory(), "blowdown_userimage.jpeg"));
         //下面这句指定调用相机拍照后的照片存储的路径
         intent.putExtra(MediaStore.EXTRA_OUTPUT, m_imageUri);
         startActivityForResult(intent, TAKE_PICTURE);
@@ -200,6 +200,9 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
     {
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
         {
+            //取消严格模式
+            StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+            StrictMode.setVmPolicy(builder.build());
             ArrayList<String> permissionsList = new ArrayList<>();
             String[] permissions = {
                     Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE
@@ -310,10 +313,10 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
         switch(requestCode)
         {
             case CHOOSE_PICTURE:
-                StartPhotoZoom(m_imageUri);
+                StartPhotoZoom(data.getData());
                 break;
             case TAKE_PICTURE:
-                StartPhotoZoom(data.getData());
+                StartPhotoZoom(m_imageUri);
                 break;
             case CROP_SMALL_PICTURE:
                 SetImageToView(data);
