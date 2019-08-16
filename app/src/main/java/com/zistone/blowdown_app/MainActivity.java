@@ -98,7 +98,8 @@ public class MainActivity extends AppCompatActivity implements MapFragment.OnFra
                             public void onClick(DialogInterface dialog, int which)
                             {
                                 dialog.dismiss();
-                                ClickUserItem();
+                                //ClickUserItem();
+                                m_bottomNavigationView.setSelectedItemId(m_bottomNavigationView.getMenu().getItem(2).getItemId());
                             }
                         });
                         builder.setMessage("您还没有登录");

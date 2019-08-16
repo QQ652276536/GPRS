@@ -32,24 +32,20 @@
 
     <EditText
         android:id="@+id/editTextUserName_register"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="24dp"
-        android:layout_marginEnd="24dp"
+        android:layout_gravity="center"
         android:ems="10"
-        android:hint="@string/prompt_email"
+        android:hint="@string/text_userName"
         android:inputType="textEmailAddress"
         android:selectAllOnFocus="true"
         android:text="LiXiaoWei" />
 
     <EditText
         android:id="@+id/editTextRealName_register"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="24dp"
+        android:layout_gravity="center"
         android:ems="10"
         android:hint="@string/text_realName"
         android:inputType="textPersonName"
@@ -57,11 +53,9 @@
 
     <EditText
         android:id="@+id/editTextPhone_register"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="24dp"
+        android:layout_gravity="center"
         android:ems="10"
         android:hint="@string/text_phone"
         android:inputType="numberSigned"
@@ -69,23 +63,19 @@
 
     <EditText
         android:id="@+id/editTextPassword_register"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="24dp"
+        android:layout_gravity="center"
         android:ems="10"
-        android:hint="@string/prompt_password"
+        android:hint="@string/text_password"
         android:inputType="textPassword"
         android:text="a123456" />
 
     <EditText
         android:id="@+id/editTextRePassword_register"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="24dp"
+        android:layout_gravity="center"
         android:ems="10"
         android:hint="@string/text_confirmPwd"
         android:inputType="textPassword"

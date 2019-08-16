@@ -4,28 +4,41 @@
     android:layout_height="fill_parent"
     android:orientation="vertical">
 
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar_register"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@color/transparent">
+
+        <TextView
+            android:id="@+id/textView6"
+            android:layout_width="80dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:text="@string/title_login"
+            android:textColor="@color/colorPrimary"
+            android:textSize="18sp" />
+    </android.support.v7.widget.Toolbar>
+
 
     <EditText
         android:id="@+id/editTextUserName_login"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="75dp"
-        android:layout_marginEnd="24dp"
+        android:layout_gravity="center"
         android:ems="10"
-        android:hint="@string/prompt_email"
+        android:hint="@string/text_userName"
         android:inputType="textEmailAddress"
         android:text="qwer1234" />
 
     <EditText
         android:id="@+id/editTextPassword_login"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="24dp"
+        android:layout_gravity="center"
         android:ems="10"
-        android:hint="@string/prompt_password"
+        android:hint="@string/text_password"
         android:inputType="textPassword"
         android:text="a123456" />
 
@@ -39,33 +52,25 @@
 
     <Button
         android:id="@+id/btn_login_login"
-        android:layout_width="match_parent"
+        android:layout_width="100dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="96dp"
-        android:layout_marginEnd="96dp"
-        android:layout_marginBottom="16dp"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
-        android:text="@string/title_login" />
+        android:layout_gravity="center"
+        android:text="@string/btn_login" />
 
     <Button
         android:id="@+id/btn_register_login"
-        android:layout_width="match_parent"
+        android:layout_marginTop="32dp"
+        android:layout_width="100dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="96dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="96dp"
-        android:layout_marginBottom="16dp"
-        android:text="@string/title_register" />
+        android:layout_gravity="center"
+        android:text="@string/btn_register" />
 
     <Button
         android:id="@+id/btn_forget_login"
-        android:layout_width="match_parent"
+        android:layout_marginTop="32dp"
+        android:layout_width="100dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="96dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="96dp"
-        android:layout_marginBottom="16dp"
-        android:text="@string/title_forget" />
+        android:layout_gravity="center"
+        android:text="@string/btn_forget" />
 
 </LinearLayout>
