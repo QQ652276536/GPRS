@@ -105,8 +105,7 @@ public class UserFragment extends Fragment
         {
             for(Fragment fragment : fragmentList)
             {
-                //if(!"userInfoFragment".equals(fragment.getTag()))
-                if(!"forgetFragment".equals(fragment.getTag()))
+                if(!"userInfoFragment".equals(fragment.getTag()))
                 {
                     getChildFragmentManager().beginTransaction().hide(fragment).commitNow();
                 }
@@ -120,7 +119,8 @@ public class UserFragment extends Fragment
         {
             for(Fragment fragment : fragmentList)
             {
-                if(!"loginFragment".equals(fragment.getTag()))
+                //if(!"loginFragment".equals(fragment.getTag()))
+                if(!"userInfoFragment".equals(fragment.getTag()))
                 {
                     getChildFragmentManager().beginTransaction().hide(fragment).commitNow();
                 }
