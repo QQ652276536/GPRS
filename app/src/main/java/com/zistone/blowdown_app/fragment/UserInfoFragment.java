@@ -1,11 +1,14 @@
 package com.zistone.blowdown_app.fragment;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -105,6 +108,28 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
     }
 
     /**
+     * 将选取的图片设置到ImageView控件
+     *
+     * @param intent
+     */
+    private void SetImageToView(Intent intent)
+    {
+        if(null == intent)
+        {
+            Log.i("UserInfoFragment", ">>>Intent为Null");
+            return;
+        }
+        Bundle bundle = intent.getExtras();
+        m_bitmap = bundle.getParcelable("data");
+        if(null == m_bitmap)
+        {
+            Log.i("UserInfoFragment", ">>>Bitmap为Null");
+            return;
+        }
+        m_imageView.setImageBitmap(m_bitmap);
+    }
+
+    /**
      * 更新完成,用于释放控件
      */
     private void IsUpdateEnd()
@@ -133,35 +158,19 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
     }
 
     /**
-     * 将选取的图片设置到ImageView控件
-     *
-     * @param data
-     */
-    private void SetImageToView(Intent data)
-    {
-        if(null == data)
-        {
-            Log.e("UserInfoFragment", ">>>图片为Null");
-            return;
-        }
-        Bundle bundle = data.getExtras();
-        m_bitmap = bundle.getParcelable("userImage");
-        m_imageView.setImageBitmap(m_bitmap);
-    }
-
-    /**
      * 裁剪图片
      *
-     * @param imageUri
+     * @param uri
      */
-    private void SetPhotoZoom(Uri imageUri)
+    private void CropImage(Uri uri)
     {
-        if(null == imageUri)
+        if(null == uri)
         {
-            Log.i("UserInfoFragment", ">>>图片路径为Null");
+            Log.e("UserInfoFragment", ">>>Uri为Null");
+            return;
         }
         Intent intent = new Intent("com.android.camera.action.CROP");
-        intent.setDataAndType(imageUri, "image/*");
+        intent.setDataAndType(uri, "image/*");
         // 设置裁剪
         intent.putExtra("crop", "true");
         // aspectX aspectY 是宽高的比例
@@ -189,43 +198,27 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
                 {
                     //选择本地照片
                     case CHOOSE_PICTURE:
-                        ChoosePhoto();
+                    {
+                        Intent intent = new Intent(Intent.ACTION_PICK);
+                        //如果限制上传到服务器的图片类型:"image/jpeg、image/png"等的类型,所有类型则写"image/*"
+                        intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
+                        startActivityForResult(intent, CHOOSE_PICTURE);
                         break;
+                    }
                     //拍照
                     case TAKE_PICTURE:
-                        TakePhoto();
+                    {
+                        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                        m_imageUri = Uri.fromFile(new File(Environment.getExternalStorageDirectory(), "blowdown_userimage.jpeg"));
+                        startActivityForResult(intent, TAKE_PICTURE);
                         break;
+                    }
                     default:
                         break;
                 }
             }
         });
         builder.create().show();
-    }
-
-    /**
-     * 本地照片
-     */
-    private void ChoosePhoto()
-    {
-        //调用图库,获取本地所有图片
-        Intent intent = new Intent(Intent.ACTION_PICK, null);
-        //如果限制上传到服务器的图片类型:"image/jpeg、image/png"等的类型,所有类型则写"image/*"
-        intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
-        startActivityForResult(intent, CHOOSE_PICTURE);
-    }
-
-    /**
-     * 系统拍照
-     */
-    private void TakePhoto()
-    {
-        //从相机中获取一张图片
-        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        m_imageUri = Uri.fromFile(new File(Environment.getExternalStorageDirectory(), "blowdown_userimage.jpeg"));
-        //下面这句指定调用相机拍照后的照片存储的路径
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, m_imageUri);
-        startActivityForResult(intent, TAKE_PICTURE);
     }
 
     /**
@@ -386,13 +379,17 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
         super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode != Activity.RESULT_OK)
+        {
+            return;
+        }
         switch(requestCode)
         {
             case CHOOSE_PICTURE:
-                SetPhotoZoom(data.getData());
+                CropImage(data.getData());
                 break;
             case TAKE_PICTURE:
-                SetPhotoZoom(m_imageUri);
+                CropImage(m_imageUri);
                 break;
             case CROP_SMALL_PICTURE:
                 SetImageToView(data);
