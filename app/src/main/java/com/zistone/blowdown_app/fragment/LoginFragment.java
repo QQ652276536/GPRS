@@ -367,15 +367,15 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
     @Override
     public void onClick(View v)
     {
+        //隐藏键盘
+        InputMethodManager inputMethodManager = (InputMethodManager) v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        if(inputMethodManager.isActive())
+        {
+            inputMethodManager.hideSoftInputFromWindow(v.getApplicationWindowToken(), 0);
+        }
         //登录,这里是发起登录请求
         if(R.id.btn_login_login == v.getId())
         {
-            //隐藏键盘
-            InputMethodManager imm = (InputMethodManager) v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-            if(imm.isActive())
-            {
-                imm.hideSoftInputFromWindow(v.getApplicationWindowToken(), 0);
-            }
             if(Pattern.matches(REGEXUSERNAME, m_editText_userName.getText().toString()))
             {
                 m_editText_userName.setError(null);

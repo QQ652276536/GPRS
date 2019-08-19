@@ -209,7 +209,7 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
     private void ChoosePhoto()
     {
         //调用图库,获取本地所有图片
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        Intent intent = new Intent(Intent.ACTION_PICK, null);
         //如果限制上传到服务器的图片类型:"image/jpeg、image/png"等的类型,所有类型则写"image/*"
         intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
         startActivityForResult(intent, CHOOSE_PICTURE);
@@ -366,12 +366,6 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
         m_imageView = m_userInfoView.findViewById(R.id.imageView);
         m_imageView.setOnClickListener(this);
         m_updateUserInfoProgressBar = m_userInfoView.findViewById(R.id.progressBar_updateUserInfo);
-        //隐藏键盘
-        InputMethodManager imm = (InputMethodManager) m_context.getSystemService(Context.INPUT_METHOD_SERVICE);
-        if(imm.isActive())
-        {
-            imm.hideSoftInputFromWindow(m_userInfoView.getApplicationWindowToken(), 0);
-        }
     }
 
     public interface OnFragmentInteractionListener
