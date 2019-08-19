@@ -54,13 +54,15 @@ public class MainActivity extends AppCompatActivity implements MapFragment.OnFra
         int state = UserSharedPreference.GetState(this);
         if(!"".equals(realName) && 1 == state)
         {
-            m_currentFragment = DeviceFragment.newInstance();
+            m_deviceFragment = DeviceFragment.newInstance();
             m_bottomNavigationView.setSelectedItemId(m_bottomNavigationView.getMenu().getItem(1).getItemId());
+            m_currentFragment = m_deviceFragment;
         }
         else
         {
-            m_currentFragment = UserFragment.newInstance("", "");
+            m_userFragment = UserFragment.newInstance("", "");
             m_bottomNavigationView.setSelectedItemId(m_bottomNavigationView.getMenu().getItem(2).getItemId());
+            m_currentFragment = m_userFragment;
         }
         getSupportFragmentManager().beginTransaction().add(R.id.fragment_current, m_currentFragment).show(m_currentFragment).commitNow();
         //因为启动时有默认选中页,防止事件重复触发,所以在后面注册监听事件
@@ -98,7 +100,6 @@ public class MainActivity extends AppCompatActivity implements MapFragment.OnFra
                             public void onClick(DialogInterface dialog, int which)
                             {
                                 dialog.dismiss();
-                                //ClickUserItem();
                                 m_bottomNavigationView.setSelectedItemId(m_bottomNavigationView.getMenu().getItem(2).getItemId());
                             }
                         });

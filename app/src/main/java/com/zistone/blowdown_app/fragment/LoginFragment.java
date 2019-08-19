@@ -114,7 +114,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
                 }
                 case MESSAGE_GETRESPONSE_FAIL:
                 {
-                    IsLoginEd();
+                    IsLoginEnd();
                     String responseStr = (String) message.obj;
                     Toast.makeText(m_context, "登录超时,请检查网络环境", Toast.LENGTH_SHORT).show();
                     break;
@@ -181,7 +181,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
      */
     private void LoginResult(UserInfo userInfo)
     {
-        IsLoginEd();
+        IsLoginEnd();
         if(userInfo != null)
         {
             Log.i("LoginFragment", "登录成功:用户真实姓名为:" + userInfo.getM_realName());
@@ -213,7 +213,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
     /**
      * 登录完成,用于释放控件
      */
-    private void IsLoginEd()
+    private void IsLoginEnd()
     {
         m_loginProgressBar.setVisibility(View.INVISIBLE);
         m_editText_userName.setEnabled(true);
@@ -253,7 +253,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
                     @Override
                     public void run()
                     {
-                        IsLoginEd();
+                        IsLoginEnd();
                         //从任务队列中取消任务
                         m_loginTimer.cancel();
                         Toast.makeText(m_context, "登录失败,请检查网络", Toast.LENGTH_SHORT).show();
@@ -275,8 +275,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
         m_editText_password.setOnFocusChangeListener(this);
         m_btn_login = m_userView.findViewById(R.id.btn_login_login);
         m_btn_login.setOnClickListener(this);
-        //强制让登录按钮获得焦点
-        //m_btn_login.requestFocus();
         m_btn_register = m_userView.findViewById(R.id.btn_register_login);
         m_btn_register.setOnClickListener(this);
         m_btn_forget = m_userView.findViewById(R.id.btn_forget_login);

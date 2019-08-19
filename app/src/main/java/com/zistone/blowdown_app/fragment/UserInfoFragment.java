@@ -25,6 +25,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -104,6 +105,34 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
     }
 
     /**
+     * 更新完成,用于释放控件
+     */
+    private void IsUpdateEnd()
+    {
+        m_updateUserInfoProgressBar.setVisibility(View.INVISIBLE);
+        m_editText_userRealName.setEnabled(true);
+        m_editText_userPhone.setEnabled(true);
+        m_editText_password.setEnabled(true);
+        m_editText_rePassword.setEnabled(true);
+        m_btnUpdate.setEnabled(true);
+        m_btnLogout.setEnabled(true);
+    }
+
+    /**
+     * 正在更新,用于禁止控件
+     */
+    private void IsUpdateing()
+    {
+        m_updateUserInfoProgressBar.setVisibility(View.VISIBLE);
+        m_editText_userRealName.setEnabled(false);
+        m_editText_userPhone.setEnabled(false);
+        m_editText_password.setEnabled(false);
+        m_editText_rePassword.setEnabled(false);
+        m_btnUpdate.setEnabled(false);
+        m_btnLogout.setEnabled(false);
+    }
+
+    /**
      * 将选取的图片设置到ImageView控件
      *
      * @param data
@@ -112,7 +141,7 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
     {
         if(null == data)
         {
-            Log.i("UserInfoFragment", ">>>图片为Null");
+            Log.e("UserInfoFragment", ">>>图片为Null");
             return;
         }
         Bundle bundle = data.getExtras();
@@ -247,6 +276,7 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
                 {
                     String responseStr = (String) message.obj;
                     Toast.makeText(m_context, "请求超时,请检查网络环境", Toast.LENGTH_SHORT).show();
+                    IsUpdateEnd();
                     break;
                 }
                 default:
@@ -267,8 +297,11 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
             {
                 Looper.prepare();
                 Map<String, String> map = new HashMap<>();
-                byte[] bytes = ImageUtil.BitmapToByteArray(m_bitmap);
-                map.put("m_userImage", Base64.encodeToString(bytes, Base64.DEFAULT));
+                if(null != m_bitmap)
+                {
+                    byte[] bytes = ImageUtil.BitmapToByteArray(m_bitmap);
+                    map.put("m_userImage", Base64.encodeToString(bytes, Base64.DEFAULT));
+                }
                 map.put("m_realName", m_editText_userRealName.getText().toString());
                 map.put("m_phoneNumber", m_editText_userPhone.getText().toString());
                 map.put("m_password", m_editText_rePassword.getText().toString());
@@ -333,6 +366,12 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
         m_imageView = m_userInfoView.findViewById(R.id.imageView);
         m_imageView.setOnClickListener(this);
         m_updateUserInfoProgressBar = m_userInfoView.findViewById(R.id.progressBar_updateUserInfo);
+        //隐藏键盘
+        InputMethodManager imm = (InputMethodManager) m_context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        if(imm.isActive())
+        {
+            imm.hideSoftInputFromWindow(m_userInfoView.getApplicationWindowToken(), 0);
+        }
     }
 
     public interface OnFragmentInteractionListener
@@ -446,6 +485,7 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
         //更新信息
         else if(R.id.btnUpdate_userInfo == v.getId())
         {
+            IsUpdateing();
             SendWithOkHttp();
         }
         //退出登录
