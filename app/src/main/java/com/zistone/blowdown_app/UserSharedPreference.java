@@ -2,6 +2,7 @@ package com.zistone.blowdown_app;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Base64;
 import android.util.Log;
 
 import com.zistone.blowdown_app.entity.DeviceInfo;
@@ -16,6 +17,7 @@ public class UserSharedPreference
         UserSharedPreference.SetRealName(context, "");
         UserSharedPreference.SetLevel(context, 1);
         UserSharedPreference.SetState(context, 2);
+        UserSharedPreference.SetUserImage(context, "");
     }
 
     public static void LoginSuccess(Context context, UserInfo userInfo)
@@ -25,11 +27,24 @@ public class UserSharedPreference
         UserSharedPreference.SetRealName(context, userInfo.getM_realName());
         UserSharedPreference.SetLevel(context, userInfo.getM_level());
         UserSharedPreference.SetState(context, userInfo.getM_state());
+        UserSharedPreference.SetUserImage(context, Base64.encodeToString(userInfo.getM_userImage(), Base64.DEFAULT));
     }
 
     public static SharedPreferences Share(Context context)
     {
         return context.getSharedPreferences("USER", Context.MODE_PRIVATE);
+    }
+
+    public static String GetUserImage(Context context)
+    {
+        return Share(context).getString("userImage", null);
+    }
+
+    public static boolean SetUserImage(Context context, String image)
+    {
+        SharedPreferences.Editor editor = Share(context).edit();
+        editor.putString("userImage", image);
+        return editor.commit();
     }
 
     public static String GetUserName(Context context)

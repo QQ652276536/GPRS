@@ -60,7 +60,8 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
 {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    private static final String URL = "http://192.168.10.197:8080/Blowdown_Web/UserInfo/Update";
+    //    private static final String URL = "http://192.168.10.197:8080/Blowdown_Web/UserInfo/Update";
+    private static final String URL = "http://192.168.191.1:8080/Blowdown_Web/UserInfo/Update";
     private static final int MESSAGE_GETRESPONSE_SUCCESS = 0;
     private static final int MESSAGE_GETRESPONSE_FAIL = 1;
     //6~12位字母数字组合
@@ -82,6 +83,7 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
 
     private Context m_context;
     private View m_userInfoView;
+    private EditText m_editText_userName;
     private EditText m_editText_userRealName;
     private EditText m_editText_userPhone;
     private EditText m_editText_password;
@@ -261,15 +263,16 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
             {
                 case MESSAGE_GETRESPONSE_SUCCESS:
                 {
+                    IsUpdateEnd();
                     String responseStr = (String) message.obj;
                     UserInfo userInfo = JSON.parseObject(responseStr, UserInfo.class);
                     break;
                 }
                 case MESSAGE_GETRESPONSE_FAIL:
                 {
+                    IsUpdateEnd();
                     String responseStr = (String) message.obj;
                     Toast.makeText(m_context, "请求超时,请检查网络环境", Toast.LENGTH_SHORT).show();
-                    IsUpdateEnd();
                     break;
                 }
                 default:
@@ -295,6 +298,7 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
                     byte[] bytes = ImageUtil.BitmapToByteArray(m_bitmap);
                     userInfo.setM_userImage(bytes);
                 }
+                userInfo.setM_userName(m_editText_userName.getText().toString());
                 userInfo.setM_realName(m_editText_userRealName.getText().toString());
                 userInfo.setM_phoneNumber(m_editText_userPhone.getText().toString());
                 userInfo.setM_password(m_editText_rePassword.getText().toString());
@@ -344,6 +348,7 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
     private void InitView()
     {
         m_context = m_userInfoView.getContext();
+        m_editText_userName = m_userInfoView.findViewById(R.id.editText_userName_userInfo);
         m_editText_userRealName = m_userInfoView.findViewById(R.id.editText_userRealName_userInfo);
         m_editText_userRealName.setOnFocusChangeListener(this);
         m_editText_userPhone = m_userInfoView.findViewById(R.id.editText_userPhone_userInfo);
