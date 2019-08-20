@@ -5,6 +5,7 @@ import android.os.Message;
 import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
+import com.zistone.blowdown_app.entity.UserInfo;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -55,13 +56,13 @@ public class OkHttpUtil
      * 异步发送Post请求,使用Handler处理消息
      *
      * @param url
-     * @param map
+     * @param userInfo
      */
-    public void AsynSendByPost(String url, Map<String, String> map)
+    public void AsynSendByPost(String url, UserInfo userInfo)
     {
         //实例化并设置连接超时时间、读取超时时间
         OkHttpClient okHttpClient = new OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS).readTimeout(10, TimeUnit.SECONDS).build();
-        String data = JSON.toJSONString(map);
+        String data = JSON.toJSONString(userInfo);
         RequestBody requestBody = FormBody.create(data, MediaType.parse("application/json; charset=utf-8"));
         //创建Post请求的方式
         Request request = new Request.Builder().post(requestBody).url(url).build();
@@ -103,14 +104,14 @@ public class OkHttpUtil
      * 异步发送Post请求,使用回调处理消息
      *
      * @param url
-     * @param map
+     * @param userInfo
      * @param listener
      */
-    public void AsynSendByPost(String url, Map<String, String> map, Callback listener)
+    public void AsynSendByPost(String url, UserInfo userInfo, Callback listener)
     {
         //实例化并设置连接超时时间、读取超时时间
         OkHttpClient okHttpClient = new OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS).readTimeout(10, TimeUnit.SECONDS).build();
-        String data = JSON.toJSONString(map);
+        String data = JSON.toJSONString(userInfo);
         RequestBody requestBody = FormBody.create(data, MediaType.parse("application/json; charset=utf-8"));
         //创建Post请求的方式
         Request request = new Request.Builder().post(requestBody).url(url).build();

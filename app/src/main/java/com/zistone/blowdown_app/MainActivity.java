@@ -35,8 +35,6 @@ public class MainActivity extends AppCompatActivity implements MapFragment.OnFra
     public UserFragment m_userFragment;
     //底部导航栏
     public BottomNavigationView m_bottomNavigationView;
-    //点击设备列表显示对应设备位置信息时需要将底部导航栏的选中样式修改,也使用了选中事件,避免重复触发
-    public boolean m_isFromClickDevice = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -57,15 +55,15 @@ public class MainActivity extends AppCompatActivity implements MapFragment.OnFra
             m_deviceFragment = DeviceFragment.newInstance();
             m_bottomNavigationView.setSelectedItemId(m_bottomNavigationView.getMenu().getItem(1).getItemId());
             m_currentFragment = m_deviceFragment;
+            getSupportFragmentManager().beginTransaction().add(R.id.fragment_current, m_currentFragment, "deviceFragment").show(m_currentFragment).commitNow();
         }
         else
         {
             m_userFragment = UserFragment.newInstance("", "");
             m_bottomNavigationView.setSelectedItemId(m_bottomNavigationView.getMenu().getItem(2).getItemId());
             m_currentFragment = m_userFragment;
+            getSupportFragmentManager().beginTransaction().add(R.id.fragment_current, m_currentFragment, "userFragment").show(m_currentFragment).commitNow();
         }
-        getSupportFragmentManager().beginTransaction().add(R.id.fragment_current, m_currentFragment).show(m_currentFragment).commitNow();
-        //因为启动时有默认选中页,防止事件重复触发,所以在后面注册监听事件
         m_bottomNavigationView.setOnNavigationItemSelectedListener(OnNavigationItemSeletecListener);
     }
 
@@ -77,11 +75,7 @@ public class MainActivity extends AppCompatActivity implements MapFragment.OnFra
             switch(menuItem.getItemId())
             {
                 case R.id.navigation_map:
-                    if(!m_isFromClickDevice)
-                    {
-                        ClickMapItem();
-                        m_isFromClickDevice = true;
-                    }
+                    ClickMapItem();
                     return true;
                 //如果已经登录过则允许跳转至设备页,否则跳转至用户页的登录界面
                 case R.id.navigation_device:
@@ -135,6 +129,7 @@ public class MainActivity extends AppCompatActivity implements MapFragment.OnFra
 
     private void ClickMapItem()
     {
+        m_mapFragment = (MapFragment) getSupportFragmentManager().findFragmentByTag("mapFragment");
         if(m_mapFragment == null)
         {
             m_mapFragment = MapFragment.newInstance(null);

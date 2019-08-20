@@ -20,14 +20,14 @@ public class UserInfo
     /**
      * 用户头像
      */
-    private String m_userImage;
+    private byte[] m_userImage;
 
-    public String getM_userImage()
+    public byte[] getM_userImage()
     {
         return m_userImage;
     }
 
-    public void setM_userImage(String m_userImage)
+    public void setM_userImage(byte[] m_userImage)
     {
         this.m_userImage = m_userImage;
     }

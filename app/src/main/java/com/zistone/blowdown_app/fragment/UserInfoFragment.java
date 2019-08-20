@@ -289,18 +289,18 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
             public void run()
             {
                 Looper.prepare();
-                Map<String, String> map = new HashMap<>();
+                UserInfo userInfo = new UserInfo();
                 if(null != m_bitmap)
                 {
                     byte[] bytes = ImageUtil.BitmapToByteArray(m_bitmap);
-                    map.put("m_userImage", Base64.encodeToString(bytes, Base64.DEFAULT));
+                    userInfo.setM_userImage(bytes);
                 }
-                map.put("m_realName", m_editText_userRealName.getText().toString());
-                map.put("m_phoneNumber", m_editText_userPhone.getText().toString());
-                map.put("m_password", m_editText_rePassword.getText().toString());
+                userInfo.setM_realName(m_editText_userRealName.getText().toString());
+                userInfo.setM_phoneNumber(m_editText_userPhone.getText().toString());
+                userInfo.setM_password(m_editText_rePassword.getText().toString());
                 OkHttpUtil okHttpUtil = new OkHttpUtil();
                 //异步方式发起请求,回调处理信息
-                okHttpUtil.AsynSendByPost(URL, map, new Callback()
+                okHttpUtil.AsynSendByPost(URL, userInfo, new Callback()
                 {
                     @Override
                     public void onFailure(@NotNull Call call, @NotNull IOException e)
