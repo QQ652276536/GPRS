@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
 import com.zistone.blowdown_app.MainActivity;
+import com.zistone.blowdown_app.PropertiesUtil;
 import com.zistone.blowdown_app.R;
 import com.zistone.blowdown_app.control.DeviceInfoRecyclerAdapter;
 import com.zistone.blowdown_app.entity.DeviceInfo;
@@ -46,8 +47,7 @@ public class DeviceFragment extends Fragment
     private static final int TIMEINTERVAL = 30 * 1000;
     private static final int MESSAGE_GETRESPONSE_SUCCESS = 0;
     private static final int MESSAGE_GETRESPONSE_FAIL = 1;
-    //private static final String URL = "http://10.0.2.2:8080/Blowdown_Web/DeviceInfo/FindAll";
-    private static final String URL = "http://192.168.10.197:8080/Blowdown_Web/DeviceInfo/FindAll";
+    private static String URL;
     private Context m_context;
     private View m_deviceView;
     private List<DeviceInfo> m_deviceList = new ArrayList<>();
@@ -119,6 +119,7 @@ public class DeviceFragment extends Fragment
     public void InitView()
     {
         m_context = m_deviceView.getContext();
+        URL = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/DeviceInfo/FindAll";
         //下拉刷新控件
         m_materialRefreshLayout = m_deviceView.findViewById(R.id.refresh);
         //禁用加载更多

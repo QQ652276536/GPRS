@@ -28,7 +28,7 @@ public class ImageUtil
     public static byte[] BitmapToByteArray(Bitmap bitmap)
     {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+        bitmap.compress(Bitmap.CompressFormat.PNG, 50, byteArrayOutputStream);
         return byteArrayOutputStream.toByteArray();
     }
 

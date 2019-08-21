@@ -1,17 +1,20 @@
 package com.zistone.blowdown_app.fragment;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.zistone.blowdown_app.ImageUtil;
 import com.zistone.blowdown_app.R;
 import com.zistone.blowdown_app.UserSharedPreference;
 
@@ -111,6 +114,13 @@ public class UserFragment extends Fragment
                 }
                 else
                 {
+                    String imageStr = UserSharedPreference.GetUserImage(m_context);
+                    if(null != imageStr && !"".equals(imageStr))
+                    {
+                        byte[] bytes = Base64.decode(imageStr, Base64.DEFAULT);
+                        Bitmap bitmap = ImageUtil.ByteArrayToBitmap(bytes);
+                        m_userInfoFragment.m_imageView.setImageBitmap(bitmap);
+                    }
                     getChildFragmentManager().beginTransaction().show(fragment).commitNow();
                 }
             }
@@ -119,8 +129,8 @@ public class UserFragment extends Fragment
         {
             for(Fragment fragment : fragmentList)
             {
-                //if(!"loginFragment".equals(fragment.getTag()))
-                if(!"userInfoFragment".equals(fragment.getTag()))
+                if(!"loginFragment".equals(fragment.getTag()))
+                //if(!"userInfoFragment".equals(fragment.getTag()))
                 {
                     getChildFragmentManager().beginTransaction().hide(fragment).commitNow();
                 }

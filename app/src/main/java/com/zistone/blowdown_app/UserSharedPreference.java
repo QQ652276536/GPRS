@@ -27,7 +27,7 @@ public class UserSharedPreference
         UserSharedPreference.SetRealName(context, userInfo.getM_realName());
         UserSharedPreference.SetLevel(context, userInfo.getM_level());
         UserSharedPreference.SetState(context, userInfo.getM_state());
-        UserSharedPreference.SetUserImage(context, Base64.encodeToString(userInfo.getM_userImage(), Base64.DEFAULT));
+        UserSharedPreference.SetUserImage(context, userInfo.getM_userImage());
     }
 
     public static SharedPreferences Share(Context context)

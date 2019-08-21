@@ -30,7 +30,7 @@
         android:ems="10"
         android:hint="@string/text_userName"
         android:inputType="textEmailAddress"
-        android:text="qwer1234" />
+        android:text="数学家赌博" />
 
     <EditText
         android:id="@+id/editTextPassword_login"

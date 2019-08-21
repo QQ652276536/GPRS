@@ -14,20 +14,23 @@ public class UserInfo
     @Override
     public String toString()
     {
-        return "UserInfo{" + "m_id=" + m_id + ", m_userName='" + m_userName + '\'' + ", m_realName='" + m_realName + '\'' + ", m_phoneNumber='" + m_phoneNumber + '\'' + ", m_level=" + m_level + ", m_state=" + m_state + ", m_craeteTime=" + m_craeteTime + ", m_updateTime=" + m_updateTime + ", m_password='" + m_password + '\'' + '}';
+        return "UserInfo{" + "m_id=" + m_id + ", m_userName='" + m_userName + '\'' + ", m_realName='" + m_realName + '\'' + ", m_phoneNumber='"
+                + m_phoneNumber + '\'' + ", m_level=" + m_level + ", m_state=" + m_state + ", m_craeteTime=" + m_craeteTime + ", m_updateTime="
+                + m_updateTime + ", m_password='" + m_password + '\'' + '}';
     }
 
     /**
      * 用户头像
+     * 存储的是Base64转换的字符串
      */
-    private byte[] m_userImage;
+    private String m_userImage;
 
-    public byte[] getM_userImage()
+    public String getM_userImage()
     {
         return m_userImage;
     }
 
-    public void setM_userImage(byte[] m_userImage)
+    public void setM_userImage(String m_userImage)
     {
         this.m_userImage = m_userImage;
     }

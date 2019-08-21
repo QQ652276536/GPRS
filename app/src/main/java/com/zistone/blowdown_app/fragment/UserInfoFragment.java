@@ -37,6 +37,7 @@ import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
 import com.zistone.blowdown_app.ImageUtil;
+import com.zistone.blowdown_app.PropertiesUtil;
 import com.zistone.blowdown_app.R;
 import com.zistone.blowdown_app.UserSharedPreference;
 import com.zistone.blowdown_app.entity.UserInfo;
@@ -60,8 +61,6 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
 {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    //    private static final String URL = "http://192.168.10.197:8080/Blowdown_Web/UserInfo/Update";
-    private static final String URL = "http://192.168.191.1:8080/Blowdown_Web/UserInfo/Update";
     private static final int MESSAGE_GETRESPONSE_SUCCESS = 0;
     private static final int MESSAGE_GETRESPONSE_FAIL = 1;
     //6~12位字母数字组合
@@ -74,9 +73,8 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
     private static final int TAKE_PICTURE = 1;
     //裁剪图片回传
     private static final int CROP_SMALL_PICTURE = 2;
-    //用户头像
-    private Uri m_imageUri;
-    private Bitmap m_bitmap;
+
+    private static String URL;
 
     private String mParam1;
     private String mParam2;
@@ -91,9 +89,12 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
     private Button m_btnUpdate;
     private Button m_btnLogout;
     private ProgressBar m_updateUserInfoProgressBar;
-    private ImageView m_imageView;
+    private Uri m_imageUri;
 
     private OnFragmentInteractionListener mListener;
+
+    public ImageView m_imageView;
+    public Bitmap m_bitmap;
 
     public UserInfoFragment()
     {
@@ -296,7 +297,8 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
                 if(null != m_bitmap)
                 {
                     byte[] bytes = ImageUtil.BitmapToByteArray(m_bitmap);
-                    userInfo.setM_userImage(bytes);
+                    String imageStr = Base64.encodeToString(bytes, Base64.DEFAULT);
+                    userInfo.setM_userImage(imageStr);
                 }
                 userInfo.setM_userName(m_editText_userName.getText().toString());
                 userInfo.setM_realName(m_editText_userRealName.getText().toString());
@@ -339,15 +341,10 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
         }).start();
     }
 
-    private void InitData()
-    {
-        //动态获取权限
-        RequestPermission();
-    }
-
     private void InitView()
     {
         m_context = m_userInfoView.getContext();
+        URL = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/UserInfo/Update";
         m_editText_userName = m_userInfoView.findViewById(R.id.editText_userName_userInfo);
         m_editText_userRealName = m_userInfoView.findViewById(R.id.editText_userRealName_userInfo);
         m_editText_userRealName.setOnFocusChangeListener(this);
@@ -364,6 +361,8 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
         m_imageView = m_userInfoView.findViewById(R.id.imageView);
         m_imageView.setOnClickListener(this);
         m_updateUserInfoProgressBar = m_userInfoView.findViewById(R.id.progressBar_updateUserInfo);
+        //动态获取权限
+        RequestPermission();
     }
 
     public interface OnFragmentInteractionListener
@@ -442,7 +441,6 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
     {
         m_userInfoView = inflater.inflate(R.layout.fragment_userinfo, container, false);
         InitView();
-        InitData();
         return m_userInfoView;
     }
 

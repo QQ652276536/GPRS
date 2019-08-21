@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import com.zistone.blowdown_app.PropertiesUtil;
 import com.zistone.blowdown_app.R;
 
 import java.util.List;
@@ -27,15 +28,15 @@ import java.util.List;
  */
 public class ForgetFragment extends Fragment implements View.OnClickListener
 {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
+    private static String URL;
+
     private String mParam1;
     private String mParam2;
 
+    private Context m_context;
     private View m_forgetView;
     private Toolbar m_toolbar;
     private ImageButton m_btnReturn;
@@ -67,6 +68,8 @@ public class ForgetFragment extends Fragment implements View.OnClickListener
 
     private void InitView()
     {
+        m_context = getContext();
+        URL = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/UserInfo/Forget";
         m_toolbar = m_forgetView.findViewById(R.id.toolbar_forget);
         m_btnReturn = m_forgetView.findViewById(R.id.btn_return_forget);
         m_btnReturn.setOnClickListener(this);

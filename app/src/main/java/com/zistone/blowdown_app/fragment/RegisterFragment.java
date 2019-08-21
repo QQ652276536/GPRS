@@ -19,6 +19,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
+import com.zistone.blowdown_app.PropertiesUtil;
 import com.zistone.blowdown_app.R;
 import com.zistone.blowdown_app.entity.UserInfo;
 
@@ -31,13 +32,14 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
 {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    private static final String URL = "http://192.168.10.197:8080/Blowdown_Web/UserInfo/Register";
     private static final int MESSAGE_GETRESPONSE_SUCCESS = 0;
     private static final int MESSAGE_GETRESPONSE_FAIL = 1;
     //6~12位字母数字组合
     private static final String REGEXUSERNAME = "([a-zA-Z0-9]{6,12})";
     //首位不能是数字,不能全为数字或字母,6~16位
     private static final String REGEXPASSWORD = "^(?![0-9])(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,16}$";
+
+    private static String URL;
 
     private String mParam1;
     private String mParam2;
@@ -115,7 +117,7 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         m_registerView = inflater.inflate(R.layout.fragment_register, container, false);
-        InitData();
+        InitView();
         return m_registerView;
     }
 
@@ -349,9 +351,10 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
         SendWithOkHttp();
     }
 
-    private void InitData()
+    private void InitView()
     {
         m_context = m_registerView.getContext();
+        URL = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/UserInfo/Register";
         m_editText_userName = m_registerView.findViewById(R.id.editTextUserName_register);
         m_editText_userName.setOnFocusChangeListener(this);
         m_editText_userRealName = m_registerView.findViewById(R.id.editTextRealName_register);

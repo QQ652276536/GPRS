@@ -19,6 +19,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
+import com.zistone.blowdown_app.PropertiesUtil;
 import com.zistone.blowdown_app.R;
 import com.zistone.blowdown_app.UserSharedPreference;
 import com.zistone.blowdown_app.entity.UserInfo;
@@ -42,13 +43,14 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
 {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    private static final String URL = "http://192.168.10.197:8080/Blowdown_Web/UserInfo/Login";
     private static final int MESSAGE_GETRESPONSE_SUCCESS = 0;
     private static final int MESSAGE_GETRESPONSE_FAIL = 1;
+
+    private static String URL;
     //间隔时间
     private static int TIMEINTERVAL = 5 * 1000;
-    //6~12位字母数字组合
-    private static final String REGEXUSERNAME = "([a-zA-Z0-9]{6,12})";
+    //6~12位字母数字组合或6位中文
+    private static final String REGEXUSERNAME = "([a-zA-Z0-9]{6,12})|[\\u4e00-\\u9fa5]{2,6}";
     //首位不能是数字,不能全为数字或字母,6~16位
     private static final String REGEXPASSWORD = "^(?![0-9])(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,16}$";
 
@@ -190,7 +192,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
             List<Fragment> fragmentList = getFragmentManager().getFragments();
             for(Fragment fragment : fragmentList)
             {
-                //注意:一个FragmentTransaction只能Commit一次,不要用全局或共享一个FragmentTransaction对象,多个Fragment则多次get
                 if(!"userInfoFragment".equals(fragment.getTag()))
                 {
                     getFragmentManager().beginTransaction().hide(fragment).commitNow();
@@ -266,9 +267,10 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
         //m_loginTimer.schedule(loginTask, TIMEINTERVAL);
     }
 
-    private void InitData()
+    private void InitView()
     {
         m_context = m_userView.getContext();
+        URL = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/UserInfo/Login";
         m_editText_userName = m_userView.findViewById(R.id.editTextUserName_login);
         m_editText_userName.setOnFocusChangeListener(this);
         m_editText_password = m_userView.findViewById(R.id.editTextPassword_login);
@@ -327,7 +329,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         m_userView = inflater.inflate(R.layout.fragment_login, container, false);
-        InitData();
+        InitView();
         return m_userView;
     }
 
