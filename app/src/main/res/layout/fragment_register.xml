@@ -39,7 +39,7 @@
         android:hint="@string/text_userName"
         android:inputType="textEmailAddress"
         android:selectAllOnFocus="true"
-        android:text="LiXiaoWei" />
+        android:text="" />
 
     <EditText
         android:id="@+id/editTextRealName_register"
@@ -49,7 +49,7 @@
         android:ems="10"
         android:hint="@string/text_realName"
         android:inputType="textPersonName"
-        android:text="李小伟" />
+        android:text="" />
 
     <EditText
         android:id="@+id/editTextPhone_register"
@@ -59,7 +59,7 @@
         android:ems="10"
         android:hint="@string/text_phone"
         android:inputType="numberSigned"
-        android:text="13477855544" />
+        android:text="" />
 
     <EditText
         android:id="@+id/editTextPassword_register"
@@ -69,7 +69,7 @@
         android:ems="10"
         android:hint="@string/text_password"
         android:inputType="textPassword"
-        android:text="a123456" />
+        android:text="" />
 
     <EditText
         android:id="@+id/editTextRePassword_register"
@@ -79,7 +79,7 @@
         android:ems="10"
         android:hint="@string/text_confirmPwd"
         android:inputType="textPassword"
-        android:text="a123456" />
+        android:text="" />
 
     <ProgressBar
         android:id="@+id/progressBar_register"
