@@ -1,6 +1,7 @@
 package com.zistone.blowdown_app.fragment;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -99,6 +100,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
     private LatLng m_latLng;
     //设备信息
     private DeviceInfo m_deviceInfo;
+    private Activity m_activity;
 
     private OnFragmentInteractionListener mListener;
 
@@ -414,9 +416,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
             m_isPermissionRequested = true;
             ArrayList<String> permissionsList = new ArrayList<>();
             String[] permissions = {
-                    Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.INTERNET, Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                    Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.ACCESS_COARSE_LOCATION,
-                    Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.WRITE_SETTINGS, Manifest.permission.ACCESS_WIFI_STATE,
+                    Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.INTERNET, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.WRITE_SETTINGS, Manifest.permission.ACCESS_WIFI_STATE,
             };
             for(String perm : permissions)
             {
@@ -470,11 +470,11 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
      */
     private void DrawMarkerText(LatLng latLng, String str, int foreColor, int backColor)
     {
-        if(null == latLng || "".equals(str))
+        if(null == latLng || "".equals(str) || null == m_activity)
         {
             return;
         }
-        TextView textView = new TextView(getActivity());
+        TextView textView = new TextView(m_activity);
         //内容距中
         textView.setGravity(Gravity.LEFT);
         textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
@@ -495,8 +495,23 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
         m_baiduMap.addOverlay(textOverlayOptions);
     }
 
-    private void InitData()
+    private void InitView()
     {
+        m_context = m_mapView.getContext();
+        m_activity = getActivity();
+        m_textView = m_mapView.findViewById(R.id.textView);
+        //支持TextView内容滑动
+        m_textView.setMovementMethod(ScrollingMovementMethod.getInstance());
+        m_baiduMapView = m_mapView.findViewById(R.id.mapView);
+        //动态获取权限
+        RequestPermission();
+        //注册SDK广播监听者
+        IntentFilter iFilter = new IntentFilter();
+        iFilter.addAction(SDKInitializer.SDK_BROADTCAST_ACTION_STRING_PERMISSION_CHECK_OK);
+        iFilter.addAction(SDKInitializer.SDK_BROADTCAST_ACTION_STRING_PERMISSION_CHECK_ERROR);
+        iFilter.addAction(SDKInitializer.SDK_BROADCAST_ACTION_STRING_NETWORK_ERROR);
+        m_sdkReceiver = new SDKReceiver();
+        m_context.registerReceiver(m_sdkReceiver, iFilter);
         //获取设备信息
         m_deviceInfo = getArguments().getParcelable("DEVICEINFO");
         if(null != m_deviceInfo)
@@ -546,25 +561,6 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
             }
         });
         /*************************************************************************************************/
-
-    }
-
-    private void InitView()
-    {
-        m_context = m_mapView.getContext();
-        m_textView = m_mapView.findViewById(R.id.textView);
-        //支持TextView内容滑动
-        m_textView.setMovementMethod(ScrollingMovementMethod.getInstance());
-        m_baiduMapView = m_mapView.findViewById(R.id.mapView);
-        //动态获取权限
-        RequestPermission();
-        //注册SDK广播监听者
-        IntentFilter iFilter = new IntentFilter();
-        iFilter.addAction(SDKInitializer.SDK_BROADTCAST_ACTION_STRING_PERMISSION_CHECK_OK);
-        iFilter.addAction(SDKInitializer.SDK_BROADTCAST_ACTION_STRING_PERMISSION_CHECK_ERROR);
-        iFilter.addAction(SDKInitializer.SDK_BROADCAST_ACTION_STRING_NETWORK_ERROR);
-        m_sdkReceiver = new SDKReceiver();
-        m_context.registerReceiver(m_sdkReceiver, iFilter);
     }
 
     /**
@@ -675,7 +671,6 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
     {
         m_mapView = inflater.inflate(R.layout.fragment_map, container, false);
         InitView();
-        InitData();
         return m_mapView;
     }
 
