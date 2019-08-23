@@ -206,11 +206,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
                     {
                         byte[] bytes = Base64.decode(imageStr, Base64.DEFAULT);
                         Bitmap bitmap = ImageUtil.ByteArrayToBitmap(bytes);
-                        //模拟上运行时选择不了图片,加判断避免抛空指针
-                        if(null != bitmap)
-                        {
-                            ((UserInfoFragment) fragment).m_imageView.setImageBitmap(bitmap);
-                        }
+                        ((UserInfoFragment) fragment).m_imageView.setImageBitmap(bitmap);
                     }
                     getFragmentManager().beginTransaction().show(fragment).commitNow();
                 }

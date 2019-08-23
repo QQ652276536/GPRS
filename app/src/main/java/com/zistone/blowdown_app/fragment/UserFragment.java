@@ -114,17 +114,6 @@ public class UserFragment extends Fragment
                 }
                 else
                 {
-                    String imageStr = UserSharedPreference.GetUserImage(m_context);
-                    if(null != imageStr && !"".equals(imageStr))
-                    {
-                        byte[] bytes = Base64.decode(imageStr, Base64.DEFAULT);
-                        Bitmap bitmap = ImageUtil.ByteArrayToBitmap(bytes);
-                        //模拟上运行时选择不了图片,加判断避免抛空指针
-                        if(null != bitmap)
-                        {
-                            m_userInfoFragment.m_imageView.setImageBitmap(bitmap);
-                        }
-                    }
                     getChildFragmentManager().beginTransaction().show(fragment).commitNow();
                 }
             }

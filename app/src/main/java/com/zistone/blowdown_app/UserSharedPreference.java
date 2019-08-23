@@ -10,13 +10,20 @@ import com.zistone.blowdown_app.entity.UserInfo;
 
 public class UserSharedPreference
 {
+
+    public static void UpdateSuccess(Context context, UserInfo userInfo)
+    {
+        UserSharedPreference.SetPassword(context, userInfo.getM_password());
+        UserSharedPreference.SetRealName(context, userInfo.getM_realName());
+        UserSharedPreference.SetLevel(context, userInfo.getM_level());
+        UserSharedPreference.SetUserImage(context, userInfo.getM_userImage());
+    }
     public static void LogoutSuccess(Context context)
     {
         UserSharedPreference.SetUserName(context, "");
         UserSharedPreference.SetPassword(context, "");
         UserSharedPreference.SetRealName(context, "");
         UserSharedPreference.SetLevel(context, 1);
-        UserSharedPreference.SetState(context, 2);
         UserSharedPreference.SetUserImage(context, "");
     }
 
@@ -26,7 +33,6 @@ public class UserSharedPreference
         UserSharedPreference.SetPassword(context, userInfo.getM_password());
         UserSharedPreference.SetRealName(context, userInfo.getM_realName());
         UserSharedPreference.SetLevel(context, userInfo.getM_level());
-        UserSharedPreference.SetState(context, userInfo.getM_state());
         UserSharedPreference.SetUserImage(context, userInfo.getM_userImage());
     }
 
