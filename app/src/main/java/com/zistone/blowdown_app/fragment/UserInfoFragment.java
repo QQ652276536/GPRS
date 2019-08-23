@@ -94,7 +94,6 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
     private OnFragmentInteractionListener mListener;
 
     public ImageView m_imageView;
-    public Bitmap m_bitmap;
 
     public UserInfoFragment()
     {
@@ -119,17 +118,17 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
     {
         if(null == intent)
         {
-            Log.i("UserInfoFragment", ">>>Intent为Null");
+            Log.e("UserInfoFragment", ">>>Intent为Null");
             return;
         }
         Bundle bundle = intent.getExtras();
-        m_bitmap = bundle.getParcelable("data");
-        if(null == m_bitmap)
+        Bitmap bitmap = bundle.getParcelable("data");
+        if(null == bitmap)
         {
-            Log.i("UserInfoFragment", ">>>Bitmap为Null");
+            Log.e("UserInfoFragment", ">>>Bitmap为Null");
             return;
         }
-        m_imageView.setImageBitmap(m_bitmap);
+        m_imageView.setImageBitmap(bitmap);
     }
 
     /**
@@ -267,12 +266,30 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
                     IsUpdateEnd();
                     String responseStr = (String) message.obj;
                     UserInfo userInfo = JSON.parseObject(responseStr, UserInfo.class);
+                    if(null != userInfo)
+                    {
+                        UserSharedPreference.UpdateSuccess(m_context, userInfo);
+                        //修改用户头像
+                        String imageStr = UserSharedPreference.GetUserImage(m_context);
+                        if(null != imageStr && !"".equals(imageStr))
+                        {
+                            byte[] bytes = Base64.decode(imageStr, Base64.DEFAULT);
+                            Bitmap bitmap = ImageUtil.ByteArrayToBitmap(bytes);
+                            m_imageView.setImageBitmap(bitmap);
+                        }
+                        Log.i("UserInfoFragment", ">>>用户信息更新成功");
+                    }
+                    else
+                    {
+                        Log.e("UserInfoFragment", ">>>用户信息更新失败");
+                    }
                     break;
                 }
                 case MESSAGE_GETRESPONSE_FAIL:
                 {
                     IsUpdateEnd();
                     String responseStr = (String) message.obj;
+                    Log.e("UserInfoFragment", ">>>请求超时:" + responseStr);
                     Toast.makeText(m_context, "请求超时,请检查网络环境", Toast.LENGTH_SHORT).show();
                     break;
                 }
@@ -294,9 +311,12 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
             {
                 Looper.prepare();
                 UserInfo userInfo = new UserInfo();
-                if(null != m_bitmap)
+                m_imageView.setDrawingCacheEnabled(true);
+                Bitmap bitmap = Bitmap.createBitmap(m_imageView.getDrawingCache());
+                m_imageView.setDrawingCacheEnabled(false);
+                if(null != bitmap)
                 {
-                    byte[] bytes = ImageUtil.BitmapToByteArray(m_bitmap);
+                    byte[] bytes = ImageUtil.BitmapToByteArray(bitmap);
                     String imageStr = Base64.encodeToString(bytes, Base64.DEFAULT);
                     userInfo.setM_userImage(imageStr);
                 }
@@ -363,6 +383,14 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
         m_updateUserInfoProgressBar = m_userInfoView.findViewById(R.id.progressBar_updateUserInfo);
         //动态获取权限
         RequestPermission();
+        //设置用户头像
+        String imageStr = UserSharedPreference.GetUserImage(m_context);
+        if(null != imageStr && !"".equals(imageStr))
+        {
+            byte[] bytes = Base64.decode(imageStr, Base64.DEFAULT);
+            Bitmap bitmap = ImageUtil.ByteArrayToBitmap(bytes);
+            m_imageView.setImageBitmap(bitmap);
+        }
     }
 
     public interface OnFragmentInteractionListener
