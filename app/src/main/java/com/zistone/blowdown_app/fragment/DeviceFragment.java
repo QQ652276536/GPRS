@@ -81,7 +81,6 @@ public class DeviceFragment extends Fragment
         void onFragmentInteraction(Uri uri);
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri)
     {
         if(mListener != null)

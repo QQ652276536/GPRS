@@ -1,12 +1,14 @@
 package com.zistone.blowdown_app.fragment;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,8 +21,10 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
+import com.zistone.blowdown_app.ImageUtil;
 import com.zistone.blowdown_app.PropertiesUtil;
 import com.zistone.blowdown_app.R;
+import com.zistone.blowdown_app.UserSharedPreference;
 import com.zistone.blowdown_app.entity.UserInfo;
 
 import java.util.HashMap;
@@ -61,15 +65,6 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
     {
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment RegisterFragment.
-     */
-    // TODO: Rename and change types and number of parameters
     public static RegisterFragment newInstance(String param1, String param2)
     {
         RegisterFragment fragment = new RegisterFragment();
@@ -121,7 +116,6 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
         return m_registerView;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri)
     {
         if(mListener != null)
@@ -306,12 +300,25 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
         if(userInfo != null)
         {
             Log.i("RegisterLog", "注册成功:用户真实姓名为:" + userInfo.getM_realName());
-            //TODO:跳转至登录页面并将用户名填至输入框
+            //跳转至登录页面并将用户名填至输入框
+            List<Fragment> fragmentList = getFragmentManager().getFragments();
+            for(Fragment fragment : fragmentList)
+            {
+                if(!"loginFragment".equals(fragment.getTag()))
+                {
+                    getFragmentManager().beginTransaction().hide(fragment).commitNow();
+                }
+                else
+                {
+                    ((LoginFragment) fragment).m_editText_userName.setText(userInfo.getM_userName());
+                    getFragmentManager().beginTransaction().show(fragment).commitNow();
+                }
+            }
         }
         else
         {
-            Log.i("RegisterLog", "注册失败:用户名或密码错误");
-            Toast.makeText(m_context, "用户名或密码错误", Toast.LENGTH_SHORT).show();
+            Log.i("RegisterLog", "注册失败:用户名已被注册");
+            Toast.makeText(m_context, "注册失败:用户名已被注册", Toast.LENGTH_SHORT).show();
         }
     }
 

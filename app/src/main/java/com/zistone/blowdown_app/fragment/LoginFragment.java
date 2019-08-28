@@ -59,34 +59,23 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
 
     private String mParam1;
     private String mParam2;
-
     private Context m_context;
     private View m_userView;
-    private EditText m_editText_userName;
     private EditText m_editText_password;
     private Button m_btn_login;
     private Button m_btn_register;
     private Button m_btn_forget;
     private ProgressBar m_loginProgressBar;
     private Timer m_loginTimer;
-    //底部导航栏
-    public BottomNavigationView m_bottomNavigationView;
-
+    private BottomNavigationView m_bottomNavigationView;
     private OnFragmentInteractionListener mListener;
+
+    public EditText m_editText_userName;
 
     public LoginFragment()
     {
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment LoginFragment.
-     */
-    // TODO: Rename and change types and number of parameters
     public static LoginFragment newInstance(String param1, String param2)
     {
         LoginFragment fragment = new LoginFragment();
@@ -343,7 +332,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
         return m_userView;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri)
     {
         if(mListener != null)
