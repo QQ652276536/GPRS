@@ -53,7 +53,7 @@
             android:enabled="false"
             android:gravity="center_vertical"
             android:inputType="textPostalAddress"
-            android:text="数学家赌博"
+            android:text=""
             android:textSize="18sp" />
 
     </LinearLayout>
@@ -79,9 +79,10 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:ems="10"
+            android:enabled="false"
             android:gravity="center_vertical"
             android:inputType="textPostalAddress"
-            android:text="李小伟"
+            android:text=""
             android:textSize="18sp" />
 
     </LinearLayout>
@@ -107,9 +108,10 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:ems="10"
+            android:enabled="false"
             android:gravity="center_vertical"
             android:inputType="phone"
-            android:text="13477855544"
+            android:text=""
             android:textSize="18sp" />
     </LinearLayout>
 
@@ -135,7 +137,8 @@
             android:layout_gravity="center"
             android:ems="10"
             android:gravity="center_vertical"
-            android:text="a123456"
+            android:inputType="textPassword"
+            android:text=""
             android:textSize="18sp" />
 
     </LinearLayout>
@@ -162,7 +165,8 @@
             android:layout_gravity="center"
             android:ems="10"
             android:gravity="center_vertical"
-            android:text="a123456"
+            android:inputType="textPassword"
+            android:text=""
             android:textSize="18sp" />
 
     </LinearLayout>
