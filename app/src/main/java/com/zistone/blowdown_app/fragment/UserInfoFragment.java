@@ -81,19 +81,18 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
 
     private Context m_context;
     private View m_userInfoView;
-    private EditText m_editText_userName;
-    private EditText m_editText_userRealName;
-    private EditText m_editText_userPhone;
     private EditText m_editText_password;
     private EditText m_editText_rePassword;
     private Button m_btnUpdate;
     private Button m_btnLogout;
     private ProgressBar m_updateUserInfoProgressBar;
     private Uri m_imageUri;
-
     private OnFragmentInteractionListener mListener;
 
     public ImageView m_imageView;
+    public EditText m_editText_userName;
+    public EditText m_editText_userRealName;
+    public EditText m_editText_userPhone;
 
     public UserInfoFragment()
     {
@@ -268,6 +267,7 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
                     UserInfo userInfo = JSON.parseObject(responseStr, UserInfo.class);
                     if(null != userInfo)
                     {
+                        Log.i("UserInfoFragment", ">>>用户信息更新成功");
                         UserSharedPreference.UpdateSuccess(m_context, userInfo);
                         //修改用户头像
                         String imageStr = UserSharedPreference.GetUserImage(m_context);
@@ -277,7 +277,6 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
                             Bitmap bitmap = ImageUtil.ByteArrayToBitmap(bytes);
                             m_imageView.setImageBitmap(bitmap);
                         }
-                        Log.i("UserInfoFragment", ">>>用户信息更新成功");
                     }
                     else
                     {
@@ -320,10 +319,10 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
                     String imageStr = Base64.encodeToString(bytes, Base64.DEFAULT);
                     userInfo.setM_userImage(imageStr);
                 }
-                userInfo.setM_userName(m_editText_userName.getText().toString());
-                userInfo.setM_realName(m_editText_userRealName.getText().toString());
-                userInfo.setM_phoneNumber(m_editText_userPhone.getText().toString());
-                userInfo.setM_password(m_editText_rePassword.getText().toString());
+                if(!"".equals(m_editText_rePassword.getText().toString()))
+                {
+                    userInfo.setM_password(m_editText_rePassword.getText().toString());
+                }
                 OkHttpUtil okHttpUtil = new OkHttpUtil();
                 //异步方式发起请求,回调处理信息
                 okHttpUtil.AsynSendByPost(URL, userInfo, new Callback()
@@ -541,14 +540,6 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
             }
             else
             {
-                if(Pattern.matches(REGEXUSERNAME, m_editText_userRealName.getText().toString()))
-                {
-                    m_editText_userRealName.setError(null);
-                }
-                else
-                {
-                    m_editText_userRealName.setError("姓名非法");
-                }
             }
         }
         else if(R.id.editText_userPhone_userInfo == v.getId())

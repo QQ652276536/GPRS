@@ -397,6 +397,8 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
                 userInfo.setM_userName(m_editText_userName.getText().toString());
                 userInfo.setM_phoneNumber(m_editText_userPhone.getText().toString());
                 userInfo.setM_password(m_editText_rePassword.getText().toString());
+                userInfo.setM_state(1);
+                userInfo.setM_level(1);
                 OkHttpUtil okHttpUtil = new OkHttpUtil();
                 //异步方式发起请求,回调处理信息
                 okHttpUtil.AsynSendByPost(URL, userInfo, new Callback()

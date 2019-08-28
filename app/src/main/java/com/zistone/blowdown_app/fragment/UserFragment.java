@@ -93,10 +93,11 @@ public class UserFragment extends Fragment
         }
         List<Fragment> fragmentList = getChildFragmentManager().getFragments();
         //已经登录过则显示用户信息页面,否则显示登录页面
-        String realName = UserSharedPreference.GetRealName(m_context);
+        int id = UserSharedPreference.GetUserId(m_context);
         int state = UserSharedPreference.GetState(m_context);
-        if(!"".equals(realName) && 1 == state)
+        if(id != 0 && 1 == state)
         {
+            UserInfoFragment tempUserFragment = null;
             for(Fragment fragment : fragmentList)
             {
                 if(!"userInfoFragment".equals(fragment.getTag()))
@@ -105,9 +106,21 @@ public class UserFragment extends Fragment
                 }
                 else
                 {
+                    tempUserFragment = ((UserInfoFragment) fragment);
                     getChildFragmentManager().beginTransaction().show(fragment).commitNow();
                 }
             }
+            //显示用户基本信息
+            String imageStr = UserSharedPreference.GetUserImage(m_context);
+            if(null != imageStr && !"".equals(imageStr))
+            {
+                byte[] bytes = Base64.decode(imageStr, Base64.DEFAULT);
+                Bitmap bitmap = ImageUtil.ByteArrayToBitmap(bytes);
+                tempUserFragment.m_imageView.setImageBitmap(bitmap);
+            }
+            tempUserFragment.m_editText_userName.setText(UserSharedPreference.GetUserName(m_context));
+            tempUserFragment.m_editText_userRealName.setText(UserSharedPreference.GetRealName(m_context));
+            tempUserFragment.m_editText_userPhone.setText(UserSharedPreference.GetPhone(m_context));
         }
         else
         {

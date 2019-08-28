@@ -177,10 +177,12 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
     {
         if(userInfo != null)
         {
-            Log.i("LoginFragment", "登录成功:用户真实姓名为:" + userInfo.getM_realName());
+            Log.i("LoginFragment", "登录成功,用户真实姓名为:" + userInfo.getM_realName());
+            //本地存储用户基本信息
             UserSharedPreference.LoginSuccess(m_context, userInfo);
             //用户碎片显示用户信息的子碎片
             List<Fragment> fragmentList = getFragmentManager().getFragments();
+            UserInfoFragment tempUserFragment = null;
             for(Fragment fragment : fragmentList)
             {
                 if(!"userInfoFragment".equals(fragment.getTag()))
@@ -189,16 +191,21 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
                 }
                 else
                 {
-                    String imageStr = UserSharedPreference.GetUserImage(m_context);
-                    if(null != imageStr && !"".equals(imageStr))
-                    {
-                        byte[] bytes = Base64.decode(imageStr, Base64.DEFAULT);
-                        Bitmap bitmap = ImageUtil.ByteArrayToBitmap(bytes);
-                        ((UserInfoFragment) fragment).m_imageView.setImageBitmap(bitmap);
-                    }
+                    tempUserFragment = ((UserInfoFragment) fragment);
                     getFragmentManager().beginTransaction().show(fragment).commitNow();
                 }
             }
+            //登录成功后显示用户基本信息
+            String imageStr = UserSharedPreference.GetUserImage(m_context);
+            if(null != imageStr && !"".equals(imageStr))
+            {
+                byte[] bytes = Base64.decode(imageStr, Base64.DEFAULT);
+                Bitmap bitmap = ImageUtil.ByteArrayToBitmap(bytes);
+                tempUserFragment.m_imageView.setImageBitmap(bitmap);
+            }
+            tempUserFragment.m_editText_userName.setText(userInfo.getM_userName());
+            tempUserFragment.m_editText_userRealName.setText(userInfo.getM_realName());
+            tempUserFragment.m_editText_userPhone.setText(userInfo.getM_phoneNumber());
             //当前碎片切换为设备碎片
             m_bottomNavigationView.setSelectedItemId(m_bottomNavigationView.getMenu().getItem(1).getItemId());
         }
