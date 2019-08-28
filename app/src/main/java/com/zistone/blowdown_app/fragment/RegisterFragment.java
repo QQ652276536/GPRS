@@ -26,11 +26,19 @@ import com.zistone.blowdown_app.PropertiesUtil;
 import com.zistone.blowdown_app.R;
 import com.zistone.blowdown_app.UserSharedPreference;
 import com.zistone.blowdown_app.entity.UserInfo;
+import com.zistone.blowdown_app.http.OkHttpUtil;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
 
 public class RegisterFragment extends Fragment implements View.OnClickListener, View.OnFocusChangeListener
 {
@@ -252,6 +260,7 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
         public void handleMessage(Message message)
         {
             super.handleMessage(message);
+            IsRegisterEd();
             switch(message.what)
             {
                 case MESSAGE_GETRESPONSE_SUCCESS:
@@ -263,7 +272,6 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
                 }
                 case MESSAGE_GETRESPONSE_FAIL:
                 {
-                    IsRegisterEd();
                     String responseStr = (String) message.obj;
                     Toast.makeText(m_context, "注册超时,请检查网络环境", Toast.LENGTH_SHORT).show();
                     break;
@@ -285,7 +293,43 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
             public void run()
             {
                 Looper.prepare();
+                UserInfo userInfo = new UserInfo();
+                userInfo.setM_realName(m_editText_userRealName.getText().toString());
+                userInfo.setM_userName(m_editText_userName.getText().toString());
+                userInfo.setM_phoneNumber(m_editText_userPhone.getText().toString());
+                userInfo.setM_password(m_editText_rePassword.getText().toString());
+                OkHttpUtil okHttpUtil = new OkHttpUtil();
+                //异步方式发起请求,回调处理信息
+                okHttpUtil.AsynSendByPost(URL, userInfo, new Callback()
+                {
+                    @Override
+                    public void onFailure(@NotNull Call call, @NotNull IOException e)
+                    {
+                        Log.e("RegisterFragment", "请求失败:" + e.toString());
+                        Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_FAIL, "请求失败:" + e.toString());
+                        handler.sendMessage(message);
+                    }
 
+                    //获得请求响应的字符串:response.body().string()该方法只能被调用一次!另:toString()返回的是对象地址
+                    //获得请求响应的二进制字节数组:response.body().bytes()
+                    //获得请求响应的inputStream:response.body().byteStream()
+                    @Override
+                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException
+                    {
+                        String responseStr = response.body().string();
+                        Log.i("RegisterFragment", "请求响应:" + responseStr);
+                        if(response.isSuccessful())
+                        {
+                            Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_SUCCESS, responseStr);
+                            handler.sendMessage(message);
+                        }
+                        else
+                        {
+                            Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_FAIL, responseStr);
+                            handler.sendMessage(message);
+                        }
+                    }
+                });
                 Looper.loop();
             }
         }).start();
@@ -296,7 +340,6 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
      */
     private void RegisterResult(UserInfo userInfo)
     {
-        IsRegisterEd();
         if(userInfo != null)
         {
             Log.i("RegisterLog", "注册成功:用户真实姓名为:" + userInfo.getM_realName());

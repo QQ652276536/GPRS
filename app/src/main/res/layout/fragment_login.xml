@@ -39,8 +39,7 @@
         android:layout_gravity="center"
         android:ems="10"
         android:hint="@string/text_password"
-        android:inputType="textPassword"
-        android:text="a123456" />
+        android:inputType="textPassword" />
 
     <ProgressBar
         android:id="@+id/progressBar_login"

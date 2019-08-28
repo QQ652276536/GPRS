@@ -97,6 +97,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
         public void handleMessage(Message message)
         {
             super.handleMessage(message);
+            IsLoginEnd();
             switch(message.what)
             {
                 case MESSAGE_GETRESPONSE_SUCCESS:
@@ -108,7 +109,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
                 }
                 case MESSAGE_GETRESPONSE_FAIL:
                 {
-                    IsLoginEnd();
                     String responseStr = (String) message.obj;
                     Toast.makeText(m_context, "登录超时,请检查网络环境", Toast.LENGTH_SHORT).show();
                     break;
@@ -175,7 +175,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
      */
     private void LoginResult(UserInfo userInfo)
     {
-        IsLoginEnd();
         if(userInfo != null)
         {
             Log.i("LoginFragment", "登录成功:用户真实姓名为:" + userInfo.getM_realName());
