@@ -1,6 +1,7 @@
 package com.zistone.blowdown_app.fragment;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
@@ -8,6 +9,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,6 +24,7 @@ import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
 import com.zistone.blowdown_app.ImageUtil;
+import com.zistone.blowdown_app.MainActivity;
 import com.zistone.blowdown_app.PropertiesUtil;
 import com.zistone.blowdown_app.R;
 import com.zistone.blowdown_app.UserSharedPreference;
@@ -46,10 +49,14 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
     private static final String ARG_PARAM2 = "param2";
     private static final int MESSAGE_GETRESPONSE_SUCCESS = 0;
     private static final int MESSAGE_GETRESPONSE_FAIL = 1;
-    //6~12位字母数字组合
-    private static final String REGEXUSERNAME = "([a-zA-Z0-9]{6,12})";
+    //6~12位字母数字组合或6位中文
+    private static final String REGEXUSERNAME = "([a-zA-Z0-9]{6,12})|[\\u4e00-\\u9fa5]{2,6}";
     //首位不能是数字,不能全为数字或字母,6~16位
     private static final String REGEXPASSWORD = "^(?![0-9])(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,16}$";
+    //2~4位纯中文
+    private static final String REGEXNAME = "[\\u4e00-\\u9fa5]{2,4}";
+    //手机号
+    private static final String REGEXPHONE = "^(13|14|15|18|17)[0-9]{9}";
 
     private static String URL;
 
@@ -193,6 +200,22 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
             {
                 m_editText_userName.setError("用户名非法");
             }
+            if(Pattern.matches(REGEXNAME, m_editText_userRealName.getText().toString()))
+            {
+                m_editText_userRealName.setError(null);
+            }
+            else
+            {
+                m_editText_userRealName.setError("姓名非法");
+            }
+            if(Pattern.matches(REGEXPHONE, m_editText_userPhone.getText().toString()))
+            {
+                m_editText_userPhone.setError(null);
+            }
+            else
+            {
+                m_editText_userPhone.setError("手机号非法");
+            }
             if(Pattern.matches(REGEXPASSWORD, m_editText_password.getText().toString()))
             {
                 m_editText_password.setError(null);
@@ -201,7 +224,22 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
             {
                 m_editText_password.setError("密码非法");
             }
-            if(m_editText_userName.getError() == null && m_editText_password.getError() == null)
+            if(Pattern.matches(REGEXPASSWORD, m_editText_rePassword.getText().toString()))
+            {
+                if(!m_editText_rePassword.getText().toString().equals(m_editText_password.getText().toString()))
+                {
+                    m_editText_rePassword.setError("两次密码不一致");
+                }
+                else
+                {
+                    m_editText_rePassword.setError(null);
+                }
+            }
+            else
+            {
+                m_editText_rePassword.setError("密码非法");
+            }
+            if(m_editText_userName.getError() == null && m_editText_userRealName.getError() == null && m_editText_userPhone.getError() == null && m_editText_password.getError() == null && m_editText_rePassword.getError() == null)
             {
                 Register();
             }
@@ -229,6 +267,42 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
                 }
             }
         }
+        if(R.id.editTextRealName_register == v.getId())
+        {
+            if(hasFocus)
+            {
+                m_editText_userRealName.setError(null);
+            }
+            else
+            {
+                if(Pattern.matches(REGEXNAME, m_editText_userRealName.getText().toString()))
+                {
+                    m_editText_userRealName.setError(null);
+                }
+                else
+                {
+                    m_editText_userRealName.setError("密码非法");
+                }
+            }
+        }
+        if(R.id.editTextPhone_register == v.getId())
+        {
+            if(hasFocus)
+            {
+                m_editText_userPhone.setError(null);
+            }
+            else
+            {
+                if(Pattern.matches(REGEXPHONE, m_editText_userPhone.getText().toString()))
+                {
+                    m_editText_userPhone.setError(null);
+                }
+                else
+                {
+                    m_editText_userPhone.setError("手机号非法");
+                }
+            }
+        }
         if(R.id.editTextPassword_register == v.getId())
         {
             if(hasFocus)
@@ -244,6 +318,31 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
                 else
                 {
                     m_editText_password.setError("密码非法");
+                }
+            }
+        }
+        if(R.id.editTextRePassword_register == v.getId())
+        {
+            if(hasFocus)
+            {
+                m_editText_rePassword.setError(null);
+            }
+            else
+            {
+                if(Pattern.matches(REGEXPASSWORD, m_editText_rePassword.getText().toString()))
+                {
+                    if(!m_editText_rePassword.getText().toString().equals(m_editText_password.getText().toString()))
+                    {
+                        m_editText_rePassword.setError("再次密码不一致");
+                    }
+                    else
+                    {
+                        m_editText_rePassword.setError(null);
+                    }
+                }
+                else
+                {
+                    m_editText_rePassword.setError("密码非法");
                 }
             }
         }
@@ -342,21 +441,33 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
     {
         if(userInfo != null)
         {
-            Log.i("RegisterLog", "注册成功:用户真实姓名为:" + userInfo.getM_realName());
-            //跳转至登录页面并将用户名填至输入框
-            List<Fragment> fragmentList = getFragmentManager().getFragments();
-            for(Fragment fragment : fragmentList)
+            Log.i("RegisterLog", "注册成功:用户ID是" + userInfo.getM_id());
+            final String userName = userInfo.getM_userName();
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setPositiveButton("确定", new DialogInterface.OnClickListener()
             {
-                if(!"loginFragment".equals(fragment.getTag()))
+                @Override
+                public void onClick(DialogInterface dialog, int which)
                 {
-                    getFragmentManager().beginTransaction().hide(fragment).commitNow();
+                    dialog.dismiss();
+                    //跳转至登录页面并将用户名填至输入框
+                    List<Fragment> fragmentList = getFragmentManager().getFragments();
+                    for(Fragment fragment : fragmentList)
+                    {
+                        if(!"loginFragment".equals(fragment.getTag()))
+                        {
+                            getFragmentManager().beginTransaction().hide(fragment).commitNow();
+                        }
+                        else
+                        {
+                            ((LoginFragment) fragment).m_editText_userName.setText(userName);
+                            getFragmentManager().beginTransaction().show(fragment).commitNow();
+                        }
+                    }
                 }
-                else
-                {
-                    ((LoginFragment) fragment).m_editText_userName.setText(userInfo.getM_userName());
-                    getFragmentManager().beginTransaction().show(fragment).commitNow();
-                }
-            }
+            });
+            builder.setMessage("注册成功,请牢记您的密码!");
+            builder.show();
         }
         else
         {
