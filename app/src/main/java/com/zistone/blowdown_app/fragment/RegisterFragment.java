@@ -166,25 +166,12 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
     @Override
     public void onClick(View v)
     {
-        //登录,这里是跳转至登录页面
-        if(R.id.btn_return_register == v.getId())
+        if(m_btnReturn.getId() == v.getId())
         {
-            List<Fragment> fragmentList = getFragmentManager().getFragments();
-            for(Fragment fragment : fragmentList)
-            {
-                //注意:一个FragmentTransaction只能Commit一次,不要用全局或共享一个FragmentTransaction对象,多个Fragment则多次get
-                if(!"loginFragment".equals(fragment.getTag()))
-                {
-                    getFragmentManager().beginTransaction().hide(fragment).commitNow();
-                }
-                else
-                {
-                    getFragmentManager().beginTransaction().show(fragment).commitNow();
-                }
-            }
+            LoginFragment loginFragment = LoginFragment.newInstance("", "");
+            getFragmentManager().beginTransaction().replace(R.id.fragment_current_user, loginFragment, "loginFragment").commitNow();
         }
-        //注册,这里是发起注册请求
-        else if(R.id.btn_register_register == v.getId())
+        if(R.id.btn_register_register == v.getId())
         {
             //隐藏键盘
             InputMethodManager imm = (InputMethodManager) v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -444,7 +431,6 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
         if(userInfo != null)
         {
             Log.i("RegisterLog", "注册成功:用户ID是" + userInfo.getM_id());
-            final String userName = userInfo.getM_userName();
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder.setPositiveButton("确定", new DialogInterface.OnClickListener()
             {
@@ -452,23 +438,11 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
                 public void onClick(DialogInterface dialog, int which)
                 {
                     dialog.dismiss();
-                    //跳转至登录页面并将用户名填至输入框
-                    List<Fragment> fragmentList = getFragmentManager().getFragments();
-                    for(Fragment fragment : fragmentList)
-                    {
-                        if(!"loginFragment".equals(fragment.getTag()))
-                        {
-                            getFragmentManager().beginTransaction().hide(fragment).commitNow();
-                        }
-                        else
-                        {
-                            ((LoginFragment) fragment).m_editText_userName.setText(userName);
-                            getFragmentManager().beginTransaction().show(fragment).commitNow();
-                        }
-                    }
+                    LoginFragment loginFragment = LoginFragment.newInstance("", "");
+                    getFragmentManager().beginTransaction().replace(R.id.fragment_current_user, loginFragment, "loginFragment").commitNow();
                 }
             });
-            builder.setMessage("注册成功,请牢记您的密码!");
+            builder.setMessage("注册成功,请牢记你的用户名" + userInfo.getM_userName() + "和密码!");
             builder.show();
         }
         else

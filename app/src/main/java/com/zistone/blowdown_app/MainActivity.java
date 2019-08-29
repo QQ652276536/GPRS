@@ -97,7 +97,7 @@ public class MainActivity extends AppCompatActivity implements MapFragment.OnFra
                                 m_bottomNavigationView.setSelectedItemId(m_bottomNavigationView.getMenu().getItem(2).getItemId());
                             }
                         });
-                        builder.setMessage("您还没有登录");
+                        builder.setMessage("你还没有登录");
                         builder.show();
                     }
                     return true;

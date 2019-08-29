@@ -61,6 +61,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
     private String mParam2;
     private Context m_context;
     private View m_userView;
+    private EditText m_editText_userName;
     private EditText m_editText_password;
     private Button m_btn_login;
     private Button m_btn_register;
@@ -69,8 +70,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
     private Timer m_loginTimer;
     private BottomNavigationView m_bottomNavigationView;
     private OnFragmentInteractionListener mListener;
-
-    public EditText m_editText_userName;
 
     public LoginFragment()
     {
@@ -180,32 +179,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
             Log.i("LoginFragment", "登录成功,用户真实姓名为:" + userInfo.getM_realName());
             //本地存储用户基本信息
             UserSharedPreference.LoginSuccess(m_context, userInfo);
-            //用户碎片显示用户信息的子碎片
-            List<Fragment> fragmentList = getFragmentManager().getFragments();
-            UserInfoFragment tempUserFragment = null;
-            for(Fragment fragment : fragmentList)
-            {
-                if(!"userInfoFragment".equals(fragment.getTag()))
-                {
-                    getFragmentManager().beginTransaction().hide(fragment).commitNow();
-                }
-                else
-                {
-                    tempUserFragment = ((UserInfoFragment) fragment);
-                    getFragmentManager().beginTransaction().show(fragment).commitNow();
-                }
-            }
-            //登录成功后显示用户基本信息
-            String imageStr = UserSharedPreference.GetUserImage(m_context);
-            if(null != imageStr && !"".equals(imageStr))
-            {
-                byte[] bytes = Base64.decode(imageStr, Base64.DEFAULT);
-                Bitmap bitmap = ImageUtil.ByteArrayToBitmap(bytes);
-                tempUserFragment.m_imageView.setImageBitmap(bitmap);
-            }
-            tempUserFragment.m_editText_userName.setText(userInfo.getM_userName());
-            tempUserFragment.m_editText_userRealName.setText(userInfo.getM_realName());
-            tempUserFragment.m_editText_userPhone.setText(userInfo.getM_phoneNumber());
+            UserInfoFragment userInfoFragment = UserInfoFragment.newInstance("", "");
+            getFragmentManager().beginTransaction().replace(R.id.fragment_current_user, userInfoFragment, "userInfoFragment").commitNow();
             //当前碎片切换为设备碎片
             m_bottomNavigationView.setSelectedItemId(m_bottomNavigationView.getMenu().getItem(1).getItemId());
         }
@@ -406,34 +381,15 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
         //注册,这里是跳转至注册页面
         else if(R.id.btn_register_login == v.getId())
         {
-            List<Fragment> fragmentList = getFragmentManager().getFragments();
-            for(Fragment fragment : fragmentList)
-            {
-                if(!"registerFragment".equals(fragment.getTag()))
-                {
-                    getFragmentManager().beginTransaction().hide(fragment).commitNow();
-                }
-                else
-                {
-                    getFragmentManager().beginTransaction().show(fragment).commitNow();
-                }
-            }
+            RegisterFragment registerFragment = RegisterFragment.newInstance("", "");
+            getFragmentManager().beginTransaction().replace(R.id.fragment_current_user, registerFragment, "registerFragment").commitNow();
+
         }
         //忘记密码,这里是跳转至找回密码页
         else if(R.id.btn_forget_login == v.getId())
         {
-            List<Fragment> fragmentList = getFragmentManager().getFragments();
-            for(Fragment fragment : fragmentList)
-            {
-                if(!"forgetFragment".equals(fragment.getTag()))
-                {
-                    getFragmentManager().beginTransaction().hide(fragment).commitNow();
-                }
-                else
-                {
-                    getFragmentManager().beginTransaction().show(fragment).commitNow();
-                }
-            }
+            ForgetFragment forgetFragment = ForgetFragment.newInstance("", "");
+            getFragmentManager().beginTransaction().replace(R.id.fragment_current_user, forgetFragment, "forgetFragment").commitNow();
         }
     }
 

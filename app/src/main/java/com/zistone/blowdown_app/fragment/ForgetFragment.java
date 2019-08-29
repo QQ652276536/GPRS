@@ -119,19 +119,8 @@ public class ForgetFragment extends Fragment implements View.OnClickListener
     {
         if(m_btnReturn.getId() == v.getId())
         {
-            List<Fragment> fragmentList = getFragmentManager().getFragments();
-            for(Fragment fragment : fragmentList)
-            {
-                //注意:一个FragmentTransaction只能Commit一次,不要用全局或共享一个FragmentTransaction对象,多个Fragment则多次get
-                if(!"loginFragment".equals(fragment.getTag()))
-                {
-                    getFragmentManager().beginTransaction().hide(fragment).commitNow();
-                }
-                else
-                {
-                    getFragmentManager().beginTransaction().show(fragment).commitNow();
-                }
-            }
+            LoginFragment loginFragment = LoginFragment.newInstance("", "");
+            getFragmentManager().beginTransaction().replace(R.id.fragment_current_user, loginFragment, "loginFragment").commitNow();
         }
     }
 

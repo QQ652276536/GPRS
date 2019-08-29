@@ -30,10 +30,6 @@ public class UserFragment extends Fragment
 
     private Context m_context;
     private View m_userView;
-    private LoginFragment m_loginFragment;
-    private RegisterFragment m_registerFragment;
-    private ForgetFragment m_forgetFragment;
-    private UserInfoFragment m_userInfoFragment;
 
     private OnFragmentInteractionListener mListener;
 
@@ -55,87 +51,18 @@ public class UserFragment extends Fragment
     {
         m_context = getContext();
         //注意:一个FragmentTransaction只能Commit一次,不要用全局或共享一个FragmentTransaction对象,多个Fragment则多次get
-        //用户信息
-        if(m_userInfoFragment == null)
-        {
-            m_userInfoFragment = UserInfoFragment.newInstance("", "");
-        }
-        if(!m_userInfoFragment.isAdded())
-        {
-            getChildFragmentManager().beginTransaction().add(R.id.fragment_current_user, m_userInfoFragment, "userInfoFragment").commitNow();
-        }
-        //登录
-        if(m_loginFragment == null)
-        {
-            m_loginFragment = LoginFragment.newInstance("", "");
-        }
-        if(!m_loginFragment.isAdded())
-        {
-            getChildFragmentManager().beginTransaction().add(R.id.fragment_current_user, m_loginFragment, "loginFragment").commitNow();
-        }
-        //注册
-        if(m_registerFragment == null)
-        {
-            m_registerFragment = RegisterFragment.newInstance("", "");
-        }
-        if(!m_registerFragment.isAdded())
-        {
-            getChildFragmentManager().beginTransaction().add(R.id.fragment_current_user, m_registerFragment, "registerFragment").commitNow();
-        }
-        //找回密码
-        if(m_forgetFragment == null)
-        {
-            m_forgetFragment = ForgetFragment.newInstance("", "");
-        }
-        if(!m_forgetFragment.isAdded())
-        {
-            getChildFragmentManager().beginTransaction().add(R.id.fragment_current_user, m_forgetFragment, "forgetFragment").commitNow();
-        }
-        List<Fragment> fragmentList = getChildFragmentManager().getFragments();
         //已经登录过则显示用户信息页面,否则显示登录页面
         int id = UserSharedPreference.GetUserId(m_context);
         int state = UserSharedPreference.GetState(m_context);
         if(id != 0 && 1 == state)
         {
-            UserInfoFragment tempUserFragment = null;
-            for(Fragment fragment : fragmentList)
-            {
-                if(!"userInfoFragment".equals(fragment.getTag()))
-                {
-                    getChildFragmentManager().beginTransaction().hide(fragment).commitNow();
-                }
-                else
-                {
-                    tempUserFragment = ((UserInfoFragment) fragment);
-                    getChildFragmentManager().beginTransaction().show(fragment).commitNow();
-                }
-            }
-            //显示用户基本信息
-            String imageStr = UserSharedPreference.GetUserImage(m_context);
-            if(null != imageStr && !"".equals(imageStr))
-            {
-                byte[] bytes = Base64.decode(imageStr, Base64.DEFAULT);
-                Bitmap bitmap = ImageUtil.ByteArrayToBitmap(bytes);
-                tempUserFragment.m_imageView.setImageBitmap(bitmap);
-            }
-            tempUserFragment.m_editText_userName.setText(UserSharedPreference.GetUserName(m_context));
-            tempUserFragment.m_editText_userRealName.setText(UserSharedPreference.GetRealName(m_context));
-            tempUserFragment.m_editText_userPhone.setText(UserSharedPreference.GetPhone(m_context));
+            UserInfoFragment userInfoFragment = UserInfoFragment.newInstance("", "");
+            getChildFragmentManager().beginTransaction().add(R.id.fragment_current_user, userInfoFragment, "userInfoFragment").show(userInfoFragment).commitNow();
         }
         else
         {
-            for(Fragment fragment : fragmentList)
-            {
-                if(!"loginFragment".equals(fragment.getTag()))
-                //if(!"userInfoFragment".equals(fragment.getTag()))
-                {
-                    getChildFragmentManager().beginTransaction().hide(fragment).commitNow();
-                }
-                else
-                {
-                    getChildFragmentManager().beginTransaction().show(fragment).commitNow();
-                }
-            }
+            LoginFragment loginFragment = LoginFragment.newInstance("", "");
+            getChildFragmentManager().beginTransaction().add(R.id.fragment_current_user, loginFragment, "loginFragment").show(loginFragment).commitNow();
         }
     }
 

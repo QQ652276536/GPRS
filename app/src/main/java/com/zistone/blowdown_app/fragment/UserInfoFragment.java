@@ -88,11 +88,10 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
     private ProgressBar m_updateUserInfoProgressBar;
     private Uri m_imageUri;
     private OnFragmentInteractionListener mListener;
-
-    public ImageView m_imageView;
-    public EditText m_editText_userName;
-    public EditText m_editText_userRealName;
-    public EditText m_editText_userPhone;
+    private ImageView m_imageView;
+    private EditText m_editText_userName;
+    private EditText m_editText_userRealName;
+    private EditText m_editText_userPhone;
 
     public UserInfoFragment()
     {
@@ -382,7 +381,7 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
         m_updateUserInfoProgressBar = m_userInfoView.findViewById(R.id.progressBar_updateUserInfo);
         //动态获取权限
         RequestPermission();
-        //设置用户头像
+        //显示用户基本信息
         String imageStr = UserSharedPreference.GetUserImage(m_context);
         if(null != imageStr && !"".equals(imageStr))
         {
@@ -390,6 +389,9 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
             Bitmap bitmap = ImageUtil.ByteArrayToBitmap(bytes);
             m_imageView.setImageBitmap(bitmap);
         }
+        m_editText_userName.setText(UserSharedPreference.GetUserName(m_context));
+        m_editText_userRealName.setText(UserSharedPreference.GetRealName(m_context));
+        m_editText_userPhone.setText(UserSharedPreference.GetPhone(m_context));
     }
 
     public interface OnFragmentInteractionListener
@@ -512,20 +514,8 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
         else if(R.id.btnLogout_userInfo == v.getId())
         {
             UserSharedPreference.LogoutSuccess(m_context);
-            //用户碎片的子碎片切换至登录碎片
-            List<Fragment> fragmentList = getFragmentManager().getFragments();
-            for(Fragment fragment : fragmentList)
-            {
-                //注意:一个FragmentTransaction只能Commit一次,不要用全局或共享一个FragmentTransaction对象,多个Fragment则多次get
-                if(!"loginFragment".equals(fragment.getTag()))
-                {
-                    getFragmentManager().beginTransaction().hide(fragment).commitNow();
-                }
-                else
-                {
-                    getFragmentManager().beginTransaction().show(fragment).commitNow();
-                }
-            }
+            LoginFragment loginFragment = new LoginFragment();
+            getFragmentManager().beginTransaction().replace(R.id.fragment_current_user, loginFragment, "loginFragment").commitNow();
         }
     }
 
