@@ -309,6 +309,7 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
             {
                 Looper.prepare();
                 UserInfo userInfo = new UserInfo();
+                userInfo.setM_id(UserSharedPreference.GetUserId(m_context));
                 m_imageView.setDrawingCacheEnabled(true);
                 Bitmap bitmap = Bitmap.createBitmap(m_imageView.getDrawingCache());
                 m_imageView.setDrawingCacheEnabled(false);

@@ -150,7 +150,7 @@ public class DeviceFragment extends Fragment
             @Override
             public void onfinish()
             {
-                Toast.makeText(m_context, "完成", Toast.LENGTH_LONG).show();
+                //Toast.makeText(m_context, "完成", Toast.LENGTH_LONG).show();
             }
 
             /**
