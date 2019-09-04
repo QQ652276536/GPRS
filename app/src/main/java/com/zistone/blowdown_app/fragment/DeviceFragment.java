@@ -3,74 +3,30 @@ package com.zistone.blowdown_app.fragment;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
-import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.Toast;
+import android.widget.Button;
 
-import com.alibaba.fastjson.JSON;
-import com.zistone.blowdown_app.MainActivity;
-import com.zistone.blowdown_app.PropertiesUtil;
 import com.zistone.blowdown_app.R;
-import com.zistone.blowdown_app.control.DeviceInfoRecyclerAdapter;
-import com.zistone.blowdown_app.entity.DeviceInfo;
-import com.zistone.blowdown_app.http.OkHttpUtil;
-import com.zistone.material_refresh_layout.MaterialRefreshLayout;
-import com.zistone.material_refresh_layout.MaterialRefreshListener;
-
-import org.jetbrains.annotations.NotNull;
-
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
-
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.Response;
 
 public class DeviceFragment extends Fragment
 {
-    private static final int TIMEINTERVAL = 30 * 1000;
-    private static final int MESSAGE_GETRESPONSE_SUCCESS = 0;
-    private static final int MESSAGE_GETRESPONSE_FAIL = 1;
-    private static String URL;
+    private static final String ARG_PARAM1 = "param1";
+    private static final String ARG_PARAM2 = "param2";
     private Context m_context;
     private View m_deviceView;
-    private List<DeviceInfo> m_deviceList = new ArrayList<>();
-    //下拉刷新控件
-    private MaterialRefreshLayout m_materialRefreshLayout;
-    //RecyclerView
-    private RecyclerView m_recyclerView;
-    //适配器
-    private DeviceInfoRecyclerAdapter m_deviceInfoRecyclerAdapter;
-    private Timer m_refreshTimer;
-    //底部导航栏
-    public BottomNavigationView m_bottomNavigationView;
-
     private OnFragmentInteractionListener mListener;
 
-    public DeviceFragment()
+    public static DeviceFragment newInstance(String param1, String param2)
     {
-    }
-
-    public static DeviceFragment newInstance()
-    {
-        DeviceFragment tempFragment = new DeviceFragment();
-        return tempFragment;
+        DeviceFragment fragment = new DeviceFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_PARAM1, param1);
+        args.putString(ARG_PARAM2, param2);
+        fragment.setArguments(args);
+        return fragment;
     }
 
     /**
@@ -89,220 +45,18 @@ public class DeviceFragment extends Fragment
         }
     }
 
-    /**
-     * 定时刷新设备列表
-     */
-    private void RefreshDeviceList()
-    {
-        m_refreshTimer = new Timer();
-        TimerTask refreshTask = new TimerTask()
-        {
-            @Override
-            public void run()
-            {
-                //返回到UI线程,两种更新UI的方法之一
-                getActivity().runOnUiThread(new Runnable()
-                {
-                    @Override
-                    public void run()
-                    {
-                        SendWithOkHttp();
-                    }
-                });
-            }
-        };
-        //任务、延迟执行时间、重复调用间隔
-        m_refreshTimer.schedule(refreshTask, 0, TIMEINTERVAL);
-    }
-
     public void InitView()
     {
-        m_context = m_deviceView.getContext();
-        URL = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/DeviceInfo/FindAll";
-        //下拉刷新控件
-        m_materialRefreshLayout = m_deviceView.findViewById(R.id.refresh);
-        //禁用加载更多
-        m_materialRefreshLayout.setLoadMore(false);
-        m_materialRefreshLayout.setMaterialRefreshListener(new MaterialRefreshListener()
-        {
-            /**
-             * 下拉刷新
-             * @param materialRefreshLayout
-             */
-            @Override
-            public void onRefresh(final MaterialRefreshLayout materialRefreshLayout)
-            {
-                materialRefreshLayout.postDelayed(new Runnable()
-                {
-                    @Override
-                    public void run()
-                    {
-                        SendWithOkHttp();
-                        //结束下拉刷新
-                        materialRefreshLayout.finishRefresh();
-                    }
-                }, 1 * 1000);
-            }
-
-            /**
-             * 加载完毕
-             */
-            @Override
-            public void onfinish()
-            {
-                //Toast.makeText(m_context, "完成", Toast.LENGTH_LONG).show();
-            }
-
-            /**
-             * 加载更多
-             * @param materialRefreshLayout
-             */
-            @Override
-            public void onRefreshLoadMore(MaterialRefreshLayout materialRefreshLayout)
-            {
-                Toast.makeText(m_context, "别滑了,到底了", Toast.LENGTH_LONG).show();
-            }
-        });
-        //自动刷新
-        m_materialRefreshLayout.autoRefresh();
-        //RecyclerView
-        m_recyclerView = m_deviceView.findViewById(R.id.device_recycler);
-        //使用线性布局
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(m_context);
-        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        //设置布局
-        m_recyclerView.setLayoutManager(linearLayoutManager);
-        //TODO:设置适配器是在异步回调里设的,所以启动时会有No adapter attached; skipping layout异常
-        RefreshDeviceList();
-    }
-
-    /**
-     * 给下拉控件设置点击事件
-     */
-    private void SetDeviceInfoRecyclerAdapterListener()
-    {
-        if(null != m_deviceInfoRecyclerAdapter)
-        {
-            m_deviceInfoRecyclerAdapter.SetOnItemClickListener(new DeviceInfoRecyclerAdapter.OnItemClickListener()
-            {
-                @Override
-                public void OnClick(int position)
-                {
-                    DeviceInfo tempDevice = m_deviceList.get(position);
-                    Toast.makeText(m_context, tempDevice.getM_name(), Toast.LENGTH_SHORT).show();
-                    int fragmentSize = getFragmentManager().getFragments().size();
-                    //隐藏当前设备页
-                    Fragment deviceFragment = getFragmentManager().findFragmentByTag("deviceFragment");
-                    getFragmentManager().beginTransaction().hide(deviceFragment).commitNow();
-                    //地图页已经实例化过则从管理器中移除之前的地图页
-                    Fragment oldMapFragment = getFragmentManager().findFragmentByTag("mapFragment");
-                    if(oldMapFragment != null)
-                    {
-                        getFragmentManager().beginTransaction().remove(oldMapFragment).commitNow();
-                    }
-                    //重新实例化地图碎片实现重新加载设备位置
-                    MapFragment newMapFragment = MapFragment.newInstance(tempDevice);
-                    getFragmentManager().beginTransaction().add(R.id.fragment_current, newMapFragment, "mapFragment").show(newMapFragment).commitNow();
-                    //通过点击设备列表切换到地图时修改bottomNavigation控件的选中效果
-                    m_bottomNavigationView.setSelectedItemId(m_bottomNavigationView.getMenu().getItem(0).getItemId());
-                }
-
-                @Override
-                public void OnLongClick(int position)
-                {
-                    Toast.makeText(m_context, "当前长按 " + position, Toast.LENGTH_SHORT).show();
-                }
-            });
-        }
-    }
-
-    private Handler handler = new Handler()
-    {
-        @Override
-        public void handleMessage(Message message)
-        {
-            super.handleMessage(message);
-            switch(message.what)
-            {
-                case MESSAGE_GETRESPONSE_SUCCESS:
-                {
-                    String responseStr = (String) message.obj;
-                    if(null == responseStr || "".equals(responseStr))
-                    {
-                        return;
-                    }
-                    m_deviceList = JSON.parseArray(responseStr, DeviceInfo.class);
-                    //设置适配器
-                    m_deviceInfoRecyclerAdapter = new DeviceInfoRecyclerAdapter(m_context, m_deviceList);
-                    m_recyclerView.setAdapter(m_deviceInfoRecyclerAdapter);
-                    SetDeviceInfoRecyclerAdapterListener();
-                    break;
-                }
-                case MESSAGE_GETRESPONSE_FAIL:
-                {
-                    String responseStr = (String) message.obj;
-                    Toast.makeText(m_context, "请求超时,请检查网络环境", Toast.LENGTH_SHORT).show();
-                    break;
-                }
-                default:
-                    break;
-            }
-        }
-    };
-
-    /**
-     * 用OkHttp发送网络请求,并在里面开启线程
-     */
-    private void SendWithOkHttp()
-    {
-        new Thread(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                Looper.prepare();
-                OkHttpUtil okHttpUtil = new OkHttpUtil();
-                //异步方式发起请求,回调处理信息
-                okHttpUtil.AsynSendByPost(URL, null, new Callback()
-                {
-                    @Override
-                    public void onFailure(@NotNull Call call, @NotNull IOException e)
-                    {
-                        Log.e("DeviceLog", "请求失败:" + e.toString());
-                        Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_FAIL, "请求失败:" + e.toString());
-                        handler.sendMessage(message);
-                    }
-
-                    //获得请求响应的字符串:response.body().string()该方法只能被调用一次!另:toString()返回的是对象地址
-                    //获得请求响应的二进制字节数组:response.body().bytes()
-                    //获得请求响应的inputStream:response.body().byteStream()
-                    @Override
-                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException
-                    {
-                        String responseStr = response.body().string();
-                        Log.i("DeviceLog", "请求响应:" + responseStr);
-                        if(response.isSuccessful())
-                        {
-                            Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_SUCCESS, responseStr);
-                            handler.sendMessage(message);
-                        }
-                        else
-                        {
-                            Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_FAIL, responseStr);
-                            handler.sendMessage(message);
-                        }
-                    }
-                });
-                Looper.loop();
-            }
-        }).start();
+        m_context = getContext();
+        //注意:一个FragmentTransaction只能Commit一次,不要用全局或共享一个FragmentTransaction对象,多个Fragment则多次get
+        DeviceManageFragment deviceManageFragment = DeviceManageFragment.newInstance("", "");
+        getChildFragmentManager().beginTransaction().add(R.id.fragment_current_device, deviceManageFragment, "deviceManageFragment").show(deviceManageFragment).commitNow();
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState)
     {
         super.onActivityCreated(savedInstanceState);
-        m_bottomNavigationView = getActivity().findViewById(R.id.nav_view);
     }
 
     @Override

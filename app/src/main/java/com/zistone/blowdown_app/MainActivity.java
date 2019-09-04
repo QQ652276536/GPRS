@@ -12,8 +12,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.zistone.blowdown_app.entity.DeviceInfo;
 import com.zistone.blowdown_app.fragment.DeviceFragment;
+import com.zistone.blowdown_app.fragment.DeviceListFragment;
+import com.zistone.blowdown_app.fragment.DeviceManageFragment;
 import com.zistone.blowdown_app.fragment.ForgetFragment;
 import com.zistone.blowdown_app.fragment.LoginFragment;
 import com.zistone.blowdown_app.fragment.MapFragment;
@@ -23,7 +24,7 @@ import com.zistone.blowdown_app.fragment.UserInfoFragment;
 
 import java.io.Serializable;
 
-public class MainActivity extends AppCompatActivity implements MapFragment.OnFragmentInteractionListener, DeviceFragment.OnFragmentInteractionListener, UserFragment.OnFragmentInteractionListener, LoginFragment.OnFragmentInteractionListener, RegisterFragment.OnFragmentInteractionListener, ForgetFragment.OnFragmentInteractionListener, UserInfoFragment.OnFragmentInteractionListener, Serializable
+public class MainActivity extends AppCompatActivity implements MapFragment.OnFragmentInteractionListener, DeviceFragment.OnFragmentInteractionListener, DeviceManageFragment.OnFragmentInteractionListener, DeviceListFragment.OnFragmentInteractionListener, UserFragment.OnFragmentInteractionListener, LoginFragment.OnFragmentInteractionListener, RegisterFragment.OnFragmentInteractionListener, ForgetFragment.OnFragmentInteractionListener, UserInfoFragment.OnFragmentInteractionListener, Serializable
 {
     //当前页,用来切换
     public Fragment m_currentFragment;
@@ -52,7 +53,7 @@ public class MainActivity extends AppCompatActivity implements MapFragment.OnFra
         int state = UserSharedPreference.GetState(this);
         if(!"".equals(realName) && 1 == state)
         {
-            m_deviceFragment = DeviceFragment.newInstance();
+            m_deviceFragment = DeviceFragment.newInstance("", "");
             m_bottomNavigationView.setSelectedItemId(m_bottomNavigationView.getMenu().getItem(1).getItemId());
             m_currentFragment = m_deviceFragment;
             getSupportFragmentManager().beginTransaction().add(R.id.fragment_current, m_currentFragment, "deviceFragment").show(m_currentFragment).commitNow();
@@ -122,7 +123,7 @@ public class MainActivity extends AppCompatActivity implements MapFragment.OnFra
     {
         if(m_deviceFragment == null)
         {
-            m_deviceFragment = DeviceFragment.newInstance();
+            m_deviceFragment = DeviceFragment.newInstance("", "");
         }
         AddOrShowFragment(getSupportFragmentManager().beginTransaction(), m_deviceFragment, "deviceFragment");
     }

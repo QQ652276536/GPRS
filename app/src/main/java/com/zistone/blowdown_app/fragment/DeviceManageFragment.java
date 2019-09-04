@@ -3,53 +3,34 @@ package com.zistone.blowdown_app.fragment;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
-import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
+import android.widget.Button;
 
-import com.alibaba.fastjson.JSON;
-import com.zistone.blowdown_app.PropertiesUtil;
 import com.zistone.blowdown_app.R;
-import com.zistone.blowdown_app.control.DeviceInfoRecyclerAdapter;
-import com.zistone.blowdown_app.entity.DeviceInfo;
-import com.zistone.blowdown_app.http.OkHttpUtil;
-import com.zistone.material_refresh_layout.MaterialRefreshLayout;
-import com.zistone.material_refresh_layout.MaterialRefreshListener;
 
-import org.jetbrains.annotations.NotNull;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.Response;
-
-public class DeviceManagerFragment extends Fragment implements View.OnClickListener
+public class DeviceManageFragment extends Fragment implements View.OnClickListener
 {
+    private static final String ARG_PARAM1 = "param1";
+    private static final String ARG_PARAM2 = "param2";
     private Context m_context;
-    private View m_deviceManagerView;
+    private View m_deviceView;
     private OnFragmentInteractionListener mListener;
+    private Button m_btn_canUse;
+    private Button m_btn_notUse;
+    private Button m_btn_add;
 
     @Override
     public void onClick(View v)
     {
         if(R.id.btn_canuse_manager == v.getId())
         {
+            DeviceListFragment deviceListFragment = DeviceListFragment.newInstance("", "");
+            getFragmentManager().beginTransaction().replace(R.id.fragment_current_device, deviceListFragment, "deviceListFragment").commitNow();
         }
-        else if(R.id.btn_cannot_use_manager == v.getId())
+        else if(R.id.btn_not_use_manager == v.getId())
         {
         }
         else if(R.id.btn_add_manager == v.getId())
@@ -57,10 +38,14 @@ public class DeviceManagerFragment extends Fragment implements View.OnClickListe
         }
     }
 
-    public static DeviceManagerFragment newInstance()
+    public static DeviceManageFragment newInstance(String param1, String param2)
     {
-        DeviceManagerFragment tempFragment = new DeviceManagerFragment();
-        return tempFragment;
+        DeviceManageFragment fragment = new DeviceManageFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_PARAM1, param1);
+        args.putString(ARG_PARAM2, param2);
+        fragment.setArguments(args);
+        return fragment;
     }
 
     /**
@@ -81,7 +66,13 @@ public class DeviceManagerFragment extends Fragment implements View.OnClickListe
 
     public void InitView()
     {
-        m_context = m_deviceManagerView.getContext();
+        m_context = m_deviceView.getContext();
+        m_btn_canUse = m_deviceView.findViewById(R.id.btn_canuse_manager);
+        m_btn_canUse.setOnClickListener(this);
+        m_btn_notUse = m_deviceView.findViewById(R.id.btn_not_use_manager);
+        m_btn_notUse.setOnClickListener(this);
+        m_btn_add = m_deviceView.findViewById(R.id.btn_add_manager);
+        m_btn_add.setOnClickListener(this);
     }
 
     @Override
@@ -102,9 +93,9 @@ public class DeviceManagerFragment extends Fragment implements View.OnClickListe
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        m_deviceManagerView = inflater.inflate(R.layout.fragment_device_manager, container, false);
+        m_deviceView = inflater.inflate(R.layout.fragment_device_manage, container, false);
         InitView();
-        return m_deviceManagerView;
+        return m_deviceView;
     }
 
     @Override

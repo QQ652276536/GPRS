@@ -1,7 +1,6 @@
 package com.zistone.blowdown_app.fragment;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -9,7 +8,6 @@ import android.os.Looper;
 import android.os.Message;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
-import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,7 +19,6 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
-import com.zistone.blowdown_app.ImageUtil;
 import com.zistone.blowdown_app.PropertiesUtil;
 import com.zistone.blowdown_app.R;
 import com.zistone.blowdown_app.UserSharedPreference;
@@ -31,9 +28,6 @@ import com.zistone.blowdown_app.http.OkHttpUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.regex.Pattern;
@@ -308,7 +302,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        m_userView = inflater.inflate(R.layout.fragment_login, container, false);
+        m_userView = inflater.inflate(R.layout.fragment_user_login, container, false);
         InitView();
         return m_userView;
     }

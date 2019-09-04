@@ -66,9 +66,8 @@ public class DeviceInfoRecyclerAdapter extends RecyclerView.Adapter<DeviceInfoRe
     public void onBindViewHolder(@NonNull DeviceInfoViewHolder deviceInfoViewHolder, final int i)
     {
         DeviceInfo deviceInfo = m_list.get(i);
-        String state = deviceInfo.getM_state() == 1 ? "在线" : "离线";
-        deviceInfoViewHolder.m_textView.setText(deviceInfo.getM_name() + "(" + state + ")" + "\n" + deviceInfo.getM_type());
-        if(state.equals("在线"))
+        deviceInfoViewHolder.m_textView.setText(deviceInfo.getM_name() + "\n" + deviceInfo.getM_type());
+        if(deviceInfo.getM_state() == 1)
         {
             deviceInfoViewHolder.m_imageView.setImageResource(R.drawable.device3);
             deviceInfoViewHolder.m_textView.setTextColor(m_context.getColor(R.color.colorPrimary));
