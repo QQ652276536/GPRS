@@ -35,11 +35,6 @@ public class DeviceInfoRecyclerAdapter extends RecyclerView.Adapter<DeviceInfoRe
         m_list = list;
     }
 
-    public void AddData(int position)
-    {
-
-    }
-
     public void SetOnItemClickListener(OnItemClickListener onItemClickListener)
     {
         this.m_onItemClickListener = onItemClickListener;

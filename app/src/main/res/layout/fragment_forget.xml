@@ -10,13 +10,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:background="@color/transparent">
+        android:background="@color/colorPrimary">
 
         <ImageButton
             android:id="@+id/btn_return_forget"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="32dp"
             android:background="@color/transparent"
             app:srcCompat="@drawable/btn_return" />
 
@@ -26,7 +25,7 @@
             android:layout_height="match_parent"
             android:layout_gravity="center"
             android:text="@string/title_forget"
-            android:textColor="@color/colorPrimary"
+            android:textColor="@color/white"
             android:textSize="28sp" />
     </android.support.v7.widget.Toolbar>
 

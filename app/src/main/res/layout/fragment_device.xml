@@ -6,12 +6,35 @@
     android:orientation="vertical"
     app:overlay="false"
     app:progress_backgroud_color="#FFFAFAFA"
-    app:progress_colors="@array/material_colors"
     app:progress_show_arrow="true"
     app:progress_show_circle_backgroud="true"
     app:wave_color="@color/colorPrimary"
     app:wave_height_type="normal"
     app:wave_show="true">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar_device"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@color/colorPrimary">
+
+        <ImageButton
+            android:id="@+id/btn_return_canuse"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/transparent"
+            app:srcCompat="@drawable/btn_return" />
+
+        <TextView
+            android:id="@+id/textView-1"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:text="@string/title_canuse"
+            android:textColor="@color/white"
+            android:textSize="28sp" />
+    </android.support.v7.widget.Toolbar>
 
     <com.zistone.material_refresh_layout.MaterialRefreshLayout
         android:id="@+id/refresh"
@@ -25,13 +48,5 @@
             android:layout_height="fill_parent" />
 
     </com.zistone.material_refresh_layout.MaterialRefreshLayout>
-
-    <Button
-        android:id="@+id/btn_add"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:gravity="bottom"
-        android:text="添加设备"
-        android:textAlignment="center" />
 
 </LinearLayout>
