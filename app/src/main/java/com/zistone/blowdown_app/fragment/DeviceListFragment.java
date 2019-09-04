@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
@@ -39,7 +40,7 @@ import okhttp3.Response;
 
 public class DeviceListFragment extends Fragment
 {
-    private static final String ARG_PARAM1 = "param1";
+    private static final String ARG_PARAM1 = "DEVICESTATE";
     private static final String ARG_PARAM2 = "param2";
     private static final int TIMEINTERVAL = 30 * 1000;
     private static final int MESSAGE_GETRESPONSE_SUCCESS = 0;
@@ -55,6 +56,9 @@ public class DeviceListFragment extends Fragment
     //适配器
     private DeviceInfoRecyclerAdapter m_deviceInfoRecyclerAdapter;
     private Timer m_refreshTimer;
+    //设备状态
+    private int m_deviceState;
+    private TextView m_ToolbarTextView;
     //底部导航栏
     public BottomNavigationView m_bottomNavigationView;
 
@@ -64,11 +68,16 @@ public class DeviceListFragment extends Fragment
     {
     }
 
-    public static DeviceListFragment newInstance(String param1, String param2)
+    /**
+     * @param param1 设备状态
+     * @param param2
+     * @return
+     */
+    public static DeviceListFragment newInstance(int param1, String param2)
     {
         DeviceListFragment fragment = new DeviceListFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
+        args.putInt(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
@@ -120,6 +129,16 @@ public class DeviceListFragment extends Fragment
     {
         m_context = m_deviceListView.getContext();
         URL = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/DeviceInfo/FindAll";
+        m_ToolbarTextView = m_deviceListView.findViewById(R.id.textView_toolbar);
+        m_deviceState = getArguments().getInt("DEVICESTATE");
+        if(m_deviceState == 1)
+        {
+            m_ToolbarTextView.setText("可用设备列表");
+        }
+        else
+        {
+            m_ToolbarTextView.setText("停用设备列表");
+        }
         //下拉刷新控件
         m_materialRefreshLayout = m_deviceListView.findViewById(R.id.refresh);
         //禁用加载更多
@@ -234,8 +253,20 @@ public class DeviceListFragment extends Fragment
                         return;
                     }
                     m_deviceList = JSON.parseArray(responseStr, DeviceInfo.class);
-                    //设置适配器
+                    //在线设备
+                    if(m_deviceState == 1)
+                    {
+                        //过滤掉离线设备
+                        m_deviceList.removeIf(p -> p.getM_state() == 0);
+                    }
+                    //离线设备
+                    else
+                    {
+                        //过滤掉在线设备
+                        m_deviceList.removeIf(p -> p.getM_state() == 1);
+                    }
                     m_deviceInfoRecyclerAdapter = new DeviceInfoRecyclerAdapter(m_context, m_deviceList);
+                    //设置适配器
                     m_recyclerView.setAdapter(m_deviceInfoRecyclerAdapter);
                     SetDeviceInfoRecyclerAdapterListener();
                     break;

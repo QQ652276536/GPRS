@@ -446,9 +446,8 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
         MarkerOptions markerOptions = new MarkerOptions().position(m_latLng).icon(ICON_MARKER);
         //标记添加至地图中
         m_marker = (Marker) (m_baiduMap.addOverlay(markerOptions));
-        //定义地图状态
-        MapStatus mapStatus = new MapStatus.Builder().target(m_latLng).zoom(14).build();
-        //定义MapStatusUpdate对象,以便描述地图状态将要发生的变化
+        //定义地图缩放级别3~16,值越大地图越精细
+        MapStatus mapStatus = new MapStatus.Builder().target(m_latLng).zoom(16).build();
         MapStatusUpdate mapStatusUpdate = MapStatusUpdateFactory.newMapStatus(mapStatus);
         //改变地图状态
         m_baiduMap.setMapStatus(mapStatusUpdate);

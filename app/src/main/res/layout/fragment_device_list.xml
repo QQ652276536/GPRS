@@ -27,6 +27,7 @@
             app:srcCompat="@drawable/btn_return" />
 
         <TextView
+            android:id="@+id/textView_toolbar"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="center"
