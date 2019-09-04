@@ -64,10 +64,6 @@ public class DeviceListFragment extends Fragment
 
     private OnFragmentInteractionListener mListener;
 
-    public DeviceListFragment()
-    {
-    }
-
     /**
      * @param param1 设备状态
      * @param param2
@@ -111,14 +107,7 @@ public class DeviceListFragment extends Fragment
             public void run()
             {
                 //返回到UI线程,两种更新UI的方法之一
-                getActivity().runOnUiThread(new Runnable()
-                {
-                    @Override
-                    public void run()
-                    {
-                        SendWithOkHttp();
-                    }
-                });
+                getActivity().runOnUiThread(() -> SendWithOkHttp());
             }
         };
         //任务、延迟执行时间、重复调用间隔
@@ -152,15 +141,11 @@ public class DeviceListFragment extends Fragment
             @Override
             public void onRefresh(final MaterialRefreshLayout materialRefreshLayout)
             {
-                materialRefreshLayout.postDelayed(new Runnable()
+                materialRefreshLayout.postDelayed(() ->
                 {
-                    @Override
-                    public void run()
-                    {
-                        SendWithOkHttp();
-                        //结束下拉刷新
-                        materialRefreshLayout.finishRefresh();
-                    }
+                    SendWithOkHttp();
+                    //结束下拉刷新
+                    materialRefreshLayout.finishRefresh();
                 }, 1 * 1000);
             }
 
@@ -288,46 +273,42 @@ public class DeviceListFragment extends Fragment
      */
     private void SendWithOkHttp()
     {
-        new Thread(new Runnable()
+        new Thread(() ->
         {
-            @Override
-            public void run()
+            Looper.prepare();
+            OkHttpUtil okHttpUtil = new OkHttpUtil();
+            //异步方式发起请求,回调处理信息
+            okHttpUtil.AsynSendByPost(URL, null, new Callback()
             {
-                Looper.prepare();
-                OkHttpUtil okHttpUtil = new OkHttpUtil();
-                //异步方式发起请求,回调处理信息
-                okHttpUtil.AsynSendByPost(URL, null, new Callback()
+                @Override
+                public void onFailure(@NotNull Call call, @NotNull IOException e)
                 {
-                    @Override
-                    public void onFailure(@NotNull Call call, @NotNull IOException e)
+                    Log.e("DeviceLog", "请求失败:" + e.toString());
+                    Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_FAIL, "请求失败:" + e.toString());
+                    handler.sendMessage(message);
+                }
+
+                //获得请求响应的字符串:response.body().string()该方法只能被调用一次!另:toString()返回的是对象地址
+                //获得请求响应的二进制字节数组:response.body().bytes()
+                //获得请求响应的inputStream:response.body().byteStream()
+                @Override
+                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException
+                {
+                    String responseStr = response.body().string();
+                    Log.i("DeviceLog", "请求响应:" + responseStr);
+                    if(response.isSuccessful())
                     {
-                        Log.e("DeviceLog", "请求失败:" + e.toString());
-                        Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_FAIL, "请求失败:" + e.toString());
+                        Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_SUCCESS, responseStr);
                         handler.sendMessage(message);
                     }
-
-                    //获得请求响应的字符串:response.body().string()该方法只能被调用一次!另:toString()返回的是对象地址
-                    //获得请求响应的二进制字节数组:response.body().bytes()
-                    //获得请求响应的inputStream:response.body().byteStream()
-                    @Override
-                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException
+                    else
                     {
-                        String responseStr = response.body().string();
-                        Log.i("DeviceLog", "请求响应:" + responseStr);
-                        if(response.isSuccessful())
-                        {
-                            Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_SUCCESS, responseStr);
-                            handler.sendMessage(message);
-                        }
-                        else
-                        {
-                            Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_FAIL, responseStr);
-                            handler.sendMessage(message);
-                        }
+                        Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_FAIL, responseStr);
+                        handler.sendMessage(message);
                     }
-                });
-                Looper.loop();
-            }
+                }
+            });
+            Looper.loop();
         }).start();
     }
 

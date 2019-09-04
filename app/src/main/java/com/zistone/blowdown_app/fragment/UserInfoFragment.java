@@ -179,33 +179,29 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
         builder.setTitle("设置头像");
         String[] items = {"选择本地照片", "拍照"};
         builder.setNegativeButton("取消", null);
-        builder.setItems(items, new DialogInterface.OnClickListener()
+        builder.setItems(items, (dialog, which) ->
         {
-            @Override
-            public void onClick(DialogInterface dialog, int which)
+            switch(which)
             {
-                switch(which)
+                //选择本地照片
+                case CHOOSE_PICTURE:
                 {
-                    //选择本地照片
-                    case CHOOSE_PICTURE:
-                    {
-                        Intent intent = new Intent(Intent.ACTION_PICK);
-                        //如果限制上传到服务器的图片类型:"image/jpeg、image/png"等的类型,所有类型则写"image/*"
-                        intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
-                        startActivityForResult(intent, CHOOSE_PICTURE);
-                        break;
-                    }
-                    //拍照
-                    case TAKE_PICTURE:
-                    {
-                        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                        m_imageUri = Uri.fromFile(new File(Environment.getExternalStorageDirectory(), "blowdown_userimage.jpeg"));
-                        startActivityForResult(intent, TAKE_PICTURE);
-                        break;
-                    }
-                    default:
-                        break;
+                    Intent intent = new Intent(Intent.ACTION_PICK);
+                    //如果限制上传到服务器的图片类型:"image/jpeg、image/png"等的类型,所有类型则写"image/*"
+                    intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
+                    startActivityForResult(intent, CHOOSE_PICTURE);
+                    break;
                 }
+                //拍照
+                case TAKE_PICTURE:
+                {
+                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    m_imageUri = Uri.fromFile(new File(Environment.getExternalStorageDirectory(), "blowdown_userimage.jpeg"));
+                    startActivityForResult(intent, TAKE_PICTURE);
+                    break;
+                }
+                default:
+                    break;
             }
         });
         builder.create().show();
@@ -292,61 +288,57 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
      */
     private void SendWithOkHttp()
     {
-        new Thread(new Runnable()
+        new Thread(() ->
         {
-            @Override
-            public void run()
+            Looper.prepare();
+            UserInfo userInfo = new UserInfo();
+            userInfo.setM_id(UserSharedPreference.GetUserId(m_context));
+            m_imageView.setDrawingCacheEnabled(true);
+            Bitmap bitmap = Bitmap.createBitmap(m_imageView.getDrawingCache());
+            m_imageView.setDrawingCacheEnabled(false);
+            if(null != bitmap)
             {
-                Looper.prepare();
-                UserInfo userInfo = new UserInfo();
-                userInfo.setM_id(UserSharedPreference.GetUserId(m_context));
-                m_imageView.setDrawingCacheEnabled(true);
-                Bitmap bitmap = Bitmap.createBitmap(m_imageView.getDrawingCache());
-                m_imageView.setDrawingCacheEnabled(false);
-                if(null != bitmap)
+                byte[] bytes = ImageUtil.BitmapToByteArray(bitmap);
+                String imageStr = Base64.encodeToString(bytes, Base64.DEFAULT);
+                userInfo.setM_userImage(imageStr);
+            }
+            if(!"".equals(m_editText_rePassword.getText().toString()))
+            {
+                userInfo.setM_password(m_editText_rePassword.getText().toString());
+            }
+            OkHttpUtil okHttpUtil = new OkHttpUtil();
+            //异步方式发起请求,回调处理信息
+            okHttpUtil.AsynSendByPost(URL, userInfo, new Callback()
+            {
+                @Override
+                public void onFailure(@NotNull Call call, @NotNull IOException e)
                 {
-                    byte[] bytes = ImageUtil.BitmapToByteArray(bitmap);
-                    String imageStr = Base64.encodeToString(bytes, Base64.DEFAULT);
-                    userInfo.setM_userImage(imageStr);
+                    Log.e("UserInfoFragment", "请求失败:" + e.toString());
+                    Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_FAIL, "请求失败:" + e.toString());
+                    handler.sendMessage(message);
                 }
-                if(!"".equals(m_editText_rePassword.getText().toString()))
+
+                //获得请求响应的字符串:response.body().string()该方法只能被调用一次!另:toString()返回的是对象地址
+                //获得请求响应的二进制字节数组:response.body().bytes()
+                //获得请求响应的inputStream:response.body().byteStream()
+                @Override
+                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException
                 {
-                    userInfo.setM_password(m_editText_rePassword.getText().toString());
-                }
-                OkHttpUtil okHttpUtil = new OkHttpUtil();
-                //异步方式发起请求,回调处理信息
-                okHttpUtil.AsynSendByPost(URL, userInfo, new Callback()
-                {
-                    @Override
-                    public void onFailure(@NotNull Call call, @NotNull IOException e)
+                    String responseStr = response.body().string();
+                    Log.i("UserInfoFragment", "请求响应:" + responseStr);
+                    if(response.isSuccessful())
                     {
-                        Log.e("UserInfoFragment", "请求失败:" + e.toString());
-                        Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_FAIL, "请求失败:" + e.toString());
+                        Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_SUCCESS, responseStr);
                         handler.sendMessage(message);
                     }
-
-                    //获得请求响应的字符串:response.body().string()该方法只能被调用一次!另:toString()返回的是对象地址
-                    //获得请求响应的二进制字节数组:response.body().bytes()
-                    //获得请求响应的inputStream:response.body().byteStream()
-                    @Override
-                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException
+                    else
                     {
-                        String responseStr = response.body().string();
-                        Log.i("UserInfoFragment", "请求响应:" + responseStr);
-                        if(response.isSuccessful())
-                        {
-                            Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_SUCCESS, responseStr);
-                            handler.sendMessage(message);
-                        }
-                        else
-                        {
-                            Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_FAIL, responseStr);
-                            handler.sendMessage(message);
-                        }
+                        Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_FAIL, responseStr);
+                        handler.sendMessage(message);
                     }
-                });
-                Looper.loop();
-            }
+                }
+            });
+            Looper.loop();
         }).start();
     }
 

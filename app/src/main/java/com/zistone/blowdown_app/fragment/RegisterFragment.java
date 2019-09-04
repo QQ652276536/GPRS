@@ -373,53 +373,49 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
      */
     private void SendWithOkHttp()
     {
-        new Thread(new Runnable()
+        new Thread(() ->
         {
-            @Override
-            public void run()
+            Looper.prepare();
+            UserInfo userInfo = new UserInfo();
+            userInfo.setM_realName(m_editText_userRealName.getText().toString());
+            userInfo.setM_userName(m_editText_userName.getText().toString());
+            userInfo.setM_phoneNumber(m_editText_userPhone.getText().toString());
+            userInfo.setM_password(m_editText_rePassword.getText().toString());
+            userInfo.setM_state(1);
+            userInfo.setM_level(1);
+            OkHttpUtil okHttpUtil = new OkHttpUtil();
+            //异步方式发起请求,回调处理信息
+            okHttpUtil.AsynSendByPost(URL, userInfo, new Callback()
             {
-                Looper.prepare();
-                UserInfo userInfo = new UserInfo();
-                userInfo.setM_realName(m_editText_userRealName.getText().toString());
-                userInfo.setM_userName(m_editText_userName.getText().toString());
-                userInfo.setM_phoneNumber(m_editText_userPhone.getText().toString());
-                userInfo.setM_password(m_editText_rePassword.getText().toString());
-                userInfo.setM_state(1);
-                userInfo.setM_level(1);
-                OkHttpUtil okHttpUtil = new OkHttpUtil();
-                //异步方式发起请求,回调处理信息
-                okHttpUtil.AsynSendByPost(URL, userInfo, new Callback()
+                @Override
+                public void onFailure(@NotNull Call call, @NotNull IOException e)
                 {
-                    @Override
-                    public void onFailure(@NotNull Call call, @NotNull IOException e)
+                    Log.e("RegisterFragment", "请求失败:" + e.toString());
+                    Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_FAIL, "请求失败:" + e.toString());
+                    handler.sendMessage(message);
+                }
+
+                //获得请求响应的字符串:response.body().string()该方法只能被调用一次!另:toString()返回的是对象地址
+                //获得请求响应的二进制字节数组:response.body().bytes()
+                //获得请求响应的inputStream:response.body().byteStream()
+                @Override
+                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException
+                {
+                    String responseStr = response.body().string();
+                    Log.i("RegisterFragment", "请求响应:" + responseStr);
+                    if(response.isSuccessful())
                     {
-                        Log.e("RegisterFragment", "请求失败:" + e.toString());
-                        Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_FAIL, "请求失败:" + e.toString());
+                        Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_SUCCESS, responseStr);
                         handler.sendMessage(message);
                     }
-
-                    //获得请求响应的字符串:response.body().string()该方法只能被调用一次!另:toString()返回的是对象地址
-                    //获得请求响应的二进制字节数组:response.body().bytes()
-                    //获得请求响应的inputStream:response.body().byteStream()
-                    @Override
-                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException
+                    else
                     {
-                        String responseStr = response.body().string();
-                        Log.i("RegisterFragment", "请求响应:" + responseStr);
-                        if(response.isSuccessful())
-                        {
-                            Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_SUCCESS, responseStr);
-                            handler.sendMessage(message);
-                        }
-                        else
-                        {
-                            Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_FAIL, responseStr);
-                            handler.sendMessage(message);
-                        }
+                        Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_FAIL, responseStr);
+                        handler.sendMessage(message);
                     }
-                });
-                Looper.loop();
-            }
+                }
+            });
+            Looper.loop();
         }).start();
     }
 
@@ -432,15 +428,11 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
         {
             Log.i("RegisterLog", "注册成功:用户ID是" + userInfo.getM_id());
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setPositiveButton("确定", new DialogInterface.OnClickListener()
+            builder.setPositiveButton("确定", (dialog, which) ->
             {
-                @Override
-                public void onClick(DialogInterface dialog, int which)
-                {
-                    dialog.dismiss();
-                    LoginFragment loginFragment = LoginFragment.newInstance("", "");
-                    getFragmentManager().beginTransaction().replace(R.id.fragment_current_user, loginFragment, "loginFragment").commitNow();
-                }
+                dialog.dismiss();
+                LoginFragment loginFragment = LoginFragment.newInstance("", "");
+                getFragmentManager().beginTransaction().replace(R.id.fragment_current_user, loginFragment, "loginFragment").commitNow();
             });
             builder.setMessage("注册成功,请牢记你的用户名" + userInfo.getM_userName() + "和密码!");
             builder.show();

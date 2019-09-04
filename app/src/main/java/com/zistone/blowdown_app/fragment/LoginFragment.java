@@ -117,49 +117,45 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
      */
     private void SendWithOkHttp()
     {
-        new Thread(new Runnable()
+        new Thread(() ->
         {
-            @Override
-            public void run()
+            Looper.prepare();
+            UserInfo userInfo = new UserInfo();
+            userInfo.setM_userName(m_editText_userName.getText().toString());
+            userInfo.setM_password(m_editText_password.getText().toString());
+            OkHttpUtil okHttpUtil = new OkHttpUtil();
+            //异步方式发起请求,回调处理信息
+            okHttpUtil.AsynSendByPost(URL, userInfo, new Callback()
             {
-                Looper.prepare();
-                UserInfo userInfo = new UserInfo();
-                userInfo.setM_userName(m_editText_userName.getText().toString());
-                userInfo.setM_password(m_editText_password.getText().toString());
-                OkHttpUtil okHttpUtil = new OkHttpUtil();
-                //异步方式发起请求,回调处理信息
-                okHttpUtil.AsynSendByPost(URL, userInfo, new Callback()
+                @Override
+                public void onFailure(@NotNull Call call, @NotNull IOException e)
                 {
-                    @Override
-                    public void onFailure(@NotNull Call call, @NotNull IOException e)
+                    Log.e("LoginFragment", "请求失败:" + e.toString());
+                    Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_FAIL, "请求失败:" + e.toString());
+                    handler.sendMessage(message);
+                }
+
+                //获得请求响应的字符串:response.body().string()该方法只能被调用一次!另:toString()返回的是对象地址
+                //获得请求响应的二进制字节数组:response.body().bytes()
+                //获得请求响应的inputStream:response.body().byteStream()
+                @Override
+                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException
+                {
+                    String responseStr = response.body().string();
+                    Log.i("LoginFragment", "请求响应:" + responseStr);
+                    if(response.isSuccessful())
                     {
-                        Log.e("LoginFragment", "请求失败:" + e.toString());
-                        Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_FAIL, "请求失败:" + e.toString());
+                        Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_SUCCESS, responseStr);
                         handler.sendMessage(message);
                     }
-
-                    //获得请求响应的字符串:response.body().string()该方法只能被调用一次!另:toString()返回的是对象地址
-                    //获得请求响应的二进制字节数组:response.body().bytes()
-                    //获得请求响应的inputStream:response.body().byteStream()
-                    @Override
-                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException
+                    else
                     {
-                        String responseStr = response.body().string();
-                        Log.i("LoginFragment", "请求响应:" + responseStr);
-                        if(response.isSuccessful())
-                        {
-                            Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_SUCCESS, responseStr);
-                            handler.sendMessage(message);
-                        }
-                        else
-                        {
-                            Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_FAIL, responseStr);
-                            handler.sendMessage(message);
-                        }
+                        Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_FAIL, responseStr);
+                        handler.sendMessage(message);
                     }
-                });
-                Looper.loop();
-            }
+                }
+            });
+            Looper.loop();
         }).start();
     }
 
@@ -223,16 +219,12 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
             public void run()
             {
                 //返回到UI线程,两种更新UI的方法之一
-                getActivity().runOnUiThread(new Runnable()
+                getActivity().runOnUiThread(() ->
                 {
-                    @Override
-                    public void run()
-                    {
-                        IsLoginEnd();
-                        //从任务队列中取消任务
-                        m_loginTimer.cancel();
-                        Toast.makeText(m_context, "登录失败,请检查网络", Toast.LENGTH_SHORT).show();
-                    }
+                    IsLoginEnd();
+                    //从任务队列中取消任务
+                    m_loginTimer.cancel();
+                    Toast.makeText(m_context, "登录失败,请检查网络", Toast.LENGTH_SHORT).show();
                 });
             }
         };

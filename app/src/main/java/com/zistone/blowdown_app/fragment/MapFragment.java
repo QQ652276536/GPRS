@@ -551,14 +551,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
 
         /*********************************以下为根据提供的经纬度实现定位其它设备*********************************/
         //地图加载完毕回调
-        m_baiduMap.setOnMapLoadedCallback(new BaiduMap.OnMapLoadedCallback()
-        {
-            @Override
-            public void onMapLoaded()
-            {
-                SetMapStateAndMarkOptions();
-            }
-        });
+        m_baiduMap.setOnMapLoadedCallback(() -> SetMapStateAndMarkOptions());
         /*************************************************************************************************/
     }
 

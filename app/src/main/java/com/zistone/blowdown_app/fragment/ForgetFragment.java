@@ -37,11 +37,6 @@ public class ForgetFragment extends Fragment implements View.OnClickListener
     private ImageButton m_btnReturn;
     private OnFragmentInteractionListener mListener;
 
-    public ForgetFragment()
-    {
-        // Required empty public constructor
-    }
-
     public static ForgetFragment newInstance(String param1, String param2)
     {
         ForgetFragment fragment = new ForgetFragment();
