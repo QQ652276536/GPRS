@@ -48,7 +48,7 @@
             android:value="iHpQqgevg3XxMWbPDWTyoY9Mm7plx2qi" />
 
         <activity
-            android:name="com.zistone.blowdown_app.MainActivity"
+            android:name="com.zistone.blowdown_app.activity.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateAlwaysHidden"><!-- Activity启动时默认隐藏软键盘 -->

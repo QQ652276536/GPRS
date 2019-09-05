@@ -7,49 +7,37 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.ImageButton;
 
 import com.zistone.blowdown_app.R;
 
-public class DeviceManageFragment extends Fragment implements View.OnClickListener
+public class DeviceAddFragment extends Fragment implements View.OnClickListener
 {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     private Context m_context;
-    private View m_deviceView;
+    private View m_addDeviceView;
+    private ImageButton m_btnReturn;
     private OnFragmentInteractionListener mListener;
-    private Button m_btn_canUse;
-    private Button m_btn_notUse;
-    private Button m_btn_add;
 
-    @Override
-    public void onClick(View v)
+    public static DeviceAddFragment newInstance(String param1, String param2)
     {
-        if(R.id.btn_canuse_manager == v.getId())
-        {
-            DeviceListFragment deviceListFragment = DeviceListFragment.newInstance(1, "");
-            getFragmentManager().beginTransaction().replace(R.id.fragment_current_device, deviceListFragment, "deviceListFragment").commitNow();
-        }
-        else if(R.id.btn_not_use_manager == v.getId())
-        {
-            DeviceListFragment deviceListFragment = DeviceListFragment.newInstance(0, "");
-            getFragmentManager().beginTransaction().replace(R.id.fragment_current_device, deviceListFragment, "deviceListFragment").commitNow();
-        }
-        else if(R.id.btn_add_manager == v.getId())
-        {
-            DeviceAddFragment deviceAddFragment = DeviceAddFragment.newInstance("", "");
-            getFragmentManager().beginTransaction().replace(R.id.fragment_current_device, deviceAddFragment, "deviceAddFragment").commitNow();
-        }
-    }
-
-    public static DeviceManageFragment newInstance(String param1, String param2)
-    {
-        DeviceManageFragment fragment = new DeviceManageFragment();
+        DeviceAddFragment fragment = new DeviceAddFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
+    }
+
+    @Override
+    public void onClick(View v)
+    {
+        if(R.id.btn_return_device_add == v.getId())
+        {
+            DeviceManageFragment deviceManageFragment = DeviceManageFragment.newInstance("", "");
+            getFragmentManager().beginTransaction().replace(R.id.fragment_current_device, deviceManageFragment, "deviceManageFragment").commitNow();
+        }
     }
 
     /**
@@ -70,13 +58,9 @@ public class DeviceManageFragment extends Fragment implements View.OnClickListen
 
     public void InitView()
     {
-        m_context = m_deviceView.getContext();
-        m_btn_canUse = m_deviceView.findViewById(R.id.btn_canuse_manager);
-        m_btn_canUse.setOnClickListener(this);
-        m_btn_notUse = m_deviceView.findViewById(R.id.btn_not_use_manager);
-        m_btn_notUse.setOnClickListener(this);
-        m_btn_add = m_deviceView.findViewById(R.id.btn_add_manager);
-        m_btn_add.setOnClickListener(this);
+        m_context = getContext();
+        m_btnReturn = m_addDeviceView.findViewById(R.id.btn_return_device_add);
+        m_btnReturn.setOnClickListener(this::onClick);
     }
 
     @Override
@@ -97,9 +81,9 @@ public class DeviceManageFragment extends Fragment implements View.OnClickListen
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        m_deviceView = inflater.inflate(R.layout.fragment_device_manage, container, false);
+        m_addDeviceView = inflater.inflate(R.layout.fragment_device_add, container, false);
         InitView();
-        return m_deviceView;
+        return m_addDeviceView;
     }
 
     @Override
