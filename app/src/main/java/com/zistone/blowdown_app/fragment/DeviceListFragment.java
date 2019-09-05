@@ -14,6 +14,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,7 +40,7 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
 
-public class DeviceListFragment extends Fragment
+public class DeviceListFragment extends Fragment implements View.OnClickListener
 {
     private static final String ARG_PARAM1 = "DEVICESTATE";
     private static final String ARG_PARAM2 = "param2";
@@ -59,6 +61,7 @@ public class DeviceListFragment extends Fragment
     //设备状态
     private int m_deviceState;
     private TextView m_ToolbarTextView;
+    private ImageButton m_btnReturn;
     //底部导航栏
     public BottomNavigationView m_bottomNavigationView;
 
@@ -77,6 +80,16 @@ public class DeviceListFragment extends Fragment
         args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
+    }
+
+    @Override
+    public void onClick(View v)
+    {
+        if(R.id.btn_return_device_list == v.getId())
+        {
+            DeviceManageFragment deviceManageFragment = DeviceManageFragment.newInstance("", "");
+            getFragmentManager().beginTransaction().replace(R.id.fragment_current_device, deviceManageFragment, "deviceManageFragment").commitNow();
+        }
     }
 
     /**
@@ -118,7 +131,10 @@ public class DeviceListFragment extends Fragment
     {
         m_context = m_deviceListView.getContext();
         URL = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/DeviceInfo/FindAll";
+        m_btnReturn = m_deviceListView.findViewById(R.id.btn_return_device_list);
+        m_btnReturn.setOnClickListener(this::onClick);
         m_ToolbarTextView = m_deviceListView.findViewById(R.id.textView_toolbar);
+        m_recyclerView = m_deviceListView.findViewById(R.id.device_recycler);
         m_deviceState = getArguments().getInt("DEVICESTATE");
         if(m_deviceState == 1)
         {
@@ -170,8 +186,6 @@ public class DeviceListFragment extends Fragment
         });
         //自动刷新
         m_materialRefreshLayout.autoRefresh();
-        //RecyclerView
-        m_recyclerView = m_deviceListView.findViewById(R.id.device_recycler);
         //使用线性布局
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(m_context);
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
@@ -355,5 +369,6 @@ public class DeviceListFragment extends Fragment
     {
         super.onDetach();
         mListener = null;
+        m_refreshTimer.cancel();
     }
 }

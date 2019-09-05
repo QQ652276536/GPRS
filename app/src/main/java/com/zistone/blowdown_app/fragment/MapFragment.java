@@ -586,7 +586,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
         else
         {
             m_latLngStr = reverseGeoCodeResult.getAddress();
-            DrawMarkerText(m_latLng, m_latLngStr, Color.RED, 0xAAFFFF80);
+            //DrawMarkerText(m_latLng, m_latLngStr, Color.RED, 0xAAFFFF80);
         }
     }
 

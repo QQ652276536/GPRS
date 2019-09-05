@@ -20,7 +20,7 @@
         android:background="@color/colorPrimary">
 
         <ImageButton
-            android:id="@+id/btn_return_canuse"
+            android:id="@+id/btn_return_device_list"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@color/transparent"
