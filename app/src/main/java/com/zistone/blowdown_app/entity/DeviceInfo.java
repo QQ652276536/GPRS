@@ -122,7 +122,7 @@ public class DeviceInfo implements Parcelable
     private String m_comment;
 
     /**
-     * 鉴权码
+     * 鉴权码,注册成功后才有,由Web服务随机生成
      */
     private String m_akCode;
 
