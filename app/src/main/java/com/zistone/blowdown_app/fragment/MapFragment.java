@@ -101,7 +101,6 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
     //设备信息
     private DeviceInfo m_deviceInfo;
     private Activity m_activity;
-
     private OnFragmentInteractionListener mListener;
 
     public MapFragment()

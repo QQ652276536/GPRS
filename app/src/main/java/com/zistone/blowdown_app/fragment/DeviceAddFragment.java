@@ -3,22 +3,67 @@ package com.zistone.blowdown_app.fragment;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
+import android.widget.Switch;
+import android.widget.Toast;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.zistone.blowdown_app.PropertiesUtil;
 import com.zistone.blowdown_app.R;
+import com.zistone.blowdown_app.entity.DeviceInfo;
+import com.zistone.blowdown_app.entity.UserInfo;
+
+import org.jetbrains.annotations.NotNull;
+
+import java.io.IOException;
+import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.time.LocalTime;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.FormBody;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 public class DeviceAddFragment extends Fragment implements View.OnClickListener
 {
+    private static final String TAG = "DeviceAddFragment";
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+    private static final int MESSAGE_GETRREQUEST_FAIL = 1;
+    private static final int MESSAGE_GETRESPONSE_FAIL = 2;
+    private static final int MESSAGE_GETRESPONSE_SUCCESS = 3;
+    private static String URL;
     private Context m_context;
     private View m_addDeviceView;
     private ImageButton m_btnReturn;
     private OnFragmentInteractionListener mListener;
+    private EditText m_editText_deviceName;
+    private EditText m_editText_deviceType;
+    private EditText m_editText_deviceId;
+    private EditText m_editText_simNumber;
+    private EditText m_editText_comment;
+    private Switch m_switch_state;
+    private Button m_btnSave;
+    private ProgressBar m_progressBar;
 
     public static DeviceAddFragment newInstance(String param1, String param2)
     {
@@ -30,6 +75,78 @@ public class DeviceAddFragment extends Fragment implements View.OnClickListener
         return fragment;
     }
 
+    private void IsAdding()
+    {
+        m_progressBar.setVisibility(View.VISIBLE);
+        m_editText_deviceName.setEnabled(false);
+        m_editText_deviceType.setEnabled(false);
+        m_editText_deviceId.setEnabled(false);
+        m_editText_simNumber.setEnabled(false);
+        m_editText_comment.setEnabled(false);
+        m_switch_state.setEnabled(false);
+    }
+
+    private void IsAddEnd()
+    {
+        m_progressBar.setVisibility(View.INVISIBLE);
+        m_editText_deviceName.setEnabled(true);
+        m_editText_deviceType.setEnabled(true);
+        m_editText_deviceId.setEnabled(true);
+        m_editText_simNumber.setEnabled(true);
+        m_editText_comment.setEnabled(true);
+        m_switch_state.setEnabled(true);
+    }
+
+    private void AddResult(DeviceInfo deviceInfo)
+    {
+        if(deviceInfo != null)
+        {
+            Log.i(TAG, "设备添加成功,设备编号为:" + deviceInfo.getM_deviceId());
+            DeviceManageFragment deviceManageFragment = DeviceManageFragment.newInstance("", "");
+            getFragmentManager().beginTransaction().replace(R.id.fragment_current_device, deviceManageFragment, "deviceManageFragment").commitNow();
+            Toast.makeText(m_context, "设备添加成功", Toast.LENGTH_SHORT).show();
+        }
+        else
+        {
+            Log.i(TAG, "设备添加失败");
+            Toast.makeText(m_context, "用户名或密码错误", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private Handler handler = new Handler()
+    {
+        @Override
+        public void handleMessage(Message message)
+        {
+            super.handleMessage(message);
+            IsAddEnd();
+            switch(message.what)
+            {
+                case MESSAGE_GETRREQUEST_FAIL:
+                {
+                    String result = (String) message.obj;
+                    Toast.makeText(m_context, "添加设备超时,请检查网络环境", Toast.LENGTH_SHORT).show();
+                    break;
+                }
+                case MESSAGE_GETRESPONSE_SUCCESS:
+                {
+                    String result = (String) message.obj;
+                    DeviceInfo deviceInfo = JSON.parseObject(result, DeviceInfo.class);
+                    AddResult(deviceInfo);
+                    break;
+                }
+                case MESSAGE_GETRESPONSE_FAIL:
+                {
+                    String result = (String) message.obj;
+                    Toast.makeText(m_context, "添加设备失败,请与管理员联系", Toast.LENGTH_SHORT).show();
+                    break;
+                }
+                default:
+                    break;
+            }
+        }
+    };
+
     @Override
     public void onClick(View v)
     {
@@ -37,6 +154,68 @@ public class DeviceAddFragment extends Fragment implements View.OnClickListener
         {
             DeviceManageFragment deviceManageFragment = DeviceManageFragment.newInstance("", "");
             getFragmentManager().beginTransaction().replace(R.id.fragment_current_device, deviceManageFragment, "deviceManageFragment").commitNow();
+        }
+        else if(R.id.btn_save_add == v.getId())
+        {
+            String name = m_editText_deviceName.getText().toString();
+            String type = m_editText_deviceType.getText().toString();
+            String deviceId = m_editText_deviceId.getText().toString();
+            String sim = m_editText_simNumber.getText().toString();
+            String comment = m_editText_comment.getText().toString();
+            boolean state = m_switch_state.isChecked();
+            if(null == name || "".equals(name) || null == type || "".equals(type) || null == deviceId || "".equals(deviceId) || null == sim || "".equals(sim) || null == comment || "".equals(comment))
+            {
+                Toast.makeText(m_context, "请填写正确的设备信息", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            IsAdding();
+            DeviceInfo deviceInfo = new DeviceInfo();
+            deviceInfo.setM_name(name);
+            deviceInfo.setM_type(type);
+            deviceInfo.setM_deviceId(deviceId);
+            deviceInfo.setM_sim(Integer.valueOf(sim));
+            deviceInfo.setM_comment(comment);
+            deviceInfo.setM_state(state ? 1 : 0);
+            String jsonData = JSON.toJSONString(deviceInfo);
+            new Thread(() ->
+            {
+                Looper.prepare();
+                //实例化并设置连接超时时间、读取超时时间
+                OkHttpClient okHttpClient = new OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS).readTimeout(10, TimeUnit.SECONDS).build();
+                RequestBody requestBody = FormBody.create(jsonData, MediaType.parse("application/json; charset=utf-8"));
+                //创建Post请求的方式
+                Request request = new Request.Builder().post(requestBody).url(URL).build();
+                Call call = okHttpClient.newCall(request);
+                //Android中不允许任何网络的交互在主线程中进行
+                call.enqueue(new Callback()
+                {
+                    @Override
+                    public void onFailure(@NotNull Call call, @NotNull IOException e)
+                    {
+                        Log.e(TAG, "请求失败:" + e.toString());
+                        Message message = handler.obtainMessage(MESSAGE_GETRREQUEST_FAIL, "请求失败:" + e.toString());
+                        handler.sendMessage(message);
+                    }
+
+                    @Override
+                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException
+                    {
+                        String responseStr = response.body().string();
+                        Log.i(TAG, "请求响应:" + responseStr);
+                        if(response.isSuccessful())
+                        {
+                            Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_SUCCESS, responseStr);
+                            handler.sendMessage(message);
+                        }
+                        else
+                        {
+                            Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_FAIL, responseStr);
+                            handler.sendMessage(message);
+                        }
+                    }
+                });
+                Looper.loop();
+            }).start();
         }
     }
 
@@ -59,8 +238,18 @@ public class DeviceAddFragment extends Fragment implements View.OnClickListener
     public void InitView()
     {
         m_context = getContext();
+        URL = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/DeviceInfo/Insert";
         m_btnReturn = m_addDeviceView.findViewById(R.id.btn_return_device_add);
-        m_btnReturn.setOnClickListener(this::onClick);
+        m_btnReturn.setOnClickListener(this);
+        m_editText_deviceName = m_addDeviceView.findViewById(R.id.editText_deviceName_add);
+        m_editText_deviceType = m_addDeviceView.findViewById(R.id.editText_deviceType_add);
+        m_editText_deviceId = m_addDeviceView.findViewById(R.id.editText_deviceID_add);
+        m_editText_simNumber = m_addDeviceView.findViewById(R.id.editText_sim_number_add);
+        m_editText_comment = m_addDeviceView.findViewById(R.id.editText_comment_add);
+        m_switch_state = m_addDeviceView.findViewById(R.id.switch_state_add);
+        m_progressBar = m_addDeviceView.findViewById(R.id.progressBar_add);
+        m_btnSave = m_addDeviceView.findViewById(R.id.btn_save_add);
+        m_btnSave.setOnClickListener(this);
     }
 
     @Override

@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.alibaba.fastjson.annotation.JSONField;
+
 import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -11,18 +13,10 @@ import java.util.Date;
 
 public class DeviceInfo implements Parcelable
 {
-    public DeviceInfo()
-    {
-    }
-
     @Override
     public String toString()
     {
-        return "DeviceInfo{" + "m_id=" + m_id + ", m_deviceId='" + m_deviceId + '\'' + ", m_sim=" + m_sim + ", m_name='" + m_name
-                + '\'' + ", m_type='" + m_type + '\'' + ", m_state=" + m_state + ", m_lat=" + m_lat + ", m_lot=" + m_lot + ", m_height="
-                + m_height + ", m_createTime=" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(m_createTime) + ", m_updateTime="
-                + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(m_updateTime) + ", m_comment='" + m_comment + '\'' + ", m_akCode='"
-                + m_akCode + '\'' + '}';
+        return "DeviceInfo{" + "m_id=" + m_id + ", m_deviceId='" + m_deviceId + '\'' + ", m_sim=" + m_sim + ", m_name='" + m_name + '\'' + ", m_type='" + m_type + '\'' + ", m_state=" + m_state + ", m_lat=" + m_lat + ", m_lot=" + m_lot + ", m_height=" + m_height + ", m_createTime=" + m_createTime + ", m_updateTime=" + m_updateTime + ", m_comment='" + m_comment + '\'' + ", m_akCode='" + m_akCode + '\'' + '}';
     }
 
     public static final Creator<DeviceInfo> CREATOR = new Creator<DeviceInfo>()
@@ -31,27 +25,27 @@ public class DeviceInfo implements Parcelable
         public DeviceInfo createFromParcel(Parcel in)
         {
             DeviceInfo deviceInfo = new DeviceInfo();
+            Bundle bundle = in.readBundle();
+            deviceInfo.setM_id(bundle.getInt("m_id"));
+            deviceInfo.setM_name(bundle.getString("m_name"));
+            deviceInfo.setM_type(bundle.getString("m_type"));
+            deviceInfo.setM_lat(bundle.getDouble("m_lat"));
+            deviceInfo.setM_lot(bundle.getDouble("m_lot"));
+            deviceInfo.setM_state(bundle.getInt("m_state"));
+            deviceInfo.setM_deviceId(bundle.getString("m_deviceId"));
+            deviceInfo.setM_sim(bundle.getInt("m_sim"));
+            deviceInfo.setM_comment(bundle.getString("m_comment"));
             try
             {
-                Bundle bundle = in.readBundle();
-                deviceInfo.setM_id(bundle.getInt("m_id"));
-                deviceInfo.setM_name(bundle.getString("m_name"));
-                deviceInfo.setM_type(bundle.getString("m_type"));
-                deviceInfo.setM_lat(bundle.getDouble("m_lat"));
-                deviceInfo.setM_lot(bundle.getDouble("m_lot"));
-                deviceInfo.setM_state(bundle.getInt("m_state"));
-                deviceInfo.setM_deviceId(bundle.getString("m_deviceId"));
-                deviceInfo.setM_sim(bundle.getInt("m_sim"));
-                deviceInfo.setM_comment(bundle.getString("m_comment"));
                 deviceInfo.setM_createTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(bundle.getString("m_createTime")));
                 deviceInfo.setM_updateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(bundle.getString("m_updateTime")));
-                deviceInfo.setM_akCode(bundle.getString("m_akCode"));
-                deviceInfo.setM_height(bundle.getDouble("m_height"));
             }
             catch(ParseException e)
             {
                 e.printStackTrace();
             }
+            deviceInfo.setM_akCode(bundle.getString("m_akCode"));
+            deviceInfo.setM_height(bundle.getDouble("m_height"));
             return deviceInfo;
         }
 

@@ -30,29 +30,37 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.zistone.blowdown_app.ImageUtil;
 import com.zistone.blowdown_app.PropertiesUtil;
 import com.zistone.blowdown_app.R;
 import com.zistone.blowdown_app.UserSharedPreference;
 import com.zistone.blowdown_app.entity.UserInfo;
-import com.zistone.blowdown_app.http.OkHttpUtil;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.FormBody;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class UserInfoFragment extends Fragment implements View.OnClickListener, View.OnFocusChangeListener
 {
+    private static final String TAG = "UserInfoFragment";
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     private static final int MESSAGE_GETRESPONSE_SUCCESS = 0;
     private static final int MESSAGE_GETRESPONSE_FAIL = 1;
+    private static String URL;
     //6~12位字母数字组合
     private static final String REGEXUSERNAME = "([a-zA-Z0-9]{6,12})";
     //首位不能是数字,不能全为数字或字母,6~16位
@@ -63,19 +71,15 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
     private static final int TAKE_PICTURE = 1;
     //裁剪图片回传
     private static final int CROP_SMALL_PICTURE = 2;
-
-    private static String URL;
-
-    private String mParam1;
-    private String mParam2;
-
+    private String m_param1;
+    private String m_param2;
     private Context m_context;
     private View m_userInfoView;
     private EditText m_editText_password;
     private EditText m_editText_rePassword;
     private Button m_btnUpdate;
     private Button m_btnLogout;
-    private ProgressBar m_updateUserInfoProgressBar;
+    private ProgressBar m_progressBar;
     private Uri m_imageUri;
     private OnFragmentInteractionListener mListener;
     private ImageView m_imageView;
@@ -106,14 +110,14 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
     {
         if(null == intent)
         {
-            Log.e("UserInfoFragment", ">>>Intent为Null");
+            Log.e(TAG, ">>>Intent为Null");
             return;
         }
         Bundle bundle = intent.getExtras();
         Bitmap bitmap = bundle.getParcelable("data");
         if(null == bitmap)
         {
-            Log.e("UserInfoFragment", ">>>Bitmap为Null");
+            Log.e(TAG, ">>>Bitmap为Null");
             return;
         }
         m_imageView.setImageBitmap(bitmap);
@@ -124,7 +128,7 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
      */
     private void IsUpdateEnd()
     {
-        m_updateUserInfoProgressBar.setVisibility(View.INVISIBLE);
+        m_progressBar.setVisibility(View.INVISIBLE);
         m_editText_userRealName.setEnabled(true);
         m_editText_userPhone.setEnabled(true);
         m_editText_password.setEnabled(true);
@@ -138,7 +142,7 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
      */
     private void IsUpdateing()
     {
-        m_updateUserInfoProgressBar.setVisibility(View.VISIBLE);
+        m_progressBar.setVisibility(View.VISIBLE);
         m_editText_userRealName.setEnabled(false);
         m_editText_userPhone.setEnabled(false);
         m_editText_password.setEnabled(false);
@@ -156,7 +160,7 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
     {
         if(null == uri)
         {
-            Log.e("UserInfoFragment", ">>>Uri为Null");
+            Log.e(TAG, ">>>Uri为Null");
             return;
         }
         Intent intent = new Intent("com.android.camera.action.CROP");
@@ -252,7 +256,7 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
                     UserInfo userInfo = JSON.parseObject(responseStr, UserInfo.class);
                     if(null != userInfo)
                     {
-                        Log.i("UserInfoFragment", ">>>用户信息更新成功");
+                        Log.i(TAG, ">>>用户信息更新成功");
                         UserSharedPreference.UpdateSuccess(m_context, userInfo);
                         //修改用户头像
                         String imageStr = UserSharedPreference.GetUserImage(m_context);
@@ -265,7 +269,7 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
                     }
                     else
                     {
-                        Log.e("UserInfoFragment", ">>>用户信息更新失败");
+                        Log.e(TAG, ">>>用户信息更新失败");
                     }
                     break;
                 }
@@ -273,7 +277,7 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
                 {
                     IsUpdateEnd();
                     String responseStr = (String) message.obj;
-                    Log.e("UserInfoFragment", ">>>请求超时:" + responseStr);
+                    Log.e(TAG, ">>>请求超时:" + responseStr);
                     Toast.makeText(m_context, "请求超时,请检查网络环境", Toast.LENGTH_SHORT).show();
                     break;
                 }
@@ -306,14 +310,20 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
             {
                 userInfo.setM_password(m_editText_rePassword.getText().toString());
             }
-            OkHttpUtil okHttpUtil = new OkHttpUtil();
-            //异步方式发起请求,回调处理信息
-            okHttpUtil.AsynSendByPost(URL, userInfo, new Callback()
+            String jsonData = JSON.toJSONString(userInfo);
+            //实例化并设置连接超时时间、读取超时时间
+            OkHttpClient okHttpClient = new OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS).readTimeout(10, TimeUnit.SECONDS).build();
+            RequestBody requestBody = FormBody.create(jsonData, MediaType.parse("application/json; charset=utf-8"));
+            //创建Post请求的方式
+            Request request = new Request.Builder().post(requestBody).url(URL).build();
+            Call call = okHttpClient.newCall(request);
+            //Android中不允许任何网络的交互在主线程中进行
+            call.enqueue(new Callback()
             {
                 @Override
                 public void onFailure(@NotNull Call call, @NotNull IOException e)
                 {
-                    Log.e("UserInfoFragment", "请求失败:" + e.toString());
+                    Log.e(TAG, "请求失败:" + e.toString());
                     Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_FAIL, "请求失败:" + e.toString());
                     handler.sendMessage(message);
                 }
@@ -325,7 +335,7 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
                 public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException
                 {
                     String responseStr = response.body().string();
-                    Log.i("UserInfoFragment", "请求响应:" + responseStr);
+                    Log.i(TAG, "请求响应:" + responseStr);
                     if(response.isSuccessful())
                     {
                         Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_SUCCESS, responseStr);
@@ -361,7 +371,7 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
         m_btnLogout.setOnClickListener(this);
         m_imageView = m_userInfoView.findViewById(R.id.imageView);
         m_imageView.setOnClickListener(this);
-        m_updateUserInfoProgressBar = m_userInfoView.findViewById(R.id.progressBar_updateUserInfo);
+        m_progressBar = m_userInfoView.findViewById(R.id.progressBar_updateUserInfo);
         //动态获取权限
         RequestPermission();
         //显示用户基本信息
@@ -434,8 +444,8 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
         super.onCreate(savedInstanceState);
         if(getArguments() != null)
         {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            m_param1 = getArguments().getString(ARG_PARAM1);
+            m_param2 = getArguments().getString(ARG_PARAM2);
         }
     }
 

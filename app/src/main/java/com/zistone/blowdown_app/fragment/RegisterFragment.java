@@ -20,26 +20,35 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.zistone.blowdown_app.PropertiesUtil;
 import com.zistone.blowdown_app.R;
 import com.zistone.blowdown_app.entity.UserInfo;
-import com.zistone.blowdown_app.http.OkHttpUtil;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.FormBody;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class RegisterFragment extends Fragment implements View.OnClickListener, View.OnFocusChangeListener
 {
+    private static final String TAG = "RegisterFragment";
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     private static final int MESSAGE_GETRESPONSE_SUCCESS = 0;
     private static final int MESSAGE_GETRESPONSE_FAIL = 1;
+    private static String URL;
     //6~12位字母数字组合或6位中文
     private static final String REGEXUSERNAME = "([a-zA-Z0-9]{6,12})|[\\u4e00-\\u9fa5]{2,6}";
     //首位不能是数字,不能全为数字或字母,6~16位
@@ -48,12 +57,8 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
     private static final String REGEXNAME = "[\\u4e00-\\u9fa5]{2,4}";
     //手机号
     private static final String REGEXPHONE = "^(13|14|15|18|17)[0-9]{9}";
-
-    private static String URL;
-
     private String mParam1;
     private String mParam2;
-
     private Context m_context;
     private View m_registerView;
     private EditText m_editText_userName;
@@ -63,13 +68,9 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
     private EditText m_editText_rePassword;
     private ImageButton m_btnReturn;
     private Button m_btnRegister;
-    private ProgressBar m_registerProgressBar;
+    private ProgressBar m_progressBar;
 
     private OnFragmentInteractionListener mListener;
-
-    public RegisterFragment()
-    {
-    }
 
     public static RegisterFragment newInstance(String param1, String param2)
     {
@@ -374,14 +375,20 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
             userInfo.setM_password(m_editText_rePassword.getText().toString());
             userInfo.setM_state(1);
             userInfo.setM_level(1);
-            OkHttpUtil okHttpUtil = new OkHttpUtil();
-            //异步方式发起请求,回调处理信息
-            okHttpUtil.AsynSendByPost(URL, userInfo, new Callback()
+            String jsonData = JSON.toJSONString(userInfo);
+            //实例化并设置连接超时时间、读取超时时间
+            OkHttpClient okHttpClient = new OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS).readTimeout(10, TimeUnit.SECONDS).build();
+            RequestBody requestBody = FormBody.create(jsonData, MediaType.parse("application/json; charset=utf-8"));
+            //创建Post请求的方式
+            Request request = new Request.Builder().post(requestBody).url(URL).build();
+            Call call = okHttpClient.newCall(request);
+            //Android中不允许任何网络的交互在主线程中进行
+            call.enqueue(new Callback()
             {
                 @Override
                 public void onFailure(@NotNull Call call, @NotNull IOException e)
                 {
-                    Log.e("RegisterFragment", "请求失败:" + e.toString());
+                    Log.e(TAG, "请求失败:" + e.toString());
                     Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_FAIL, "请求失败:" + e.toString());
                     handler.sendMessage(message);
                 }
@@ -393,7 +400,7 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
                 public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException
                 {
                     String responseStr = response.body().string();
-                    Log.i("RegisterFragment", "请求响应:" + responseStr);
+                    Log.i(TAG, "请求响应:" + responseStr);
                     if(response.isSuccessful())
                     {
                         Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_SUCCESS, responseStr);
@@ -417,7 +424,7 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
     {
         if(userInfo != null)
         {
-            Log.i("RegisterLog", "注册成功:用户ID是" + userInfo.getM_id());
+            Log.i(TAG, "注册成功:用户ID是" + userInfo.getM_id());
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder.setPositiveButton("确定", (dialog, which) ->
             {
@@ -430,7 +437,7 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
         }
         else
         {
-            Log.i("RegisterLog", "注册失败:用户名已被注册");
+            Log.i(TAG, "注册失败:用户名已被注册");
             Toast.makeText(m_context, "注册失败:用户名已被注册", Toast.LENGTH_SHORT).show();
         }
     }
@@ -440,7 +447,7 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
      */
     private void IsRegisterEd()
     {
-        m_registerProgressBar.setVisibility(View.INVISIBLE);
+        m_progressBar.setVisibility(View.INVISIBLE);
         m_editText_userName.setEnabled(true);
         m_editText_userRealName.setEnabled(true);
         m_editText_userPhone.setEnabled(true);
@@ -455,7 +462,7 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
      */
     private void IsRegistering()
     {
-        m_registerProgressBar.setVisibility(View.VISIBLE);
+        m_progressBar.setVisibility(View.VISIBLE);
         m_editText_userName.setEnabled(false);
         m_editText_userRealName.setEnabled(false);
         m_editText_userPhone.setEnabled(false);
@@ -489,6 +496,6 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
         m_btnReturn.setOnClickListener(this);
         m_btnRegister = m_registerView.findViewById(R.id.btn_register_register);
         m_btnRegister.setOnClickListener(this);
-        m_registerProgressBar = m_registerView.findViewById(R.id.progressBar_register);
+        m_progressBar = m_registerView.findViewById(R.id.progressBar_register);
     }
 }

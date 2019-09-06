@@ -13,6 +13,7 @@ import com.zistone.blowdown_app.R;
 
 public class DeviceFragment extends Fragment
 {
+    private static final String TAG = "DeviceFragment";
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     private Context m_context;

@@ -43,7 +43,7 @@
             android:textSize="18sp" />
 
         <EditText
-            android:id="@+id/editText_deviceName_"
+            android:id="@+id/editText_deviceName_add"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="32dp"
@@ -70,14 +70,14 @@
             android:textSize="18sp" />
 
         <EditText
-            android:id="@+id/editText_deviceType"
+            android:id="@+id/editText_deviceType_add"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginRight="32dp"
             android:layout_weight="0.5"
             android:ems="10"
             android:gravity="center_vertical"
             android:text=""
-            android:layout_marginRight="32dp"
             android:textSize="18sp" />
 
     </LinearLayout>
@@ -97,13 +97,14 @@
             android:textSize="18sp" />
 
         <EditText
-            android:id="@+id/editText_deviceID"
+            android:id="@+id/editText_deviceID_add"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginRight="32dp"
             android:layout_weight="0.5"
             android:ems="10"
             android:gravity="center_vertical"
-            android:layout_marginRight="32dp"
+            android:inputType="number"
             android:text=""
             android:textSize="18sp" />
     </LinearLayout>
@@ -123,7 +124,7 @@
             android:textSize="18sp" />
 
         <EditText
-            android:id="@+id/editText_sim_number"
+            android:id="@+id/editText_sim_number_add"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="32dp"
@@ -149,7 +150,7 @@
             android:textSize="18sp" />
 
         <EditText
-            android:id="@+id/editText_comment"
+            android:id="@+id/editText_comment_add"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="32dp"
@@ -160,18 +161,18 @@
 
     </LinearLayout>
 
-        <Switch
-            android:id="@+id/switch_state"
-            android:layout_width="wrap_content"
-            android:layout_height="50dp"
-            android:text="是否启用设备"
-            android:layout_gravity="center_vertical|right"
-            android:layout_marginRight="32dp"
-            android:textColor="@color/cardview_dark_background"
-            android:textSize="18sp" />
+    <Switch
+        android:id="@+id/switch_state_add"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_gravity="center_vertical|right"
+        android:layout_marginRight="32dp"
+        android:text="是否启用设备"
+        android:textColor="@color/cardview_dark_background"
+        android:textSize="18sp" />
 
     <ProgressBar
-        android:id="@+id/progressBar_updateUserInfo"
+        android:id="@+id/progressBar_add"
         style="@android:style/Widget.DeviceDefault.Light.ProgressBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -179,7 +180,7 @@
         android:visibility="invisible" />
 
     <Button
-        android:id="@+id/btnUpdate_save_add"
+        android:id="@+id/btn_save_add"
         android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"

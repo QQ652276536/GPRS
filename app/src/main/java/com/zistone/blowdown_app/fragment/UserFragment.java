@@ -22,6 +22,7 @@ import java.util.List;
 
 public class UserFragment extends Fragment
 {
+    private static final String TAG = "UserFragment";
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 

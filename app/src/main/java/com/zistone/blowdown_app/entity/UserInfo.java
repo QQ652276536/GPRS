@@ -6,11 +6,6 @@ import java.util.Date;
 
 public class UserInfo
 {
-
-    public UserInfo()
-    {
-    }
-
     @Override
     public String toString()
     {

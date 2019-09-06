@@ -13,28 +13,19 @@ import android.widget.ImageButton;
 import com.zistone.blowdown_app.PropertiesUtil;
 import com.zistone.blowdown_app.R;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link ForgetFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link ForgetFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class ForgetFragment extends Fragment implements View.OnClickListener
 {
+    private static final String TAG = "ForgetFragment";
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-
     private static String URL;
-
     private String mParam1;
     private String mParam2;
-
     private Context m_context;
     private View m_forgetView;
     private Toolbar m_toolbar;
     private ImageButton m_btnReturn;
+
     private OnFragmentInteractionListener mListener;
 
     public static ForgetFragment newInstance(String param1, String param2)

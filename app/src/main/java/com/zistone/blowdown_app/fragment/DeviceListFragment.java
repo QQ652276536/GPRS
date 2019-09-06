@@ -24,7 +24,6 @@ import com.zistone.blowdown_app.PropertiesUtil;
 import com.zistone.blowdown_app.R;
 import com.zistone.blowdown_app.control.DeviceInfoRecyclerAdapter;
 import com.zistone.blowdown_app.entity.DeviceInfo;
-import com.zistone.blowdown_app.http.OkHttpUtil;
 import com.zistone.material_refresh_layout.MaterialRefreshLayout;
 import com.zistone.material_refresh_layout.MaterialRefreshListener;
 
@@ -35,13 +34,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.FormBody;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class DeviceListFragment extends Fragment implements View.OnClickListener
 {
+    private static final String TAG = "DeviceListFragment";
     private static final String ARG_PARAM1 = "DEVICESTATE";
     private static final String ARG_PARAM2 = "param2";
     private static final int TIMEINTERVAL = 30 * 1000;
@@ -64,7 +70,6 @@ public class DeviceListFragment extends Fragment implements View.OnClickListener
     private ImageButton m_btnReturn;
     //底部导航栏
     public BottomNavigationView m_bottomNavigationView;
-
     private OnFragmentInteractionListener mListener;
 
     /**
@@ -290,14 +295,19 @@ public class DeviceListFragment extends Fragment implements View.OnClickListener
         new Thread(() ->
         {
             Looper.prepare();
-            OkHttpUtil okHttpUtil = new OkHttpUtil();
-            //异步方式发起请求,回调处理信息
-            okHttpUtil.AsynSendByPost(URL, null, new Callback()
+            //实例化并设置连接超时时间、读取超时时间
+            OkHttpClient okHttpClient = new OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS).readTimeout(10, TimeUnit.SECONDS).build();
+            RequestBody requestBody = FormBody.create("", MediaType.parse("application/json; charset=utf-8"));
+            //创建Post请求的方式
+            Request request = new Request.Builder().post(requestBody).url(URL).build();
+            Call call = okHttpClient.newCall(request);
+            //Android中不允许任何网络的交互在主线程中进行
+            call.enqueue(new Callback()
             {
                 @Override
                 public void onFailure(@NotNull Call call, @NotNull IOException e)
                 {
-                    Log.e("DeviceLog", "请求失败:" + e.toString());
+                    Log.e(TAG, "请求失败:" + e.toString());
                     Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_FAIL, "请求失败:" + e.toString());
                     handler.sendMessage(message);
                 }
@@ -309,7 +319,7 @@ public class DeviceListFragment extends Fragment implements View.OnClickListener
                 public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException
                 {
                     String responseStr = response.body().string();
-                    Log.i("DeviceLog", "请求响应:" + responseStr);
+                    Log.i(TAG, "请求响应:" + responseStr);
                     if(response.isSuccessful())
                     {
                         Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_SUCCESS, responseStr);

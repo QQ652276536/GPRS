@@ -13,14 +13,15 @@ import com.zistone.blowdown_app.R;
 
 public class DeviceManageFragment extends Fragment implements View.OnClickListener
 {
+    private static final String TAG = "DeviceManageFragment";
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     private Context m_context;
     private View m_deviceView;
-    private OnFragmentInteractionListener mListener;
     private Button m_btn_canUse;
     private Button m_btn_notUse;
     private Button m_btn_add;
+    private OnFragmentInteractionListener mListener;
 
     @Override
     public void onClick(View v)

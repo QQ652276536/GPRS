@@ -19,30 +19,36 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.zistone.blowdown_app.PropertiesUtil;
 import com.zistone.blowdown_app.R;
 import com.zistone.blowdown_app.UserSharedPreference;
 import com.zistone.blowdown_app.entity.UserInfo;
-import com.zistone.blowdown_app.http.OkHttpUtil;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.FormBody;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class LoginFragment extends Fragment implements View.OnClickListener, View.OnFocusChangeListener
 {
+    private static final String TAG = "LoginFragment";
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     private static final int MESSAGE_GETRESPONSE_SUCCESS = 0;
     private static final int MESSAGE_GETRESPONSE_FAIL = 1;
-
     private static String URL;
     //间隔时间
     private static int TIMEINTERVAL = 5 * 1000;
@@ -50,7 +56,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
     private static final String REGEXUSERNAME = "([a-zA-Z0-9]{6,12})|[\\u4e00-\\u9fa5]{2,6}";
     //首位不能是数字,不能全为数字或字母,6~16位
     private static final String REGEXPASSWORD = "^(?![0-9])(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,16}$";
-
     private String mParam1;
     private String mParam2;
     private Context m_context;
@@ -60,14 +65,10 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
     private Button m_btn_login;
     private Button m_btn_register;
     private Button m_btn_forget;
-    private ProgressBar m_loginProgressBar;
+    private ProgressBar m_progressBar;
     private Timer m_loginTimer;
     private BottomNavigationView m_bottomNavigationView;
     private OnFragmentInteractionListener mListener;
-
-    public LoginFragment()
-    {
-    }
 
     public static LoginFragment newInstance(String param1, String param2)
     {
@@ -123,14 +124,20 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
             UserInfo userInfo = new UserInfo();
             userInfo.setM_userName(m_editText_userName.getText().toString());
             userInfo.setM_password(m_editText_password.getText().toString());
-            OkHttpUtil okHttpUtil = new OkHttpUtil();
-            //异步方式发起请求,回调处理信息
-            okHttpUtil.AsynSendByPost(URL, userInfo, new Callback()
+            String jsonData = JSON.toJSONString(userInfo);
+            //实例化并设置连接超时时间、读取超时时间
+            OkHttpClient okHttpClient = new OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS).readTimeout(10, TimeUnit.SECONDS).build();
+            RequestBody requestBody = FormBody.create(jsonData, MediaType.parse("application/json; charset=utf-8"));
+            //创建Post请求的方式
+            Request request = new Request.Builder().post(requestBody).url(URL).build();
+            Call call = okHttpClient.newCall(request);
+            //Android中不允许任何网络的交互在主线程中进行
+            call.enqueue(new Callback()
             {
                 @Override
                 public void onFailure(@NotNull Call call, @NotNull IOException e)
                 {
-                    Log.e("LoginFragment", "请求失败:" + e.toString());
+                    Log.e(TAG, "请求失败:" + e.toString());
                     Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_FAIL, "请求失败:" + e.toString());
                     handler.sendMessage(message);
                 }
@@ -142,7 +149,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
                 public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException
                 {
                     String responseStr = response.body().string();
-                    Log.i("LoginFragment", "请求响应:" + responseStr);
+                    Log.i(TAG, "请求响应:" + responseStr);
                     if(response.isSuccessful())
                     {
                         Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_SUCCESS, responseStr);
@@ -166,7 +173,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
     {
         if(userInfo != null)
         {
-            Log.i("LoginFragment", "登录成功,用户真实姓名为:" + userInfo.getM_realName());
+            Log.i(TAG, "登录成功,用户真实姓名为:" + userInfo.getM_realName());
             //本地存储用户基本信息
             UserSharedPreference.LoginSuccess(m_context, userInfo);
             UserInfoFragment userInfoFragment = UserInfoFragment.newInstance("", "");
@@ -176,7 +183,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
         }
         else
         {
-            Log.i("LoginFragment", "登录失败:用户名或密码错误");
+            Log.i(TAG, "登录失败:用户名或密码错误");
             Toast.makeText(m_context, "用户名或密码错误", Toast.LENGTH_SHORT).show();
         }
     }
@@ -186,7 +193,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
      */
     private void IsLoginEnd()
     {
-        m_loginProgressBar.setVisibility(View.INVISIBLE);
+        m_progressBar.setVisibility(View.INVISIBLE);
         m_editText_userName.setEnabled(true);
         m_editText_password.setEnabled(true);
         m_btn_login.setEnabled(true);
@@ -199,7 +206,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
      */
     private void IsLogining()
     {
-        m_loginProgressBar.setVisibility(View.VISIBLE);
+        m_progressBar.setVisibility(View.VISIBLE);
         m_editText_userName.setEnabled(false);
         m_editText_password.setEnabled(false);
         m_btn_login.setEnabled(false);
@@ -247,7 +254,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
         m_btn_register.setOnClickListener(this);
         m_btn_forget = m_userView.findViewById(R.id.btn_forget_login);
         m_btn_forget.setOnClickListener(this);
-        m_loginProgressBar = m_userView.findViewById(R.id.progressBar_login);
+        m_progressBar = m_userView.findViewById(R.id.progressBar_login);
     }
 
     @Override
