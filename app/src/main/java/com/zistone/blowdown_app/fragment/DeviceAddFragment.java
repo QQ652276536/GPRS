@@ -48,9 +48,9 @@ public class DeviceAddFragment extends Fragment implements View.OnClickListener
     private static final String TAG = "DeviceAddFragment";
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    private static final int MESSAGE_GETRREQUEST_FAIL = 1;
-    private static final int MESSAGE_GETRESPONSE_FAIL = 2;
-    private static final int MESSAGE_GETRESPONSE_SUCCESS = 3;
+    private static final int MESSAGE_RREQUEST_FAIL = 1;
+    private static final int MESSAGE_RESPONSE_FAIL = 2;
+    private static final int MESSAGE_RESPONSE_SUCCESS = 3;
     private static String URL;
     private Context m_context;
     private View m_addDeviceView;
@@ -122,20 +122,20 @@ public class DeviceAddFragment extends Fragment implements View.OnClickListener
             IsAddEnd();
             switch(message.what)
             {
-                case MESSAGE_GETRREQUEST_FAIL:
+                case MESSAGE_RREQUEST_FAIL:
                 {
                     String result = (String) message.obj;
                     Toast.makeText(m_context, "添加设备超时,请检查网络环境", Toast.LENGTH_SHORT).show();
                     break;
                 }
-                case MESSAGE_GETRESPONSE_SUCCESS:
+                case MESSAGE_RESPONSE_SUCCESS:
                 {
                     String result = (String) message.obj;
                     DeviceInfo deviceInfo = JSON.parseObject(result, DeviceInfo.class);
                     AddResult(deviceInfo);
                     break;
                 }
-                case MESSAGE_GETRESPONSE_FAIL:
+                case MESSAGE_RESPONSE_FAIL:
                 {
                     String result = (String) message.obj;
                     Toast.makeText(m_context, "添加设备失败,请与管理员联系", Toast.LENGTH_SHORT).show();
@@ -193,7 +193,7 @@ public class DeviceAddFragment extends Fragment implements View.OnClickListener
                     public void onFailure(@NotNull Call call, @NotNull IOException e)
                     {
                         Log.e(TAG, "请求失败:" + e.toString());
-                        Message message = handler.obtainMessage(MESSAGE_GETRREQUEST_FAIL, "请求失败:" + e.toString());
+                        Message message = handler.obtainMessage(MESSAGE_RREQUEST_FAIL, "请求失败:" + e.toString());
                         handler.sendMessage(message);
                     }
 
@@ -201,15 +201,15 @@ public class DeviceAddFragment extends Fragment implements View.OnClickListener
                     public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException
                     {
                         String responseStr = response.body().string();
-                        Log.i(TAG, "请求响应:" + responseStr);
+                        Log.i(TAG, "响应内容:" + responseStr);
                         if(response.isSuccessful())
                         {
-                            Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_SUCCESS, responseStr);
+                            Message message = handler.obtainMessage(MESSAGE_RESPONSE_SUCCESS, responseStr);
                             handler.sendMessage(message);
                         }
                         else
                         {
-                            Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_FAIL, responseStr);
+                            Message message = handler.obtainMessage(MESSAGE_RESPONSE_FAIL, responseStr);
                             handler.sendMessage(message);
                         }
                     }

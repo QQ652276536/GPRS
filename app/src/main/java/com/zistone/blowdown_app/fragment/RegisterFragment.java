@@ -46,8 +46,9 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
     private static final String TAG = "RegisterFragment";
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    private static final int MESSAGE_GETRESPONSE_SUCCESS = 0;
-    private static final int MESSAGE_GETRESPONSE_FAIL = 1;
+    private static final int MESSAGE_RREQUEST_FAIL = 1;
+    private static final int MESSAGE_RESPONSE_FAIL = 2;
+    private static final int MESSAGE_RESPONSE_SUCCESS = 3;
     private static String URL;
     //6~12位字母数字组合或6位中文
     private static final String REGEXUSERNAME = "([a-zA-Z0-9]{6,12})|[\\u4e00-\\u9fa5]{2,6}";
@@ -341,17 +342,23 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
             IsRegisterEd();
             switch(message.what)
             {
-                case MESSAGE_GETRESPONSE_SUCCESS:
+                case MESSAGE_RREQUEST_FAIL:
                 {
-                    String responseStr = (String) message.obj;
-                    UserInfo userInfo = JSON.parseObject(responseStr, UserInfo.class);
+                    String result = (String) message.obj;
+                    Toast.makeText(m_context, "注册超时,请检查网络环境", Toast.LENGTH_SHORT).show();
+                    break;
+                }
+                case MESSAGE_RESPONSE_SUCCESS:
+                {
+                    String result = (String) message.obj;
+                    UserInfo userInfo = JSON.parseObject(result, UserInfo.class);
                     RegisterResult(userInfo);
                     break;
                 }
-                case MESSAGE_GETRESPONSE_FAIL:
+                case MESSAGE_RESPONSE_FAIL:
                 {
-                    String responseStr = (String) message.obj;
-                    Toast.makeText(m_context, "注册超时,请检查网络环境", Toast.LENGTH_SHORT).show();
+                    String result = (String) message.obj;
+                    Toast.makeText(m_context, "注册失败,请与管理员联系", Toast.LENGTH_SHORT).show();
                     break;
                 }
                 default:
@@ -389,7 +396,7 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
                 public void onFailure(@NotNull Call call, @NotNull IOException e)
                 {
                     Log.e(TAG, "请求失败:" + e.toString());
-                    Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_FAIL, "请求失败:" + e.toString());
+                    Message message = handler.obtainMessage(MESSAGE_RREQUEST_FAIL, "请求失败:" + e.toString());
                     handler.sendMessage(message);
                 }
 
@@ -399,16 +406,16 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
                 @Override
                 public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException
                 {
-                    String responseStr = response.body().string();
-                    Log.i(TAG, "请求响应:" + responseStr);
+                    String result = response.body().string();
+                    Log.i(TAG, "响应内容:" + result);
                     if(response.isSuccessful())
                     {
-                        Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_SUCCESS, responseStr);
+                        Message message = handler.obtainMessage(MESSAGE_RESPONSE_SUCCESS, result);
                         handler.sendMessage(message);
                     }
                     else
                     {
-                        Message message = handler.obtainMessage(MESSAGE_GETRESPONSE_FAIL, responseStr);
+                        Message message = handler.obtainMessage(MESSAGE_RESPONSE_FAIL, result);
                         handler.sendMessage(message);
                     }
                 }
