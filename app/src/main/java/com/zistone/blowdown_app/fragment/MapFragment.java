@@ -20,11 +20,13 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -40,12 +42,15 @@ import com.baidu.mapapi.animation.Transformation;
 import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.BitmapDescriptor;
 import com.baidu.mapapi.map.BitmapDescriptorFactory;
+import com.baidu.mapapi.map.InfoWindow;
+import com.baidu.mapapi.map.MapPoi;
 import com.baidu.mapapi.map.MapStatus;
 import com.baidu.mapapi.map.MapStatusUpdate;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.Marker;
 import com.baidu.mapapi.map.MarkerOptions;
+import com.baidu.mapapi.map.MyLocationConfiguration;
 import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.map.OverlayOptions;
 import com.baidu.mapapi.map.TextOptions;
@@ -60,15 +65,16 @@ import com.zistone.blowdown_app.R;
 import com.zistone.blowdown_app.entity.DeviceInfo;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 import static android.content.Context.SENSOR_SERVICE;
 
-public class MapFragment extends Fragment implements View.OnClickListener, SensorEventListener, OnGetGeoCoderResultListener, Serializable
+public class MapFragment extends Fragment implements BaiduMap.OnMapClickListener, View.OnClickListener, SensorEventListener, OnGetGeoCoderResultListener, Serializable, BaiduMap.OnMarkerClickListener
 {
+    private static final String TAG = "MapFragment";
     private static final BitmapDescriptor ICON_MARKER = BitmapDescriptorFactory.fromResource(R.drawable.icon_mark2);
-
     private Context m_context;
     private MyLocationListener m_locationListener = new MyLocationListener();
     private LocationClient m_locationClient;
@@ -102,10 +108,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
     private DeviceInfo m_deviceInfo;
     private Activity m_activity;
     private OnFragmentInteractionListener mListener;
-
-    public MapFragment()
-    {
-    }
+    private LinearLayout m_infoWindow;
 
     public static MapFragment newInstance(DeviceInfo deviceInfo)
     {
@@ -122,6 +125,55 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
         {
             mListener.onFragmentInteraction(uri);
         }
+    }
+
+    private void CreateInfoWindow()
+    {
+        TextView textName = m_infoWindow.findViewById(R.id.textView4_info);
+        TextView textSIM = m_infoWindow.findViewById(R.id.textView6_info);
+        TextView textUpMode = m_infoWindow.findViewById(R.id.textView8_info);
+        TextView textUpInterval = m_infoWindow.findViewById(R.id.textView10_info);
+        TextView textReceiveTime = m_infoWindow.findViewById(R.id.textView12_info);
+        TextView textLat = m_infoWindow.findViewById(R.id.textView14_info);
+        TextView textLocation = m_infoWindow.findViewById(R.id.textView16_info);
+        TextView textTemperature = m_infoWindow.findViewById(R.id.textView18_info);
+        TextView textLastEct = m_infoWindow.findViewById(R.id.textView20_info);
+        textName.setText(m_deviceInfo.getM_name());
+        textSIM.setText(String.valueOf(m_deviceInfo.getM_sim()));
+        textUpMode.setText("正常模式");
+        textUpInterval.setText("10分钟/次");
+        textReceiveTime.setText(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(m_deviceInfo.getM_updateTime()));
+        textLat.setText(m_deviceInfo.getM_lot() + ", " + m_deviceInfo.getM_lat());
+        textLocation.setText(m_latLngStr);
+        textTemperature.setText("20℃");
+        textLastEct.setText("80%");
+    }
+
+    @Override
+    public boolean onMarkerClick(Marker marker)
+    {
+        if(null != m_latLng)
+        {
+            CreateInfoWindow();
+            m_baiduMap.showInfoWindow(new InfoWindow(m_infoWindow, m_latLng, -100));
+        }
+        return false;
+    }
+
+    @Override
+    public void onMapClick(LatLng latLng)
+    {
+        if(null != m_infoWindow)
+        {
+            m_baiduMap.hideInfoWindow();
+            m_baiduMapView.postInvalidate();
+        }
+    }
+
+    @Override
+    public boolean onMapPoiClick(MapPoi mapPoi)
+    {
+        return false;
     }
 
     public interface OnFragmentInteractionListener
@@ -168,7 +220,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
     }
 
     /**
-     * 定位结果回调
+     * 监听定位结果
      */
     public class MyLocationListener extends BDAbstractLocationListener
     {
@@ -182,7 +234,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
             {
                 return;
             }
-            StringBuffer sb = new StringBuffer(256);
+            StringBuffer sb = new StringBuffer();
             //时间也可以使用systemClock.elapsedRealtime()方法,获取的是自从开机以来每次回调的时间;
             //location.getTime()是指服务端出本次结果的时间,如果位置不发生变化,则时间不变
             sb.append("时间 : ");
@@ -245,8 +297,10 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
             {
                 for(Poi poi : poiList)
                 {
+                    Log.i(TAG, ">>>" + poi.getId() + "\t" + poi.getName() + "\t" + poi.getRank());
                 }
             }
+            Log.i(TAG, ">>>" + sb.toString());
             //GPS定位结果
             if(location.getLocType() == BDLocation.TypeGpsLocation)
             {
@@ -500,7 +554,9 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
         m_textView = m_mapView.findViewById(R.id.textView);
         //支持TextView内容滑动
         m_textView.setMovementMethod(ScrollingMovementMethod.getInstance());
-        m_baiduMapView = m_mapView.findViewById(R.id.mapView);
+        m_baiduMapView = m_mapView.findViewById(R.id.mapView_baidu);
+        m_infoWindow = (LinearLayout) LayoutInflater.from(m_activity).inflate(R.layout.map_info_window, null);
+        m_infoWindow.setOnClickListener(this);
         //动态获取权限
         RequestPermission();
         //注册SDK广播监听者
@@ -508,50 +564,16 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
         iFilter.addAction(SDKInitializer.SDK_BROADTCAST_ACTION_STRING_PERMISSION_CHECK_OK);
         iFilter.addAction(SDKInitializer.SDK_BROADTCAST_ACTION_STRING_PERMISSION_CHECK_ERROR);
         iFilter.addAction(SDKInitializer.SDK_BROADCAST_ACTION_STRING_NETWORK_ERROR);
-        m_sdkReceiver = new SDKReceiver();
-        m_context.registerReceiver(m_sdkReceiver, iFilter);
-        //获取设备信息
-        m_deviceInfo = getArguments().getParcelable("DEVICEINFO");
-        if(null != m_deviceInfo)
-        {
-            m_latLng = new LatLng(m_deviceInfo.getM_lat(), m_deviceInfo.getM_lot());
-        }
         //获取传感器管理服务
         m_sensorManager = (SensorManager) m_context.getSystemService(SENSOR_SERVICE);
+        m_sdkReceiver = new SDKReceiver();
+        m_context.registerReceiver(m_sdkReceiver, iFilter);
         //地图初始化
         m_baiduMap = m_baiduMapView.getMap();
-        MapStatus.Builder builder = new MapStatus.Builder();
-        //设置地图仰角
-        builder.overlook(0);
-        //地理编码
-        m_geoCoder = GeoCoder.newInstance();
-        m_geoCoder.setOnGetGeoCodeResultListener(this);
-        //根据经纬度搜索出对应地理位置
-        if(null != m_latLng)
-        {
-            m_geoCoder.reverseGeoCode(new ReverseGeoCodeOption().location(m_latLng).newVersion(1).radius(500));
-        }
-
-        /**********************以下为调用定位该设备的的代码,这里并未使用,需求是实现定位其它设备**********************/
-        //        m_baiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(builder.build()));
-        //        //定位模式:罗盘
-        //        MyLocationConfiguration locationConfiguration = new MyLocationConfiguration(MyLocationConfiguration.LocationMode.COMPASS, true, null);
-        //        m_baiduMap.setMyLocationConfiguration(locationConfiguration);
-        //        //开启定位图层
-        //        m_baiduMap.setMyLocationEnabled(true);
-        //        //定位初始化
-        //        m_locationClient = new LocationClient(m_context);
-        //        m_locationClient.registerLocationListener(m_locationListener);
-        //        //设置坐标各项参数
-        //        LocationClientOption option = SetLocationClientOption(new LocationClientOption());
-        //        m_locationClient.setLocOption(option);
-        //        m_locationClient.start();
-        /************************************************************************************************/
-
-        /*********************************以下为根据提供的经纬度实现定位其它设备*********************************/
+        m_baiduMap.setOnMapClickListener(this);
+        m_baiduMap.setOnMarkerClickListener(this);
         //地图加载完毕回调
         m_baiduMap.setOnMapLoadedCallback(() -> SetMapStateAndMarkOptions());
-        /*************************************************************************************************/
     }
 
     /**
@@ -565,7 +587,6 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
         if(null == geoCodeResult || SearchResult.ERRORNO.NO_ERROR != geoCodeResult.error)
         {
             Toast.makeText(m_context, "未能找到结果", Toast.LENGTH_SHORT);
-            return;
         }
     }
 
@@ -580,7 +601,6 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
         if(null == reverseGeoCodeResult || SearchResult.ERRORNO.NO_ERROR != reverseGeoCodeResult.error)
         {
             Toast.makeText(m_context, "未能找到结果", Toast.LENGTH_SHORT);
-            return;
         }
         else
         {
@@ -644,8 +664,19 @@ public class MapFragment extends Fragment implements View.OnClickListener, Senso
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        //地理编码
+        m_geoCoder = GeoCoder.newInstance();
+        m_geoCoder.setOnGetGeoCodeResultListener(this);
         if(getArguments() != null)
         {
+            //获取设备信息
+            m_deviceInfo = getArguments().getParcelable("DEVICEINFO");
+            if(null != m_deviceInfo)
+            {
+                m_latLng = new LatLng(m_deviceInfo.getM_lat(), m_deviceInfo.getM_lot());
+                //设置反地理编码坐标
+                m_geoCoder.reverseGeoCode(new ReverseGeoCodeOption().location(m_latLng).newVersion(1).radius(500));
+            }
         }
     }
 

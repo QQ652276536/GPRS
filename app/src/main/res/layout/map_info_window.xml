@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/fragment_current_user"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@color/white"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingLeft="10dp"
+        android:paddingTop="10dp"
+        android:paddingRight="10dp">
+
+        <TextView
+            android:id="@+id/textView1_info"
+            android:layout_width="120dp"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical|left"
+            android:text="车辆跟踪GPRS-1" />
+
+        <TextView
+            android:id="@+id/textView2_info"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical|right"
+            android:text="终端设置"
+            android:textColor="@color/colorPrimary"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingLeft="10dp"
+        android:paddingTop="10dp"
+        android:paddingRight="10dp">
+
+        <TextView
+            android:id="@+id/textView3_info"
+            android:layout_width="70dp"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical|left"
+            android:text="目标名称:" />
+
+        <TextView
+            android:id="@+id/textView4_info"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical|left"
+            android:text="" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingLeft="10dp"
+        android:paddingTop="10dp"
+        android:paddingRight="10dp">
+
+        <TextView
+            android:id="@+id/textView5_info"
+            android:layout_width="70dp"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical|left"
+            android:text="SIM卡号:" />
+
+        <TextView
+            android:id="@+id/textView6_info"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical|left"
+            android:text="" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingLeft="10dp"
+        android:paddingTop="10dp"
+        android:paddingRight="10dp">
+
+        <TextView
+            android:id="@+id/textView7_info"
+            android:layout_width="70dp"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical|left"
+            android:text="上报模式:" />
+
+        <TextView
+            android:id="@+id/textView8_info"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical|left"
+            android:text="" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingLeft="10dp"
+        android:paddingTop="10dp"
+        android:paddingRight="10dp">
+
+        <TextView
+            android:id="@+id/textView9_info"
+            android:layout_width="70dp"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical|left"
+            android:text="时间间隔:" />
+
+        <TextView
+            android:id="@+id/textView10_info"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical|left"
+            android:text="" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingLeft="10dp"
+        android:paddingTop="10dp"
+        android:paddingRight="10dp">
+
+        <TextView
+            android:id="@+id/textView11_info"
+            android:layout_width="70dp"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical|left"
+            android:text="接收时间:" />
+
+        <TextView
+            android:id="@+id/textView12_info"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical|left"
+            android:text="" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingLeft="10dp"
+        android:paddingTop="10dp"
+        android:paddingRight="10dp">
+
+        <TextView
+            android:id="@+id/textView13_info"
+            android:layout_width="70dp"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical|left"
+            android:text="坐标:" />
+
+        <TextView
+            android:id="@+id/textView14_info"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical|left"
+            android:text="" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingLeft="10dp"
+        android:paddingTop="10dp"
+        android:paddingRight="10dp">
+
+        <TextView
+            android:id="@+id/textView15_info"
+            android:layout_width="70dp"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical|left"
+            android:text="位置:" />
+
+        <TextView
+            android:id="@+id/textView16_info"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical|left"
+            android:text="" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingLeft="10dp"
+        android:paddingTop="10dp"
+        android:paddingRight="10dp">
+
+        <TextView
+            android:id="@+id/textView17_info"
+            android:layout_width="70dp"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical|left"
+            android:text="温度:" />
+
+        <TextView
+            android:id="@+id/textView18_info"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical|left"
+            android:text="" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingLeft="10dp"
+        android:paddingTop="10dp"
+        android:paddingRight="10dp">
+
+        <TextView
+            android:id="@+id/textView19_info"
+            android:layout_width="70dp"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical|left"
+            android:text="剩余电量:" />
+
+        <TextView
+            android:id="@+id/textView20_info"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical|left"
+            android:text="" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingLeft="10dp"
+        android:paddingTop="10dp"
+        android:paddingRight="10dp"
+        android:paddingBottom="10dp">
+
+        <TextView
+            android:id="@+id/textView21_info"
+            android:layout_width="70dp"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical|left"
+            android:text="绘制轨迹:" />
+
+        <Switch
+            android:id="@+id/switch1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+</LinearLayout>
