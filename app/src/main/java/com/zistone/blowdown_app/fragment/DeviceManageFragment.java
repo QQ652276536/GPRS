@@ -26,20 +26,27 @@ public class DeviceManageFragment extends Fragment implements View.OnClickListen
     @Override
     public void onClick(View v)
     {
-        if(R.id.btn_canuse_manager == v.getId())
+        switch(v.getId())
         {
-            DeviceListFragment deviceListFragment = DeviceListFragment.newInstance(1, "");
-            getFragmentManager().beginTransaction().replace(R.id.fragment_current_device, deviceListFragment, "deviceListFragment").commitNow();
-        }
-        else if(R.id.btn_not_use_manager == v.getId())
-        {
-            DeviceListFragment deviceListFragment = DeviceListFragment.newInstance(0, "");
-            getFragmentManager().beginTransaction().replace(R.id.fragment_current_device, deviceListFragment, "deviceListFragment").commitNow();
-        }
-        else if(R.id.btn_add_manager == v.getId())
-        {
-            DeviceAddFragment deviceAddFragment = DeviceAddFragment.newInstance("", "");
-            getFragmentManager().beginTransaction().replace(R.id.fragment_current_device, deviceAddFragment, "deviceAddFragment").commitNow();
+            case R.id.btn_canuse_manager:
+            {
+                DeviceListFragment deviceListFragment = DeviceListFragment.newInstance(1, "");
+                getFragmentManager().beginTransaction().replace(R.id.fragment_current_device, deviceListFragment, "deviceListFragment").commitNow();
+                break;
+            }
+            case R.id.btn_not_use_manager:
+            {
+                DeviceListFragment deviceListFragment = DeviceListFragment.newInstance(0, "");
+                getFragmentManager().beginTransaction().replace(R.id.fragment_current_device, deviceListFragment, "deviceListFragment").commitNow();
+                break;
+            }
+            case R.id.btn_add_manager:
+            {
+                DeviceAddFragment deviceAddFragment = DeviceAddFragment.newInstance("", "");
+                getFragmentManager().beginTransaction().replace(R.id.fragment_current_device, deviceAddFragment, "deviceAddFragment").commitNow();
+
+                break;
+            }
         }
     }
 

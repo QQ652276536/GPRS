@@ -26,6 +26,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -109,6 +110,7 @@ public class MapFragment extends Fragment implements BaiduMap.OnMapClickListener
     private Activity m_activity;
     private OnFragmentInteractionListener mListener;
     private LinearLayout m_infoWindow;
+    private ImageButton m_btnLocation;
 
     public static MapFragment newInstance(DeviceInfo deviceInfo)
     {
@@ -556,7 +558,9 @@ public class MapFragment extends Fragment implements BaiduMap.OnMapClickListener
         m_textView.setMovementMethod(ScrollingMovementMethod.getInstance());
         m_baiduMapView = m_mapView.findViewById(R.id.mapView_baidu);
         m_infoWindow = (LinearLayout) LayoutInflater.from(m_activity).inflate(R.layout.map_info_window, null);
-        m_infoWindow.setOnClickListener(this);
+        m_infoWindow.setOnClickListener(this::onClick);
+        m_btnLocation = m_mapView.findViewById(R.id.btn_location_baidu);
+        m_btnLocation.setOnClickListener(this::onClick);
         //动态获取权限
         RequestPermission();
         //注册SDK广播监听者
@@ -571,7 +575,7 @@ public class MapFragment extends Fragment implements BaiduMap.OnMapClickListener
         //地图初始化
         m_baiduMap = m_baiduMapView.getMap();
         m_baiduMap.setOnMapClickListener(this);
-        m_baiduMap.setOnMarkerClickListener(this);
+        m_baiduMap.setOnMarkerClickListener(this::onMarkerClick);
         //地图加载完毕回调
         m_baiduMap.setOnMapLoadedCallback(() -> SetMapStateAndMarkOptions());
     }
@@ -723,6 +727,14 @@ public class MapFragment extends Fragment implements BaiduMap.OnMapClickListener
     @Override
     public void onClick(View v)
     {
+        switch(v.getId())
+        {
+            case R.id.btn_location_baidu:
+                MapStatus mapStatus = new MapStatus.Builder().target(m_latLng).zoom(16).build();
+                MapStatusUpdate mapStatusUpdate = MapStatusUpdateFactory.newMapStatus(mapStatus);
+                m_baiduMap.setMapStatus(mapStatusUpdate);
+                break;
+        }
     }
 
     /**

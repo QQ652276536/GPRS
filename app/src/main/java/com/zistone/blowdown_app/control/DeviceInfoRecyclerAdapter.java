@@ -78,22 +78,11 @@ public class DeviceInfoRecyclerAdapter extends RecyclerView.Adapter<DeviceInfoRe
         }
         if(m_onItemClickListener != null)
         {
-            deviceInfoViewHolder.itemView.setOnClickListener(new View.OnClickListener()
+            deviceInfoViewHolder.itemView.setOnClickListener(v -> m_onItemClickListener.OnClick(i));
+            deviceInfoViewHolder.itemView.setOnLongClickListener(v ->
             {
-                @Override
-                public void onClick(View v)
-                {
-                    m_onItemClickListener.OnClick(i);
-                }
-            });
-            deviceInfoViewHolder.itemView.setOnLongClickListener(new View.OnLongClickListener()
-            {
-                @Override
-                public boolean onLongClick(View v)
-                {
-                    m_onItemClickListener.OnLongClick(i);
-                    return false;
-                }
+                m_onItemClickListener.OnLongClick(i);
+                return false;
             });
         }
     }

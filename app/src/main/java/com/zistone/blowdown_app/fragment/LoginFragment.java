@@ -354,42 +354,41 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
         {
             inputMethodManager.hideSoftInputFromWindow(v.getApplicationWindowToken(), 0);
         }
-        //登录,这里是发起登录请求
-        if(R.id.btn_login_login == v.getId())
+        switch(v.getId())
         {
-            if(Pattern.matches(REGEXUSERNAME, m_editText_userName.getText().toString()))
-            {
-                m_editText_userName.setError(null);
-            }
-            else
-            {
-                m_editText_userName.setError("用户名非法");
-            }
-            if(Pattern.matches(REGEXPASSWORD, m_editText_password.getText().toString()))
-            {
-                m_editText_password.setError(null);
-            }
-            else
-            {
-                m_editText_password.setError("密码非法");
-            }
-            if(m_editText_userName.getError() == null && m_editText_password.getError() == null)
-            {
-                Login();
-            }
-        }
-        //注册,这里是跳转至注册页面
-        else if(R.id.btn_register_login == v.getId())
-        {
-            RegisterFragment registerFragment = RegisterFragment.newInstance("", "");
-            getFragmentManager().beginTransaction().replace(R.id.fragment_current_user, registerFragment, "registerFragment").commitNow();
-
-        }
-        //忘记密码,这里是跳转至找回密码页
-        else if(R.id.btn_forget_login == v.getId())
-        {
-            ForgetFragment forgetFragment = ForgetFragment.newInstance("", "");
-            getFragmentManager().beginTransaction().replace(R.id.fragment_current_user, forgetFragment, "forgetFragment").commitNow();
+            //登录,这里是发起登录请求
+            case R.id.btn_login_login:
+                if(Pattern.matches(REGEXUSERNAME, m_editText_userName.getText().toString()))
+                {
+                    m_editText_userName.setError(null);
+                }
+                else
+                {
+                    m_editText_userName.setError("用户名非法");
+                }
+                if(Pattern.matches(REGEXPASSWORD, m_editText_password.getText().toString()))
+                {
+                    m_editText_password.setError(null);
+                }
+                else
+                {
+                    m_editText_password.setError("密码非法");
+                }
+                if(m_editText_userName.getError() == null && m_editText_password.getError() == null)
+                {
+                    Login();
+                }
+                break;
+            //注册,这里是跳转至注册页面
+            case R.id.btn_register_login:
+                RegisterFragment registerFragment = RegisterFragment.newInstance("", "");
+                getFragmentManager().beginTransaction().replace(R.id.fragment_current_user, registerFragment, "registerFragment").commitNow();
+                break;
+            //忘记密码,这里是跳转至找回密码页
+            case R.id.btn_forget_login:
+                ForgetFragment forgetFragment = ForgetFragment.newInstance("", "");
+                getFragmentManager().beginTransaction().replace(R.id.fragment_current_user, forgetFragment, "forgetFragment").commitNow();
+                break;
         }
     }
 

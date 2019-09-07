@@ -91,10 +91,12 @@ public class DeviceListFragment extends Fragment implements View.OnClickListener
     @Override
     public void onClick(View v)
     {
-        if(R.id.btn_return_device_list == v.getId())
+        switch(v.getId())
         {
-            DeviceManageFragment deviceManageFragment = DeviceManageFragment.newInstance("", "");
-            getFragmentManager().beginTransaction().replace(R.id.fragment_current_device, deviceManageFragment, "deviceManageFragment").commitNow();
+            case R.id.btn_return_device_list:
+                DeviceManageFragment deviceManageFragment = DeviceManageFragment.newInstance("", "");
+                getFragmentManager().beginTransaction().replace(R.id.fragment_current_device, deviceManageFragment, "deviceManageFragment").commitNow();
+                break;
         }
     }
 

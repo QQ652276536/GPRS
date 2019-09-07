@@ -159,70 +159,71 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
     @Override
     public void onClick(View v)
     {
-        if(m_btnReturn.getId() == v.getId())
+        switch(v.getId())
         {
-            LoginFragment loginFragment = LoginFragment.newInstance("", "");
-            getFragmentManager().beginTransaction().replace(R.id.fragment_current_user, loginFragment, "loginFragment").commitNow();
-        }
-        if(R.id.btn_register_register == v.getId())
-        {
-            //隐藏键盘
-            InputMethodManager imm = (InputMethodManager) v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-            if(imm.isActive())
-            {
-                imm.hideSoftInputFromWindow(v.getApplicationWindowToken(), 0);
-            }
-            if(Pattern.matches(REGEXUSERNAME, m_editText_userName.getText().toString()))
-            {
-                m_editText_userName.setError(null);
-            }
-            else
-            {
-                m_editText_userName.setError("用户名非法");
-            }
-            if(Pattern.matches(REGEXNAME, m_editText_userRealName.getText().toString()))
-            {
-                m_editText_userRealName.setError(null);
-            }
-            else
-            {
-                m_editText_userRealName.setError("姓名非法");
-            }
-            if(Pattern.matches(REGEXPHONE, m_editText_userPhone.getText().toString()))
-            {
-                m_editText_userPhone.setError(null);
-            }
-            else
-            {
-                m_editText_userPhone.setError("手机号非法");
-            }
-            if(Pattern.matches(REGEXPASSWORD, m_editText_password.getText().toString()))
-            {
-                m_editText_password.setError(null);
-            }
-            else
-            {
-                m_editText_password.setError("密码非法");
-            }
-            if(Pattern.matches(REGEXPASSWORD, m_editText_rePassword.getText().toString()))
-            {
-                if(!m_editText_rePassword.getText().toString().equals(m_editText_password.getText().toString()))
+            case R.id.btn_return_register:
+                LoginFragment loginFragment = LoginFragment.newInstance("", "");
+                getFragmentManager().beginTransaction().replace(R.id.fragment_current_user, loginFragment, "loginFragment").commitNow();
+                break;
+            case R.id.btn_register_register:
+                //隐藏键盘
+                InputMethodManager imm = (InputMethodManager) v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                if(imm.isActive())
                 {
-                    m_editText_rePassword.setError("两次密码不一致");
+                    imm.hideSoftInputFromWindow(v.getApplicationWindowToken(), 0);
+                }
+                if(Pattern.matches(REGEXUSERNAME, m_editText_userName.getText().toString()))
+                {
+                    m_editText_userName.setError(null);
                 }
                 else
                 {
-                    m_editText_rePassword.setError(null);
+                    m_editText_userName.setError("用户名非法");
                 }
-            }
-            else
-            {
-                m_editText_rePassword.setError("密码非法");
-            }
-            if(m_editText_userName.getError() == null && m_editText_userRealName.getError() == null && m_editText_userPhone.getError() == null && m_editText_password.getError() == null && m_editText_rePassword.getError() == null)
-            {
-                Register();
-            }
+                if(Pattern.matches(REGEXNAME, m_editText_userRealName.getText().toString()))
+                {
+                    m_editText_userRealName.setError(null);
+                }
+                else
+                {
+                    m_editText_userRealName.setError("姓名非法");
+                }
+                if(Pattern.matches(REGEXPHONE, m_editText_userPhone.getText().toString()))
+                {
+                    m_editText_userPhone.setError(null);
+                }
+                else
+                {
+                    m_editText_userPhone.setError("手机号非法");
+                }
+                if(Pattern.matches(REGEXPASSWORD, m_editText_password.getText().toString()))
+                {
+                    m_editText_password.setError(null);
+                }
+                else
+                {
+                    m_editText_password.setError("密码非法");
+                }
+                if(Pattern.matches(REGEXPASSWORD, m_editText_rePassword.getText().toString()))
+                {
+                    if(!m_editText_rePassword.getText().toString().equals(m_editText_password.getText().toString()))
+                    {
+                        m_editText_rePassword.setError("两次密码不一致");
+                    }
+                    else
+                    {
+                        m_editText_rePassword.setError(null);
+                    }
+                }
+                else
+                {
+                    m_editText_rePassword.setError("密码非法");
+                }
+                if(m_editText_userName.getError() == null && m_editText_userRealName.getError() == null && m_editText_userPhone.getError() == null && m_editText_password.getError() == null && m_editText_rePassword.getError() == null)
+                {
+                    Register();
+                }
+                break;
         }
     }
 

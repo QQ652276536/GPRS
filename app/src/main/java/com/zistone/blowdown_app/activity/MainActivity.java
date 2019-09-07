@@ -97,14 +97,10 @@ public class MainActivity extends AppCompatActivity implements MapFragment.OnFra
                     else
                     {
                         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                        builder.setPositiveButton("确定", new DialogInterface.OnClickListener()
+                        builder.setPositiveButton("确定", (dialog, which) ->
                         {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which)
-                            {
-                                dialog.dismiss();
-                                m_bottomNavigationView.setSelectedItemId(m_bottomNavigationView.getMenu().getItem(2).getItemId());
-                            }
+                            dialog.dismiss();
+                            m_bottomNavigationView.setSelectedItemId(m_bottomNavigationView.getMenu().getItem(2).getItemId());
                         });
                         builder.setMessage("你还没有登录");
                         builder.show();

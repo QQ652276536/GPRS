@@ -150,72 +150,73 @@ public class DeviceAddFragment extends Fragment implements View.OnClickListener
     @Override
     public void onClick(View v)
     {
-        if(R.id.btn_return_device_add == v.getId())
+        switch(v.getId())
         {
-            DeviceManageFragment deviceManageFragment = DeviceManageFragment.newInstance("", "");
-            getFragmentManager().beginTransaction().replace(R.id.fragment_current_device, deviceManageFragment, "deviceManageFragment").commitNow();
-        }
-        else if(R.id.btn_save_add == v.getId())
-        {
-            String name = m_editText_deviceName.getText().toString();
-            String type = m_editText_deviceType.getText().toString();
-            String deviceId = m_editText_deviceId.getText().toString();
-            String sim = m_editText_simNumber.getText().toString();
-            String comment = m_editText_comment.getText().toString();
-            boolean state = m_switch_state.isChecked();
-            if(null == name || "".equals(name) || null == type || "".equals(type) || null == deviceId || "".equals(deviceId) || null == sim || "".equals(sim) || null == comment || "".equals(comment))
-            {
-                Toast.makeText(m_context, "请填写正确的设备信息", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            IsAdding();
-            DeviceInfo deviceInfo = new DeviceInfo();
-            deviceInfo.setM_name(name);
-            deviceInfo.setM_type(type);
-            deviceInfo.setM_deviceId(deviceId);
-            deviceInfo.setM_sim(Integer.valueOf(sim));
-            deviceInfo.setM_comment(comment);
-            deviceInfo.setM_state(state ? 1 : 0);
-            String jsonData = JSON.toJSONString(deviceInfo);
-            new Thread(() ->
-            {
-                Looper.prepare();
-                //实例化并设置连接超时时间、读取超时时间
-                OkHttpClient okHttpClient = new OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS).readTimeout(10, TimeUnit.SECONDS).build();
-                RequestBody requestBody = FormBody.create(jsonData, MediaType.parse("application/json; charset=utf-8"));
-                //创建Post请求的方式
-                Request request = new Request.Builder().post(requestBody).url(URL).build();
-                Call call = okHttpClient.newCall(request);
-                //Android中不允许任何网络的交互在主线程中进行
-                call.enqueue(new Callback()
+            case R.id.btn_return_device_add:
+                DeviceManageFragment deviceManageFragment = DeviceManageFragment.newInstance("", "");
+                getFragmentManager().beginTransaction().replace(R.id.fragment_current_device, deviceManageFragment, "deviceManageFragment").commitNow();
+                break;
+            case R.id.btn_save_add:
+                String name = m_editText_deviceName.getText().toString();
+                String type = m_editText_deviceType.getText().toString();
+                String deviceId = m_editText_deviceId.getText().toString();
+                String sim = m_editText_simNumber.getText().toString();
+                String comment = m_editText_comment.getText().toString();
+                boolean state = m_switch_state.isChecked();
+                if(null == name || "".equals(name) || null == type || "".equals(type) || null == deviceId || "".equals(deviceId) || null == sim || "".equals(sim) || null == comment || "".equals(comment))
                 {
-                    @Override
-                    public void onFailure(@NotNull Call call, @NotNull IOException e)
+                    Toast.makeText(m_context, "请填写正确的设备信息", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                IsAdding();
+                DeviceInfo deviceInfo = new DeviceInfo();
+                deviceInfo.setM_name(name);
+                deviceInfo.setM_type(type);
+                deviceInfo.setM_deviceId(deviceId);
+                deviceInfo.setM_sim(Integer.valueOf(sim));
+                deviceInfo.setM_comment(comment);
+                deviceInfo.setM_state(state ? 1 : 0);
+                String jsonData = JSON.toJSONString(deviceInfo);
+                new Thread(() ->
+                {
+                    Looper.prepare();
+                    //实例化并设置连接超时时间、读取超时时间
+                    OkHttpClient okHttpClient = new OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS).readTimeout(10, TimeUnit.SECONDS).build();
+                    RequestBody requestBody = FormBody.create(jsonData, MediaType.parse("application/json; charset=utf-8"));
+                    //创建Post请求的方式
+                    Request request = new Request.Builder().post(requestBody).url(URL).build();
+                    Call call = okHttpClient.newCall(request);
+                    //Android中不允许任何网络的交互在主线程中进行
+                    call.enqueue(new Callback()
                     {
-                        Log.e(TAG, "请求失败:" + e.toString());
-                        Message message = handler.obtainMessage(MESSAGE_RREQUEST_FAIL, "请求失败:" + e.toString());
-                        handler.sendMessage(message);
-                    }
+                        @Override
+                        public void onFailure(@NotNull Call call, @NotNull IOException e)
+                        {
+                            Log.e(TAG, "请求失败:" + e.toString());
+                            Message message = handler.obtainMessage(MESSAGE_RREQUEST_FAIL, "请求失败:" + e.toString());
+                            handler.sendMessage(message);
+                        }
 
-                    @Override
-                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException
-                    {
-                        String responseStr = response.body().string();
-                        Log.i(TAG, "响应内容:" + responseStr);
-                        if(response.isSuccessful())
+                        @Override
+                        public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException
                         {
-                            Message message = handler.obtainMessage(MESSAGE_RESPONSE_SUCCESS, responseStr);
-                            handler.sendMessage(message);
+                            String responseStr = response.body().string();
+                            Log.i(TAG, "响应内容:" + responseStr);
+                            if(response.isSuccessful())
+                            {
+                                Message message = handler.obtainMessage(MESSAGE_RESPONSE_SUCCESS, responseStr);
+                                handler.sendMessage(message);
+                            }
+                            else
+                            {
+                                Message message = handler.obtainMessage(MESSAGE_RESPONSE_FAIL, responseStr);
+                                handler.sendMessage(message);
+                            }
                         }
-                        else
-                        {
-                            Message message = handler.obtainMessage(MESSAGE_RESPONSE_FAIL, responseStr);
-                            handler.sendMessage(message);
-                        }
-                    }
-                });
-                Looper.loop();
-            }).start();
+                    });
+                    Looper.loop();
+                }).start();
+                break;
         }
     }
 

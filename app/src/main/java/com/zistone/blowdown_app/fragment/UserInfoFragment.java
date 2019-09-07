@@ -498,23 +498,23 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
     @Override
     public void onClick(View v)
     {
-        //选择图片
-        if(R.id.imageView == v.getId())
+        switch(v.getId())
         {
-            ShowChoosePhotoDialog();
-        }
-        //更新信息
-        else if(R.id.btnUpdate_userInfo == v.getId())
-        {
-            IsUpdateing();
-            SendWithOkHttp();
-        }
-        //退出登录
-        else if(R.id.btnLogout_userInfo == v.getId())
-        {
-            UserSharedPreference.LogoutSuccess(m_context);
-            LoginFragment loginFragment = new LoginFragment();
-            getFragmentManager().beginTransaction().replace(R.id.fragment_current_user, loginFragment, "loginFragment").commitNow();
+            //选择图片
+            case R.id.imageView:
+                ShowChoosePhotoDialog();
+                break;
+            //更新信息
+            case R.id.btnUpdate_userInfo:
+                IsUpdateing();
+                SendWithOkHttp();
+                break;
+            //退出登录
+            case R.id.btnLogout_userInfo:
+                UserSharedPreference.LogoutSuccess(m_context);
+                LoginFragment loginFragment = new LoginFragment();
+                getFragmentManager().beginTransaction().replace(R.id.fragment_current_user, loginFragment, "loginFragment").commitNow();
+                break;
         }
     }
 

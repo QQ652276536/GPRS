@@ -98,10 +98,12 @@ public class ForgetFragment extends Fragment implements View.OnClickListener
     @Override
     public void onClick(View v)
     {
-        if(m_btnReturn.getId() == v.getId())
+        switch(v.getId())
         {
-            LoginFragment loginFragment = LoginFragment.newInstance("", "");
-            getFragmentManager().beginTransaction().replace(R.id.fragment_current_user, loginFragment, "loginFragment").commitNow();
+            case R.id.btn_return_forget:
+                LoginFragment loginFragment = LoginFragment.newInstance("", "");
+                getFragmentManager().beginTransaction().replace(R.id.fragment_current_user, loginFragment, "loginFragment").commitNow();
+                break;
         }
     }
 
