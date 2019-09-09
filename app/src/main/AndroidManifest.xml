@@ -60,11 +60,16 @@
         </activity>
 
         <!-- 声明service组件 -->
+        <!--地图定位-->
         <service
             android:name="com.baidu.location.f"
             android:enabled="true"
             android:process=":remote"></service>
-
+        <!--鹰眼追踪-->
+        <service
+            android:name="com.baidu.trace.LBSTraceService"
+            android:enabled="true"
+            android:process=":remote"></service>
     </application>
 
 </manifest>
