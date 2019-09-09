@@ -6,7 +6,7 @@
     android:orientation="vertical">
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/textView_baidu"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:text=""
@@ -34,6 +34,53 @@
             android:layout_marginBottom="60dp"
             android:background="@color/transparent"
             app:srcCompat="@drawable/location1" />
+
+        <LinearLayout
+            android:layout_width="40dp"
+            android:layout_height="210dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="50dp"
+            android:layout_marginRight="5dp"
+            android:background="@color/white"
+            android:orientation="vertical">
+
+            <ImageButton
+                android:id="@+id/btn_trafficlight_baidu"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="10dp"
+                android:background="@color/transparent"
+                app:srcCompat="@drawable/trafficlight1" />
+
+            <ImageButton
+                android:id="@+id/btn_locus_baidu"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="10dp"
+                android:background="@color/transparent"
+                app:srcCompat="@drawable/locus1" />
+
+            <ImageButton
+                android:id="@+id/btn_task_baidu"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="10dp"
+                android:background="@color/transparent"
+                app:srcCompat="@drawable/task1" />
+
+            <ImageButton
+                android:id="@+id/btn_defense_baidu"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="10dp"
+                android:background="@color/transparent"
+                app:srcCompat="@drawable/defense1" />
+        </LinearLayout>
     </RelativeLayout>
 
 </LinearLayout>

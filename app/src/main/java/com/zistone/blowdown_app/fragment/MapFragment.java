@@ -111,6 +111,10 @@ public class MapFragment extends Fragment implements BaiduMap.OnMapClickListener
     private OnFragmentInteractionListener mListener;
     private LinearLayout m_infoWindow;
     private ImageButton m_btnLocation;
+    private ImageButton m_btnRoad;
+    private ImageButton m_btnLocus;
+    private ImageButton m_btnTask;
+    private ImageButton m_btnDefense;
 
     public static MapFragment newInstance(DeviceInfo deviceInfo)
     {
@@ -553,14 +557,20 @@ public class MapFragment extends Fragment implements BaiduMap.OnMapClickListener
     {
         m_context = m_mapView.getContext();
         m_activity = getActivity();
-        m_textView = m_mapView.findViewById(R.id.textView);
-        //支持TextView内容滑动
-        m_textView.setMovementMethod(ScrollingMovementMethod.getInstance());
+        m_textView = m_mapView.findViewById(R.id.textView_baidu);
         m_baiduMapView = m_mapView.findViewById(R.id.mapView_baidu);
         m_infoWindow = (LinearLayout) LayoutInflater.from(m_activity).inflate(R.layout.map_info_window, null);
         m_infoWindow.setOnClickListener(this::onClick);
         m_btnLocation = m_mapView.findViewById(R.id.btn_location_baidu);
         m_btnLocation.setOnClickListener(this::onClick);
+        m_btnRoad = m_mapView.findViewById(R.id.btn_trafficlight_baidu);
+        m_btnRoad.setOnClickListener(this::onClick);
+        m_btnLocus = m_mapView.findViewById(R.id.btn_locus_baidu);
+        m_btnLocus.setOnClickListener(this::onClick);
+        m_btnTask = m_mapView.findViewById(R.id.btn_task_baidu);
+        m_btnTask.setOnClickListener(this::onClick);
+        m_btnDefense = m_mapView.findViewById(R.id.btn_defense_baidu);
+        m_btnDefense.setOnClickListener(this::onClick);
         //动态获取权限
         RequestPermission();
         //注册SDK广播监听者
