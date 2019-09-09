@@ -758,6 +758,8 @@ public class MapFragment extends Fragment implements BaiduMap.OnMapClickListener
                 }
                 break;
             case R.id.btn_locus_baidu:
+                TrackQueryFragment trackQueryFragment = TrackQueryFragment.newInstance("", "");
+                getFragmentManager().beginTransaction().replace(R.id.fragment_current, trackQueryFragment, "trackQueryFragment").commitNow();
                 break;
             case R.id.btn_task_baidu:
                 break;

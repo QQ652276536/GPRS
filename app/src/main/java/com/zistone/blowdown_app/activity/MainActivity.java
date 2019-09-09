@@ -22,17 +22,13 @@ import com.zistone.blowdown_app.fragment.ForgetFragment;
 import com.zistone.blowdown_app.fragment.LoginFragment;
 import com.zistone.blowdown_app.fragment.MapFragment;
 import com.zistone.blowdown_app.fragment.RegisterFragment;
+import com.zistone.blowdown_app.fragment.TrackQueryFragment;
 import com.zistone.blowdown_app.fragment.UserFragment;
 import com.zistone.blowdown_app.fragment.UserInfoFragment;
 
 import java.io.Serializable;
 
-public class MainActivity extends AppCompatActivity implements MapFragment.OnFragmentInteractionListener,
-        DeviceFragment.OnFragmentInteractionListener, DeviceManageFragment.OnFragmentInteractionListener,
-        DeviceListFragment.OnFragmentInteractionListener, DeviceAddFragment.OnFragmentInteractionListener,
-        UserFragment.OnFragmentInteractionListener, LoginFragment.OnFragmentInteractionListener,
-        RegisterFragment.OnFragmentInteractionListener, ForgetFragment.OnFragmentInteractionListener,
-        UserInfoFragment.OnFragmentInteractionListener, Serializable
+public class MainActivity extends AppCompatActivity implements TrackQueryFragment.OnFragmentInteractionListener, MapFragment.OnFragmentInteractionListener, DeviceFragment.OnFragmentInteractionListener, DeviceManageFragment.OnFragmentInteractionListener, DeviceListFragment.OnFragmentInteractionListener, DeviceAddFragment.OnFragmentInteractionListener, UserFragment.OnFragmentInteractionListener, LoginFragment.OnFragmentInteractionListener, RegisterFragment.OnFragmentInteractionListener, ForgetFragment.OnFragmentInteractionListener, UserInfoFragment.OnFragmentInteractionListener, Serializable
 {
     //当前页,用来切换
     public Fragment m_currentFragment;

@@ -3,60 +3,77 @@ package com.zistone.blowdown_app.fragment;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ProgressBar;
+import android.widget.Switch;
+import android.widget.Toast;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.zistone.blowdown_app.PropertiesUtil;
 import com.zistone.blowdown_app.R;
+import com.zistone.blowdown_app.entity.DeviceInfo;
+import com.zistone.blowdown_app.entity.UserInfo;
 
-public class DeviceManageFragment extends Fragment implements View.OnClickListener
+import org.jetbrains.annotations.NotNull;
+
+import java.io.IOException;
+import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.time.LocalTime;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.FormBody;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+
+public class TrackQueryFragment extends Fragment implements View.OnClickListener
 {
-    private static final String TAG = "DeviceManageFragment";
+    private static final String TAG = "TrackQueryFragment";
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+    private static final int MESSAGE_RREQUEST_FAIL = 1;
+    private static final int MESSAGE_RESPONSE_FAIL = 2;
+    private static final int MESSAGE_RESPONSE_SUCCESS = 3;
+    private static String URL;
     private Context m_context;
-    private View m_deviceView;
-    private Button m_btn_canUse;
-    private Button m_btn_notUse;
-    private Button m_btn_add;
+    private View m_addDeviceView;
+    private ImageButton m_btnReturn;
     private OnFragmentInteractionListener mListener;
+    private Button m_btnQuery;
+
+    public static TrackQueryFragment newInstance(String param1, String param2)
+    {
+        TrackQueryFragment fragment = new TrackQueryFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_PARAM1, param1);
+        args.putString(ARG_PARAM2, param2);
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     @Override
     public void onClick(View v)
     {
         switch(v.getId())
         {
-            case R.id.btn_canuse_manager:
-            {
-                DeviceListFragment deviceListFragment = DeviceListFragment.newInstance(1, "");
-                getFragmentManager().beginTransaction().replace(R.id.fragment_current_device, deviceListFragment, "deviceListFragment").commitNow();
-                break;
-            }
-            case R.id.btn_not_use_manager:
-            {
-                DeviceListFragment deviceListFragment = DeviceListFragment.newInstance(0, "");
-                getFragmentManager().beginTransaction().replace(R.id.fragment_current_device, deviceListFragment, "deviceListFragment").commitNow();
-                break;
-            }
-            case R.id.btn_add_manager:
-            {
-                DeviceAddFragment deviceAddFragment = DeviceAddFragment.newInstance("", "");
-                getFragmentManager().beginTransaction().replace(R.id.fragment_current_device, deviceAddFragment, "deviceAddFragment").commitNow();
-                break;
-            }
         }
-    }
-
-    public static DeviceManageFragment newInstance(String param1, String param2)
-    {
-        DeviceManageFragment fragment = new DeviceManageFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
     }
 
     /**
@@ -77,13 +94,9 @@ public class DeviceManageFragment extends Fragment implements View.OnClickListen
 
     public void InitView()
     {
-        m_context = m_deviceView.getContext();
-        m_btn_canUse = m_deviceView.findViewById(R.id.btn_canuse_manager);
-        m_btn_canUse.setOnClickListener(this);
-        m_btn_notUse = m_deviceView.findViewById(R.id.btn_not_use_manager);
-        m_btn_notUse.setOnClickListener(this);
-        m_btn_add = m_deviceView.findViewById(R.id.btn_add_manager);
-        m_btn_add.setOnClickListener(this);
+        m_context = getContext();
+        m_btnReturn = m_addDeviceView.findViewById(R.id.btn_return_trackQuery);
+        m_btnReturn.setOnClickListener(this);
     }
 
     @Override
@@ -104,9 +117,9 @@ public class DeviceManageFragment extends Fragment implements View.OnClickListen
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        m_deviceView = inflater.inflate(R.layout.fragment_device_manage, container, false);
+        m_addDeviceView = inflater.inflate(R.layout.fragment_track_query, container, false);
         InitView();
-        return m_deviceView;
+        return m_addDeviceView;
     }
 
     @Override
