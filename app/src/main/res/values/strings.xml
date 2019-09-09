@@ -30,4 +30,5 @@
     <string name="title_device_add">添加设备</string>
     <string name="btn_save">保存</string>
     <string name="title_trackQuery">轨迹查询</string>
+    <string name="btn_trackQuery">查询</string>
 </resources>
