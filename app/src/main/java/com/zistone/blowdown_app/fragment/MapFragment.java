@@ -111,10 +111,11 @@ public class MapFragment extends Fragment implements BaiduMap.OnMapClickListener
     private OnFragmentInteractionListener mListener;
     private LinearLayout m_infoWindow;
     private ImageButton m_btnLocation;
-    private ImageButton m_btnRoad;
+    private ImageButton m_btnTraffic;
     private ImageButton m_btnLocus;
     private ImageButton m_btnTask;
     private ImageButton m_btnDefense;
+    private boolean m_trafficEnabled;
 
     public static MapFragment newInstance(DeviceInfo deviceInfo)
     {
@@ -563,8 +564,8 @@ public class MapFragment extends Fragment implements BaiduMap.OnMapClickListener
         m_infoWindow.setOnClickListener(this::onClick);
         m_btnLocation = m_mapView.findViewById(R.id.btn_location_baidu);
         m_btnLocation.setOnClickListener(this::onClick);
-        m_btnRoad = m_mapView.findViewById(R.id.btn_trafficlight_baidu);
-        m_btnRoad.setOnClickListener(this::onClick);
+        m_btnTraffic = m_mapView.findViewById(R.id.btn_trafficlight_baidu);
+        m_btnTraffic.setOnClickListener(this::onClick);
         m_btnLocus = m_mapView.findViewById(R.id.btn_locus_baidu);
         m_btnLocus.setOnClickListener(this::onClick);
         m_btnTask = m_mapView.findViewById(R.id.btn_task_baidu);
@@ -743,6 +744,24 @@ public class MapFragment extends Fragment implements BaiduMap.OnMapClickListener
                 MapStatus mapStatus = new MapStatus.Builder().target(m_latLng).zoom(16).build();
                 MapStatusUpdate mapStatusUpdate = MapStatusUpdateFactory.newMapStatus(mapStatus);
                 m_baiduMap.setMapStatus(mapStatusUpdate);
+                break;
+            case R.id.btn_trafficlight_baidu:
+                if(!m_trafficEnabled)
+                {
+                    m_baiduMap.setTrafficEnabled(true);
+                    m_trafficEnabled = true;
+                }
+                else
+                {
+                    m_baiduMap.setTrafficEnabled(false);
+                    m_trafficEnabled = false;
+                }
+                break;
+            case R.id.btn_locus_baidu:
+                break;
+            case R.id.btn_task_baidu:
+                break;
+            case R.id.btn_defense_baidu:
                 break;
         }
     }
