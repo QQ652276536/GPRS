@@ -73,7 +73,7 @@
         </com.baidu.mapapi.map.MapView>
 
         <ImageButton
-            android:id="@+id/btn_location_baidu"
+            android:id="@+id/btn_location_trackQuery"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"

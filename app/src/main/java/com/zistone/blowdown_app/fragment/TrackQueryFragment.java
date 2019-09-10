@@ -32,6 +32,7 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.time.LocalTime;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
@@ -46,24 +47,22 @@ import okhttp3.Response;
 public class TrackQueryFragment extends Fragment implements View.OnClickListener
 {
     private static final String TAG = "TrackQueryFragment";
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
     private static final int MESSAGE_RREQUEST_FAIL = 1;
     private static final int MESSAGE_RESPONSE_FAIL = 2;
     private static final int MESSAGE_RESPONSE_SUCCESS = 3;
     private static String URL;
     private Context m_context;
-    private View m_addDeviceView;
+    private View m_trackQueryView;
     private ImageButton m_btnReturn;
     private OnFragmentInteractionListener mListener;
     private Button m_btnQuery;
+    private DeviceInfo m_deviceInfo;
 
-    public static TrackQueryFragment newInstance(String param1, String param2)
+    public static TrackQueryFragment newInstance(DeviceInfo deviceInfo)
     {
         TrackQueryFragment fragment = new TrackQueryFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putParcelable("DEVICEINFO", deviceInfo);
         fragment.setArguments(args);
         return fragment;
     }
@@ -73,6 +72,12 @@ public class TrackQueryFragment extends Fragment implements View.OnClickListener
     {
         switch(v.getId())
         {
+            case R.id.btn_return_trackQuery:
+                MapFragment mapFragment = MapFragment.newInstance(m_deviceInfo);
+                getFragmentManager().beginTransaction().replace(R.id.fragment_current, mapFragment, "mapFragment").commitNow();
+                break;
+            case R.id.btn_query_trackQuery:
+                break;
         }
     }
 
@@ -95,7 +100,7 @@ public class TrackQueryFragment extends Fragment implements View.OnClickListener
     public void InitView()
     {
         m_context = getContext();
-        m_btnReturn = m_addDeviceView.findViewById(R.id.btn_return_trackQuery);
+        m_btnReturn = m_trackQueryView.findViewById(R.id.btn_return_trackQuery);
         m_btnReturn.setOnClickListener(this);
     }
 
@@ -111,15 +116,16 @@ public class TrackQueryFragment extends Fragment implements View.OnClickListener
         super.onCreate(savedInstanceState);
         if(getArguments() != null)
         {
+            m_deviceInfo = getArguments().getParcelable("DEVICEINFO");
         }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        m_addDeviceView = inflater.inflate(R.layout.fragment_track_query, container, false);
+        m_trackQueryView = inflater.inflate(R.layout.fragment_track_query, container, false);
         InitView();
-        return m_addDeviceView;
+        return m_trackQueryView;
     }
 
     @Override

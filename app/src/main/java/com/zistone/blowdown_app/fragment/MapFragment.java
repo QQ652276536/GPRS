@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
@@ -18,6 +19,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
@@ -741,9 +743,12 @@ public class MapFragment extends Fragment implements BaiduMap.OnMapClickListener
         switch(v.getId())
         {
             case R.id.btn_location_baidu:
-                MapStatus mapStatus = new MapStatus.Builder().target(m_latLng).zoom(16).build();
-                MapStatusUpdate mapStatusUpdate = MapStatusUpdateFactory.newMapStatus(mapStatus);
-                m_baiduMap.setMapStatus(mapStatusUpdate);
+                if(null != m_deviceInfo)
+                {
+                    MapStatus mapStatus = new MapStatus.Builder().target(m_latLng).zoom(16).build();
+                    MapStatusUpdate mapStatusUpdate = MapStatusUpdateFactory.newMapStatus(mapStatus);
+                    m_baiduMap.setMapStatus(mapStatusUpdate);
+                }
                 break;
             case R.id.btn_trafficlight_baidu:
                 if(!m_trafficEnabled)
@@ -758,8 +763,18 @@ public class MapFragment extends Fragment implements BaiduMap.OnMapClickListener
                 }
                 break;
             case R.id.btn_locus_baidu:
-                TrackQueryFragment trackQueryFragment = TrackQueryFragment.newInstance("", "");
-                getFragmentManager().beginTransaction().replace(R.id.fragment_current, trackQueryFragment, "trackQueryFragment").commitNow();
+                if(null != m_deviceInfo)
+                {
+                    TrackQueryFragment trackQueryFragment = TrackQueryFragment.newInstance(m_deviceInfo);
+                    getFragmentManager().beginTransaction().replace(R.id.fragment_current, trackQueryFragment, "trackQueryFragment").commitNow();
+                }
+                else
+                {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    builder.setPositiveButton("确定", (dialog, which) -> dialog.dismiss());
+                    builder.setMessage("请选择设备");
+                    builder.show();
+                }
                 break;
             case R.id.btn_task_baidu:
                 break;

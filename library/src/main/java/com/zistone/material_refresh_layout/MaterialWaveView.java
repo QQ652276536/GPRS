@@ -11,7 +11,9 @@ import android.view.View;
 import android.view.animation.BounceInterpolator;
 import android.view.animation.DecelerateInterpolator;
 
-public class MaterialWaveView extends View implements MaterialHeadListener {
+public class MaterialWaveView extends View implements MaterialHeadListener
+{
+    private static final String TAG = "MaterialWaveView";
     private int waveHeight;
     private int headHeight;
     public static int DefaulWaveHeight;
@@ -20,69 +22,84 @@ public class MaterialWaveView extends View implements MaterialHeadListener {
     private Paint paint;
     private int color;
 
-    public MaterialWaveView(Context context) {
+    public MaterialWaveView(Context context)
+    {
         this(context, null, 0);
     }
 
-    public MaterialWaveView(Context context, AttributeSet attrs) {
+    public MaterialWaveView(Context context, AttributeSet attrs)
+    {
         this(context, attrs, 0);
     }
 
-    public MaterialWaveView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public MaterialWaveView(Context context, AttributeSet attrs, int defStyleAttr)
+    {
         super(context, attrs, defStyleAttr);
         init();
     }
 
-    private void init() {
+    private void init()
+    {
         setWillNotDraw(false);
         path = new Path();
         paint = new Paint();
         paint.setAntiAlias(true);
     }
 
-    public int getColor() {
+    public int getColor()
+    {
         return color;
     }
 
-    public void setColor(int color) {
+    public void setColor(int color)
+    {
         this.color = color;
         invalidate();
     }
 
-    public int getHeadHeight() {
+    public int getHeadHeight()
+    {
         return headHeight;
     }
 
-    public void setHeadHeight(int headHeight) {
+    public void setHeadHeight(int headHeight)
+    {
         this.headHeight = headHeight;
     }
 
-    public int getWaveHeight() {
+    public int getWaveHeight()
+    {
         return waveHeight;
     }
 
-    public void setWaveHeight(int waveHeight) {
+    public void setWaveHeight(int waveHeight)
+    {
         this.waveHeight = waveHeight;
     }
 
-    public int getDefaulWaveHeight() {
+    public int getDefaulWaveHeight()
+    {
         return DefaulWaveHeight;
     }
 
-    public void setDefaulWaveHeight(int defaulWaveHeight) {
+    public void setDefaulWaveHeight(int defaulWaveHeight)
+    {
         DefaulWaveHeight = defaulWaveHeight;
     }
 
-    public int getDefaulHeadHeight() {
+    public int getDefaulHeadHeight()
+    {
         return DefaulHeadHeight;
     }
 
-    public void setDefaulHeadHeight(int defaulHeadHeight) {
+    public void setDefaulHeadHeight(int defaulHeadHeight)
+    {
         DefaulHeadHeight = defaulHeadHeight;
     }
 
     @Override
-    protected void onDraw(Canvas canvas) {
+    protected void onDraw(Canvas canvas)
+    {
         super.onDraw(canvas);
         path.reset();
         paint.setColor(color);
@@ -94,15 +111,18 @@ public class MaterialWaveView extends View implements MaterialHeadListener {
 
 
     @Override
-    public void onComlete(MaterialRefreshLayout br) {
+    public void onComlete(MaterialRefreshLayout br)
+    {
         waveHeight = 0;
-        ValueAnimator animator =ValueAnimator.ofInt(headHeight,0);
+        ValueAnimator animator = ValueAnimator.ofInt(headHeight, 0);
         animator.setDuration(200);
         animator.setInterpolator(new DecelerateInterpolator());
         animator.start();
-        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener()
+        {
             @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
+            public void onAnimationUpdate(ValueAnimator animation)
+            {
                 int value = (int) animation.getAnimatedValue();
                 headHeight = value;
                 invalidate();
@@ -111,39 +131,40 @@ public class MaterialWaveView extends View implements MaterialHeadListener {
     }
 
     @Override
-    public void onBegin(MaterialRefreshLayout br) {
+    public void onBegin(MaterialRefreshLayout br)
+    {
 
     }
 
     @Override
-    public void onPull(MaterialRefreshLayout br, float fraction) {
+    public void onPull(MaterialRefreshLayout br, float fraction)
+    {
         setHeadHeight((int) (Util.dip2px(getContext(), DefaulHeadHeight) * Util.limitValue(1, fraction)));
         setWaveHeight((int) (Util.dip2px(getContext(), DefaulWaveHeight) * Math.max(0, fraction - 1)));
         invalidate();
     }
 
     @Override
-    public void onRelease(MaterialRefreshLayout br, float fraction) {
+    public void onRelease(MaterialRefreshLayout br, float fraction)
+    {
 
     }
 
     @Override
-    public void onRefreshing(MaterialRefreshLayout br) {
-        setHeadHeight((int) (Util.dip2px(getContext(), DefaulHeadHeight)));
-        ValueAnimator animator = ValueAnimator.ofInt(getWaveHeight(),0);
-        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                Log.i("anim", "value--->" + (int) animation.getAnimatedValue());
-                setWaveHeight((int) animation.getAnimatedValue());
-                invalidate();
-            }
+    public void onRefreshing(MaterialRefreshLayout br)
+    {
+        setHeadHeight((Util.dip2px(getContext(), DefaulHeadHeight)));
+        ValueAnimator animator = ValueAnimator.ofInt(getWaveHeight(), 0);
+        animator.addUpdateListener(animation ->
+        {
+            Log.i(TAG, ">>>value--->" + (int) animation.getAnimatedValue());
+            setWaveHeight((int) animation.getAnimatedValue());
+            invalidate();
         });
         animator.setInterpolator(new BounceInterpolator());
         animator.setDuration(200);
         animator.start();
     }
-
 
 
 }
