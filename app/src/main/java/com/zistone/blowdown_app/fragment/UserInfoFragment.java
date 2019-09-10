@@ -521,42 +521,29 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
     @Override
     public void onFocusChange(View v, boolean hasFocus)
     {
-        if(R.id.editText_userRealName_userInfo == v.getId())
+        switch(v.getId())
         {
-            if(hasFocus)
-            {
-                m_editText_userRealName.setError(null);
-            }
-            else
-            {
-            }
-        }
-        else if(R.id.editText_userPhone_userInfo == v.getId())
-        {
-            if(hasFocus)
-            {
-            }
-            else
-            {
-            }
-        }
-        else if(R.id.editText_password_userInfo == v.getId())
-        {
-            if(hasFocus)
-            {
-            }
-            else
-            {
-            }
-        }
-        else if(R.id.editText_rePassword_userInfo == v.getId())
-        {
-            if(hasFocus)
-            {
-            }
-            else
-            {
-            }
+            case R.id.editText_userRealName_userInfo:
+                if(hasFocus)
+                {
+                    m_editText_userRealName.setError(null);
+                }
+                break;
+            case R.id.editText_userPhone_userInfo:
+                if(hasFocus)
+                {
+                }
+                break;
+            case R.id.editText_password_userInfo:
+                if(hasFocus)
+                {
+                }
+                break;
+            case R.id.editText_rePassword_userInfo:
+                if(hasFocus)
+                {
+                }
+                break;
         }
     }
 

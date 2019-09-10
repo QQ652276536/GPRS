@@ -349,11 +349,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
     public void onClick(View v)
     {
         //隐藏键盘
-        InputMethodManager inputMethodManager = (InputMethodManager) v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-        if(inputMethodManager.isActive())
-        {
-            inputMethodManager.hideSoftInputFromWindow(v.getApplicationWindowToken(), 0);
-        }
+        InputMethodManager imm = (InputMethodManager) v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(v.getApplicationWindowToken(), 0);
         switch(v.getId())
         {
             //登录,这里是发起登录请求
@@ -395,41 +392,42 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
     @Override
     public void onFocusChange(View v, boolean hasFocus)
     {
-        if(R.id.editTextUserName_login == v.getId())
+        switch(v.getId())
         {
-            if(hasFocus)
-            {
-                m_editText_userName.setError(null);
-            }
-            else
-            {
-                if(Pattern.matches(REGEXUSERNAME, m_editText_userName.getText().toString()))
+            case R.id.editTextUserName_login:
+                if(hasFocus)
                 {
                     m_editText_userName.setError(null);
                 }
                 else
                 {
-                    m_editText_userName.setError("用户名非法");
+                    if(Pattern.matches(REGEXUSERNAME, m_editText_userName.getText().toString()))
+                    {
+                        m_editText_userName.setError(null);
+                    }
+                    else
+                    {
+                        m_editText_userName.setError("用户名非法");
+                    }
                 }
-            }
-        }
-        if(R.id.editTextPassword_login == v.getId())
-        {
-            if(hasFocus)
-            {
-                m_editText_password.setError(null);
-            }
-            else
-            {
-                if(Pattern.matches(REGEXPASSWORD, m_editText_password.getText().toString()))
+                break;
+            case R.id.editTextPassword_login:
+                if(hasFocus)
                 {
                     m_editText_password.setError(null);
                 }
                 else
                 {
-                    m_editText_password.setError("密码非法");
+                    if(Pattern.matches(REGEXPASSWORD, m_editText_password.getText().toString()))
+                    {
+                        m_editText_password.setError(null);
+                    }
+                    else
+                    {
+                        m_editText_password.setError("密码非法");
+                    }
                 }
-            }
+                break;
         }
     }
 
