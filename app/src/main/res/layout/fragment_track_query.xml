@@ -65,7 +65,7 @@
         android:layout_height="match_parent">
 
         <com.baidu.mapapi.map.MapView
-            android:id="@+id/mapView_baidu"
+            android:id="@+id/mapView_trackQuery"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:clickable="true" />

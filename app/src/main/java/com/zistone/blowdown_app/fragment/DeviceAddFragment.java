@@ -19,19 +19,13 @@ import android.widget.Switch;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.zistone.blowdown_app.PropertiesUtil;
+import com.zistone.blowdown_app.util.PropertiesUtil;
 import com.zistone.blowdown_app.R;
 import com.zistone.blowdown_app.entity.DeviceInfo;
-import com.zistone.blowdown_app.entity.UserInfo;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.time.LocalTime;
-import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;

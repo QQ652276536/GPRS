@@ -1,24 +1,15 @@
 package com.zistone.blowdown_app.fragment;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.TextView;
 
-import com.zistone.blowdown_app.ImageUtil;
 import com.zistone.blowdown_app.R;
-import com.zistone.blowdown_app.UserSharedPreference;
-
-import java.util.List;
+import com.zistone.blowdown_app.util.UserSharedPreference;
 
 public class UserFragment extends Fragment
 {

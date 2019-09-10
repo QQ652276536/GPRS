@@ -20,8 +20,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.zistone.blowdown_app.PropertiesUtil;
+import com.zistone.blowdown_app.util.PropertiesUtil;
 import com.zistone.blowdown_app.R;
 import com.zistone.blowdown_app.entity.UserInfo;
 
@@ -29,7 +28,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import okhttp3.Call;

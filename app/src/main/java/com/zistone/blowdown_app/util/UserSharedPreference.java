@@ -1,11 +1,8 @@
-package com.zistone.blowdown_app;
+package com.zistone.blowdown_app.util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Base64;
-import android.util.Log;
 
-import com.zistone.blowdown_app.entity.DeviceInfo;
 import com.zistone.blowdown_app.entity.UserInfo;
 
 public class UserSharedPreference

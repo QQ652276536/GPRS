@@ -14,13 +14,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
-import com.zistone.blowdown_app.PropertiesUtil;
+import com.zistone.blowdown_app.util.PropertiesUtil;
 import com.zistone.blowdown_app.R;
 import com.zistone.blowdown_app.control.DeviceInfoRecyclerAdapter;
 import com.zistone.blowdown_app.entity.DeviceInfo;

@@ -3,7 +3,6 @@ package com.zistone.blowdown_app.fragment;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -30,11 +29,10 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.zistone.blowdown_app.ImageUtil;
-import com.zistone.blowdown_app.PropertiesUtil;
+import com.zistone.blowdown_app.util.ImageUtil;
+import com.zistone.blowdown_app.util.PropertiesUtil;
 import com.zistone.blowdown_app.R;
-import com.zistone.blowdown_app.UserSharedPreference;
+import com.zistone.blowdown_app.util.UserSharedPreference;
 import com.zistone.blowdown_app.entity.UserInfo;
 
 import org.jetbrains.annotations.NotNull;

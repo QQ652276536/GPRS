@@ -19,10 +19,9 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.zistone.blowdown_app.PropertiesUtil;
+import com.zistone.blowdown_app.util.PropertiesUtil;
 import com.zistone.blowdown_app.R;
-import com.zistone.blowdown_app.UserSharedPreference;
+import com.zistone.blowdown_app.util.UserSharedPreference;
 import com.zistone.blowdown_app.entity.UserInfo;
 
 import org.jetbrains.annotations.NotNull;

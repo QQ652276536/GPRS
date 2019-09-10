@@ -1,4 +1,4 @@
-package com.zistone.blowdown_app;
+package com.zistone.blowdown_app.util;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;

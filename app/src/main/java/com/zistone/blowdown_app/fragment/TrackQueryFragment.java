@@ -4,50 +4,53 @@ import android.app.DatePickerDialog;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.text.InputType;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ProgressBar;
-import android.widget.Switch;
-import android.widget.Toast;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.zistone.blowdown_app.PropertiesUtil;
+import com.baidu.mapapi.map.MapView;
+import com.baidu.mapapi.map.Marker;
+import com.baidu.mapapi.map.MarkerOptions;
+import com.baidu.mapapi.map.OverlayOptions;
+import com.baidu.mapapi.model.LatLng;
+import com.baidu.trace.api.analysis.DrivingBehaviorRequest;
+import com.baidu.trace.api.analysis.DrivingBehaviorResponse;
+import com.baidu.trace.api.analysis.HarshAccelerationPoint;
+import com.baidu.trace.api.analysis.HarshBreakingPoint;
+import com.baidu.trace.api.analysis.HarshSteeringPoint;
+import com.baidu.trace.api.analysis.OnAnalysisListener;
+import com.baidu.trace.api.analysis.SpeedingInfo;
+import com.baidu.trace.api.analysis.SpeedingPoint;
+import com.baidu.trace.api.analysis.StayPoint;
+import com.baidu.trace.api.analysis.StayPointRequest;
+import com.baidu.trace.api.analysis.StayPointResponse;
+import com.baidu.trace.api.track.DistanceResponse;
+import com.baidu.trace.api.track.HistoryTrackRequest;
+import com.baidu.trace.api.track.HistoryTrackResponse;
+import com.baidu.trace.api.track.LatestPointResponse;
+import com.baidu.trace.api.track.OnTrackListener;
+import com.baidu.trace.api.track.TrackPoint;
+import com.baidu.trace.model.Point;
+import com.baidu.trace.model.SortType;
+import com.baidu.trace.model.StatusCodes;
 import com.zistone.blowdown_app.R;
+import com.zistone.blowdown_app.TrackApplication;
 import com.zistone.blowdown_app.entity.DeviceInfo;
-import com.zistone.blowdown_app.entity.UserInfo;
+import com.zistone.blowdown_app.util.BitmapUtil;
+import com.zistone.blowdown_app.util.CommonUtil;
+import com.zistone.blowdown_app.util.Constants;
+import com.zistone.blowdown_app.util.MapUtil;
+import com.zistone.blowdown_app.util.ViewUtil;
 
-import org.jetbrains.annotations.NotNull;
-
-import java.io.IOException;
-import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.FormBody;
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
 
 public class TrackQueryFragment extends Fragment implements View.OnClickListener, View.OnFocusChangeListener
 {
@@ -64,6 +67,63 @@ public class TrackQueryFragment extends Fragment implements View.OnClickListener
     private DeviceInfo m_deviceInfo;
     private EditText m_editBegin;
     private EditText m_editend;
+    //历史轨迹请求
+    private HistoryTrackRequest m_historyTrackRequest = new HistoryTrackRequest();
+    //轨迹监听器（用于接收历史轨迹回调）
+    private OnTrackListener m_onTrackListener = null;
+    //地图工具
+    private MapUtil m_mapUtil = null;
+    private TrackApplication m_trackApplication;
+    private ViewUtil m_viewUtil = null;
+    //轨迹分析监听器
+    private OnAnalysisListener m_onAnalysisListener = null;
+    //当前轨迹分析详情框对应的marker
+    private Marker m_analysisMarker = null;
+    //驾驶行为请求
+    private DrivingBehaviorRequest m_drivingBehaviorRequest = new DrivingBehaviorRequest();
+    //停留点请求
+    private StayPointRequest m_stayPointRequest = new StayPointRequest();
+    //轨迹分析监听器
+    private OnAnalysisListener m_mAnalysisListener = null;
+    //查询轨迹的开始时间
+    private long m_startTime = CommonUtil.getCurrentTime();
+    //查询轨迹的结束时间
+    private long m_endTime = CommonUtil.getCurrentTime();
+    //轨迹点集合
+    private List<LatLng> m_trackPointList = new ArrayList<>();
+    //轨迹分析  超速点集合
+    private List<Point> m_speedingPointList = new ArrayList<>();
+    //轨迹分析  急加速点集合
+    private List<Point> m_harshAccelPointList = new ArrayList<>();
+    //轨迹分析  急刹车点集合
+    private List<Point> m_harshBreakingPointList = new ArrayList<>();
+    //轨迹分析  急转弯点集合
+    private List<Point> m_harshSteeringPointList = new ArrayList<>();
+    //轨迹分析  停留点集合
+    private List<Point> m_stayPointList = new ArrayList<>();
+    //轨迹分析 超速点覆盖物集合
+    private List<Marker> m_speedingMarkerList = new ArrayList<>();
+    //轨迹分析 急加速点覆盖物集合
+    private List<Marker> m_harshAccelMarkerList = new ArrayList<>();
+    //轨迹分析  急刹车点覆盖物集合
+    private List<Marker> m_harshBreakingMarkerList = new ArrayList<>();
+    //轨迹分析  急转弯点覆盖物集合
+    private List<Marker> m_harshSteeringMarkerList = new ArrayList<>();
+    //轨迹分析  停留点覆盖物集合
+    private List<Marker> m_stayPointMarkerList = new ArrayList<>();
+    //是否查询超速点
+    private boolean m_isSpeeding = false;
+    //是否查询急加速点
+    private boolean m_isHarshAccel = false;
+    //是否查询急刹车点
+    private boolean m_isHarshBreaking = false;
+    //是否查询急转弯点
+    private boolean m_isHarshSteering = false;
+    //是否查询停留点
+    private boolean m_isStayPoint = false;
+    private int m_pageIndex = 1;
+    //轨迹分析上一次请求时间
+    private long m_lastQueryTime = 0;
 
     public static TrackQueryFragment newInstance(DeviceInfo deviceInfo)
     {
@@ -87,11 +147,7 @@ public class TrackQueryFragment extends Fragment implements View.OnClickListener
                 getFragmentManager().beginTransaction().replace(R.id.fragment_current, mapFragment, "mapFragment").commitNow();
                 break;
             case R.id.btn_query_trackQuery:
-                break;
-            case R.id.editText_beginTime_trackQuery:
-
-                break;
-            case R.id.editText_endTime_trackQuery:
+                QueryHistoryTrack();
                 break;
         }
     }
@@ -144,13 +200,233 @@ public class TrackQueryFragment extends Fragment implements View.OnClickListener
     {
         m_context = getContext();
         m_btnReturn = m_trackQueryView.findViewById(R.id.btn_return_trackQuery);
-        m_btnReturn.setOnClickListener(this);
+        m_btnReturn.setOnClickListener(this::onClick);
         m_editBegin = m_trackQueryView.findViewById(R.id.editText_beginTime_trackQuery);
-        m_editBegin.setOnFocusChangeListener(this);
+        m_editBegin.setOnFocusChangeListener(this::onFocusChange);
         m_editBegin.setInputType(InputType.TYPE_NULL);
         m_editend = m_trackQueryView.findViewById(R.id.editText_endTime_trackQuery);
-        m_editend.setOnFocusChangeListener(this);
+        m_editend.setOnFocusChangeListener(this::onFocusChange);
         m_editend.setInputType(InputType.TYPE_NULL);
+        m_btnQuery = m_trackQueryView.findViewById(R.id.btn_query_trackQuery);
+        m_btnQuery.setOnClickListener(this::onClick);
+        m_mapUtil = MapUtil.getInstance();
+        m_mapUtil.init(m_trackQueryView.findViewById(R.id.mapView_trackQuery));
+        m_trackApplication = (TrackApplication) m_context;
+        //设置地图中心
+        m_mapUtil.updateStatus(new LatLng(m_deviceInfo.getM_lat(), m_deviceInfo.getM_lot()), false);
+        InitListener();
+    }
+
+    private void InitListener()
+    {
+        m_onTrackListener = new OnTrackListener()
+        {
+            @Override
+            public void onHistoryTrackCallback(HistoryTrackResponse response)
+            {
+                int total = response.getTotal();
+                if(StatusCodes.SUCCESS != response.getStatus())
+                {
+                    m_viewUtil.showToast(getTargetFragment(), response.getMessage());
+                }
+                else if(0 == total)
+                {
+                    m_viewUtil.showToast(getTargetFragment(), "未查询到轨迹");
+                }
+                else
+                {
+                    List<TrackPoint> points = response.getTrackPoints();
+                    if(null != points)
+                    {
+                        for(TrackPoint trackPoint : points)
+                        {
+                            if(!CommonUtil.isZeroPoint(trackPoint.getLocation().getLatitude(), trackPoint.getLocation().getLongitude()))
+                            {
+                                m_trackPointList.add(MapUtil.convertTrace2Map(trackPoint.getLocation()));
+                            }
+                        }
+                    }
+                }
+
+                if(total > Constants.PAGE_SIZE * m_pageIndex)
+                {
+                    m_historyTrackRequest.setPageIndex(++m_pageIndex);
+                    //查询历史轨迹
+                    QueryHistoryTrack();
+                }
+                else
+                {
+                    m_mapUtil.drawHistoryTrack(m_trackPointList, SortType.asc);
+                }
+            }
+
+            @Override
+            public void onDistanceCallback(DistanceResponse response)
+            {
+                super.onDistanceCallback(response);
+            }
+
+            @Override
+            public void onLatestPointCallback(LatestPointResponse response)
+            {
+                super.onLatestPointCallback(response);
+            }
+        };
+
+        m_onAnalysisListener = new OnAnalysisListener()
+        {
+            @Override
+            public void onStayPointCallback(StayPointResponse response)
+            {
+                if(StatusCodes.SUCCESS != response.getStatus())
+                {
+                    m_lastQueryTime = 0;
+                    m_viewUtil.showToast(getTargetFragment(), response.getMessage());
+                    return;
+                }
+                if(0 == response.getStayPointNum())
+                {
+                    return;
+                }
+                m_stayPointList.addAll(response.getStayPoints());
+                handleOverlays(m_stayPointMarkerList, m_stayPointList, m_isStayPoint);
+            }
+
+            @Override
+            public void onDrivingBehaviorCallback(DrivingBehaviorResponse response)
+            {
+                if(StatusCodes.SUCCESS != response.getStatus())
+                {
+                    m_lastQueryTime = 0;
+                    m_viewUtil.showToast(getTargetFragment(), response.getMessage());
+                    return;
+                }
+
+                if(0 == response.getSpeedingNum() && 0 == response.getHarshAccelerationNum() && 0 == response.getHarshBreakingNum() && 0 == response.getHarshSteeringNum())
+                {
+                    return;
+                }
+
+                clearAnalysisList();
+                clearAnalysisOverlay();
+
+                List<SpeedingInfo> speedingInfos = response.getSpeedings();
+                for(SpeedingInfo info : speedingInfos)
+                {
+                    m_speedingPointList.addAll(info.getPoints());
+                }
+                m_harshAccelPointList.addAll(response.getHarshAccelerationPoints());
+                m_harshBreakingPointList.addAll(response.getHarshBreakingPoints());
+                m_harshSteeringPointList.addAll(response.getHarshSteeringPoints());
+
+                handleOverlays(m_speedingMarkerList, m_speedingPointList, m_isSpeeding);
+                handleOverlays(m_harshAccelMarkerList, m_harshAccelPointList, m_isHarshAccel);
+                handleOverlays(m_harshBreakingMarkerList, m_harshBreakingPointList, m_isHarshBreaking);
+                handleOverlays(m_harshSteeringMarkerList, m_harshSteeringPointList, m_isHarshSteering);
+            }
+        };
+    }
+
+    /**
+     * 清除驾驶行为分析覆盖物
+     */
+    public void clearAnalysisOverlay()
+    {
+        clearOverlays(m_speedingMarkerList);
+        clearOverlays(m_harshAccelMarkerList);
+        clearOverlays(m_harshBreakingMarkerList);
+        clearOverlays(m_stayPointMarkerList);
+    }
+
+    private void clearOverlays(List<Marker> markers)
+    {
+        if(null == markers)
+        {
+            return;
+        }
+        for(Marker marker : markers)
+        {
+            marker.remove();
+        }
+        markers.clear();
+    }
+
+    private void clearAnalysisList()
+    {
+        if(null != m_speedingPointList)
+        {
+            m_speedingPointList.clear();
+        }
+        if(null != m_harshAccelPointList)
+        {
+            m_harshAccelPointList.clear();
+        }
+        if(null != m_harshBreakingPointList)
+        {
+            m_harshBreakingPointList.clear();
+        }
+        if(null != m_harshSteeringPointList)
+        {
+            m_harshSteeringPointList.clear();
+        }
+    }
+
+    /**
+     * 处理轨迹分析覆盖物
+     *
+     * @param markers
+     * @param points
+     * @param isVisible
+     */
+    private void handleOverlays(List<Marker> markers, List<? extends com.baidu.trace.model.Point> points, boolean isVisible)
+    {
+        if(null == markers || null == points)
+        {
+            return;
+        }
+        for(com.baidu.trace.model.Point point : points)
+        {
+            OverlayOptions overlayOptions = new MarkerOptions().position(MapUtil.convertTrace2Map(point.getLocation())).icon(BitmapUtil.bmGcoding).zIndex(9).draggable(true);
+            Marker marker = (Marker) m_mapUtil.baiduMap.addOverlay(overlayOptions);
+            Bundle bundle = new Bundle();
+            marker.setExtraInfo(bundle);
+            markers.add(marker);
+        }
+        handleMarker(markers, isVisible);
+    }
+
+    /**
+     * 处理marker
+     *
+     * @param markers
+     * @param isVisible
+     */
+    private void handleMarker(List<Marker> markers, boolean isVisible)
+    {
+        if(null == markers || markers.isEmpty())
+        {
+            return;
+        }
+        for(Marker marker : markers)
+        {
+            marker.setVisible(isVisible);
+        }
+
+        if(markers.contains(m_analysisMarker))
+        {
+            m_mapUtil.baiduMap.hideInfoWindow();
+        }
+    }
+
+    private void QueryHistoryTrack()
+    {
+        m_trackApplication.initRequest(m_historyTrackRequest);
+        m_historyTrackRequest.setEntityName(m_trackApplication.entityName);
+        m_historyTrackRequest.setStartTime(m_startTime);
+        m_historyTrackRequest.setEndTime(m_endTime);
+        m_historyTrackRequest.setPageIndex(m_pageIndex);
+        m_historyTrackRequest.setPageSize(Constants.PAGE_SIZE);
+        m_trackApplication.mClient.queryHistoryTrack(m_historyTrackRequest, m_onTrackListener);
     }
 
     @Override

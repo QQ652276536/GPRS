@@ -1,6 +1,5 @@
 package com.zistone.blowdown_app.activity;
 
-import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -13,7 +12,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.zistone.blowdown_app.R;
-import com.zistone.blowdown_app.UserSharedPreference;
+import com.zistone.blowdown_app.util.UserSharedPreference;
 import com.zistone.blowdown_app.fragment.DeviceAddFragment;
 import com.zistone.blowdown_app.fragment.DeviceFragment;
 import com.zistone.blowdown_app.fragment.DeviceListFragment;
