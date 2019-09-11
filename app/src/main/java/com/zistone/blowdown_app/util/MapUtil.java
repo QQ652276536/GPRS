@@ -1,12 +1,15 @@
 package com.zistone.blowdown_app.util;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.os.Bundle;
-import android.text.TextUtils;
+import android.util.DisplayMetrics;
+import android.view.WindowManager;
 
 import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.BitmapDescriptor;
+import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.MapStatus;
 import com.baidu.mapapi.map.MapStatusUpdate;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
@@ -22,15 +25,9 @@ import com.baidu.mapapi.utils.CoordinateConverter;
 import com.baidu.trace.model.CoordType;
 import com.baidu.trace.model.SortType;
 import com.baidu.trace.model.TraceLocation;
-import com.zistone.blowdown_app.TrackApplication;
-import com.zistone.blowdown_app.entity.CurrentLocation;
-import com.zistone.blowdown_app.entity.DeviceInfo;
+import com.zistone.blowdown_app.R;
 
 import java.util.List;
-
-import static com.zistone.blowdown_app.util.BitmapUtil.bmArrowPoint;
-import static com.zistone.blowdown_app.util.BitmapUtil.bmEnd;
-import static com.zistone.blowdown_app.util.BitmapUtil.bmStart;
 
 public class MapUtil
 {
@@ -161,7 +158,14 @@ public class MapUtil
         return new LatLng(traceLatLng.latitude, traceLatLng.longitude);
     }
 
-    public void updateStatus(LatLng currentPoint, boolean showMarker)
+    /**
+     * 更新地图状态
+     *
+     * @param currentPoint
+     * @param showMarker
+     * @param context
+     */
+    public void UpdateStatus(LatLng currentPoint, boolean showMarker, Context context)
     {
         if(null == baiduMap || null == currentPoint)
         {
@@ -170,24 +174,41 @@ public class MapUtil
 
         if(null != baiduMap.getProjection())
         {
+            //获取屏幕尺寸
+            int screenHeight = getMetrics(context).heightPixels;
+            int screenWidth = getMetrics(context).widthPixels;
             Point screenPoint = baiduMap.getProjection().toScreenLocation(currentPoint);
             // 点在屏幕上的坐标超过限制范围，则重新聚焦底图
-            if(screenPoint.y < 200 || screenPoint.y > TrackApplication.screenHeight - 500 || screenPoint.x < 200 || screenPoint.x > TrackApplication.screenWidth - 200 || null == mapStatus)
+            if(screenPoint.y < 200 || screenPoint.y > screenHeight - 500 || screenPoint.x < 200 || screenPoint.x > screenWidth - 200 || null == mapStatus)
             {
                 animateMapStatus(currentPoint, 15.0f);
             }
         }
+        //第一次定位时，聚焦底图
         else if(null == mapStatus)
         {
-            // 第一次定位时，聚焦底图
             setMapStatus(currentPoint, 15.0f);
         }
-
+        //显示图标
         if(showMarker)
         {
             addMarker(currentPoint);
         }
 
+    }
+
+    /**
+     * 获取当前屏幕的尺寸大小
+     *
+     * @param context
+     * @return
+     */
+    public DisplayMetrics getMetrics(Context context)
+    {
+        DisplayMetrics metrics = new DisplayMetrics();
+        WindowManager manager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        manager.getDefaultDisplay().getMetrics(metrics);
+        return metrics;
     }
 
     public Marker addOverlay(LatLng currentPoint, BitmapDescriptor icon, Bundle bundle)
@@ -208,7 +229,7 @@ public class MapUtil
     {
         if(null == mMoveMarker)
         {
-            mMoveMarker = addOverlay(currentPoint, BitmapUtil.bmArrowPoint, null);
+            mMoveMarker = addOverlay(currentPoint, BitmapDescriptorFactory.fromResource(R.drawable.icon_mark), null);
             return;
         }
 
@@ -272,7 +293,7 @@ public class MapUtil
 
         if(points.size() == 1)
         {
-            OverlayOptions startOptions = new MarkerOptions().position(points.get(0)).icon(bmStart).zIndex(9).draggable(true);
+            OverlayOptions startOptions = new MarkerOptions().position(points.get(0)).icon(BitmapDescriptorFactory.fromResource(R.drawable.icon_mark)).zIndex(9).draggable(true);
             baiduMap.addOverlay(startOptions);
             animateMapStatus(points.get(0), 18.0f);
             return;
@@ -292,9 +313,9 @@ public class MapUtil
         }
 
         // 添加起点图标
-        OverlayOptions startOptions = new MarkerOptions().position(startPoint).icon(bmStart).zIndex(9).draggable(true);
+        OverlayOptions startOptions = new MarkerOptions().position(startPoint).icon(BitmapDescriptorFactory.fromResource(R.drawable.icon_start)).zIndex(9).draggable(true);
         // 添加终点图标
-        OverlayOptions endOptions = new MarkerOptions().position(endPoint).icon(bmEnd).zIndex(9).draggable(true);
+        OverlayOptions endOptions = new MarkerOptions().position(endPoint).icon(BitmapDescriptorFactory.fromResource(R.drawable.icon_end)).zIndex(9).draggable(true);
 
         // 添加路线（轨迹）
         OverlayOptions polylineOptions = new PolylineOptions().width(10).color(Color.BLUE).points(points);
@@ -303,7 +324,7 @@ public class MapUtil
         baiduMap.addOverlay(endOptions);
         polylineOverlay = baiduMap.addOverlay(polylineOptions);
 
-        OverlayOptions markerOptions = new MarkerOptions().flat(true).anchor(0.5f, 0.5f).icon(bmArrowPoint).position(points.get(points.size() - 1)).rotate((float) CommonUtil.getAngle(points.get(0), points.get(1)));
+        OverlayOptions markerOptions = new MarkerOptions().flat(true).anchor(0.5f, 0.5f).icon(BitmapDescriptorFactory.fromResource(R.drawable.icon_point)).position(points.get(points.size() - 1)).rotate((float) CommonUtil.getAngle(points.get(0), points.get(1)));
         mMoveMarker = (Marker) baiduMap.addOverlay(markerOptions);
 
         animateMapStatus(points);

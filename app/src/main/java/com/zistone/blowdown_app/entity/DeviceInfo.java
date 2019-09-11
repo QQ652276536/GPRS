@@ -13,12 +13,6 @@ import java.util.Date;
 
 public class DeviceInfo implements Parcelable
 {
-    @Override
-    public String toString()
-    {
-        return "DeviceInfo{" + "m_id=" + m_id + ", m_deviceId='" + m_deviceId + '\'' + ", m_sim=" + m_sim + ", m_name='" + m_name + '\'' + ", m_type='" + m_type + '\'' + ", m_state=" + m_state + ", m_lat=" + m_lat + ", m_lot=" + m_lot + ", m_height=" + m_height + ", m_createTime=" + m_createTime + ", m_updateTime=" + m_updateTime + ", m_comment='" + m_comment + '\'' + ", m_akCode='" + m_akCode + '\'' + '}';
-    }
-
     public static final Creator<DeviceInfo> CREATOR = new Creator<DeviceInfo>()
     {
         @Override
@@ -119,6 +113,42 @@ public class DeviceInfo implements Parcelable
      * 鉴权码,注册成功后才有,由Web服务随机生成
      */
     private String m_akCode;
+
+    @Override
+    public String toString()
+    {
+        return "DeviceInfo{" + "m_id=" + m_id + ", m_deviceId='" + m_deviceId + '\'' + ", m_sim=" + m_sim + ", m_name='" + m_name + '\'' + ", m_type='" + m_type + '\'' + ", m_state=" + m_state + ", m_lat=" + m_lat + ", m_lot=" + m_lot + ", m_height=" + m_height + ", m_createTime=" + m_createTime + ", m_updateTime=" + m_updateTime + ", m_comment='" + m_comment + '\'' + ", m_akCode='" + m_akCode + '\'' + '}';
+    }
+
+    @Override
+    public int describeContents()
+    {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags)
+    {
+        dest.writeInt(m_id);
+        dest.writeString(m_name);
+        dest.writeString(m_type);
+        dest.writeDouble(m_lat);
+        dest.writeDouble(m_lot);
+        dest.writeInt(m_state);
+        dest.writeString(m_deviceId);
+        dest.writeInt(m_sim);
+        dest.writeString(m_comment);
+        if(null != m_createTime)
+        {
+            dest.writeString(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(m_createTime));
+        }
+        if(null != m_updateTime)
+        {
+            dest.writeString(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(m_updateTime));
+        }
+        dest.writeString(m_akCode);
+        dest.writeDouble(m_height);
+    }
 
     public int getM_id()
     {
@@ -248,29 +278,5 @@ public class DeviceInfo implements Parcelable
     public void setM_comment(String m_comment)
     {
         this.m_comment = m_comment;
-    }
-
-    @Override
-    public int describeContents()
-    {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags)
-    {
-        dest.writeInt(m_id);
-        dest.writeString(m_name);
-        dest.writeString(m_type);
-        dest.writeDouble(m_lat);
-        dest.writeDouble(m_lot);
-        dest.writeInt(m_state);
-        dest.writeString(m_deviceId);
-        dest.writeInt(m_sim);
-        dest.writeString(m_comment);
-        dest.writeString(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(m_createTime));
-        dest.writeString(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(m_updateTime));
-        dest.writeString(m_akCode);
-        dest.writeDouble(m_height);
     }
 }

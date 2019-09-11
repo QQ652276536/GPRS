@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.baidu.mapapi.model.LatLng;
-import com.zistone.blowdown_app.TrackApplication;
 import com.zistone.blowdown_app.entity.CurrentLocation;
 
 import java.sql.Timestamp;
@@ -199,22 +198,6 @@ public class CommonUtil
         }
         double radio = Math.atan(slope);
         return 180 * (radio / Math.PI) + deltAngle - 90;
-    }
-
-    /**
-     * 保存当前定位点
-     */
-    public static void saveCurrentLocation(TrackApplication trackApp)
-    {
-        SharedPreferences.Editor editor = trackApp.trackConf.edit();
-        StringBuffer locationInfo = new StringBuffer();
-        locationInfo.append(CurrentLocation.m_time);
-        locationInfo.append(";");
-        locationInfo.append(CurrentLocation.m_lat);
-        locationInfo.append(";");
-        locationInfo.append(CurrentLocation.m_lot);
-        editor.putString(Constants.LAST_LOCATION, locationInfo.toString());
-        editor.apply();
     }
 
     /**
