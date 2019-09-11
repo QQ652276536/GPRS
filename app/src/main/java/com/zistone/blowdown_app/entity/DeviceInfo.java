@@ -34,7 +34,7 @@ public class DeviceInfo implements Parcelable
                 deviceInfo.setM_createTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(bundle.getString("m_createTime")));
                 deviceInfo.setM_updateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(bundle.getString("m_updateTime")));
             }
-            catch(ParseException e)
+            catch (ParseException e)
             {
                 e.printStackTrace();
             }
@@ -138,13 +138,21 @@ public class DeviceInfo implements Parcelable
         dest.writeString(m_deviceId);
         dest.writeInt(m_sim);
         dest.writeString(m_comment);
-        if(null != m_createTime)
+        if (null != m_createTime)
         {
             dest.writeString(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(m_createTime));
         }
-        if(null != m_updateTime)
+        else
+        {
+            dest.writeString(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+        }
+        if (null != m_updateTime)
         {
             dest.writeString(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(m_updateTime));
+        }
+        else
+        {
+            dest.writeString(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
         }
         dest.writeString(m_akCode);
         dest.writeDouble(m_height);

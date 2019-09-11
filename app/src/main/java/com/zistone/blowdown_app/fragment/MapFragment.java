@@ -763,9 +763,6 @@ public class MapFragment extends Fragment implements BaiduMap.OnMapClickListener
                 }
                 break;
             case R.id.btn_locus_baidu:
-                m_deviceInfo = new DeviceInfo();
-                m_deviceInfo.setM_lat(22.541685);
-                m_deviceInfo.setM_lot(113.939301);
                 if(null != m_deviceInfo)
                                 {
                     TrackQueryFragment trackQueryFragment = TrackQueryFragment.newInstance(m_deviceInfo);

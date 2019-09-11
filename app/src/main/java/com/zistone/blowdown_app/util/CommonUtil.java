@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.baidu.mapapi.model.LatLng;
-import com.zistone.blowdown_app.entity.CurrentLocation;
 
 import java.sql.Timestamp;
 import java.text.DecimalFormat;

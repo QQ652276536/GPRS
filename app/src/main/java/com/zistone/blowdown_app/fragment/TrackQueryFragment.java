@@ -54,9 +54,11 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
@@ -91,8 +93,6 @@ public class TrackQueryFragment extends Fragment implements View.OnClickListener
     private String m_startStr;
     //查询轨迹的结束时间
     private String m_endStr;
-    //轨迹点集合
-    private List<LatLng> m_trackPointList = new ArrayList<>();
 
     public static TrackQueryFragment newInstance(DeviceInfo deviceInfo)
     {
@@ -109,14 +109,14 @@ public class TrackQueryFragment extends Fragment implements View.OnClickListener
         //隐藏键盘
         InputMethodManager imm = (InputMethodManager) v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(v.getApplicationWindowToken(), 0);
-        switch(v.getId())
+        switch (v.getId())
         {
             case R.id.btn_return_trackQuery:
                 MapFragment mapFragment = MapFragment.newInstance(m_deviceInfo);
                 getFragmentManager().beginTransaction().replace(R.id.fragment_current, mapFragment, "mapFragment").commitNow();
                 break;
             case R.id.btn_query_trackQuery:
-                DrawHistoryTrack();
+                QueryHistoryTrack();
                 break;
         }
     }
@@ -128,10 +128,10 @@ public class TrackQueryFragment extends Fragment implements View.OnClickListener
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH);
         int day = calendar.get(Calendar.DAY_OF_MONTH);
-        switch(v.getId())
+        switch (v.getId())
         {
             case R.id.editText_beginTime_trackQuery:
-                if(hasFocus)
+                if (hasFocus)
                 {
                     DatePickerDialog.OnDateSetListener onDateSetListener = (view, y, m, d) -> m_editBegin.setText(y + "-" + m + 1 + "-" + d);
                     DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(), onDateSetListener, year, month, day);
@@ -139,7 +139,7 @@ public class TrackQueryFragment extends Fragment implements View.OnClickListener
                 }
                 break;
             case R.id.editText_endTime_trackQuery:
-                if(hasFocus)
+                if (hasFocus)
                 {
                     DatePickerDialog.OnDateSetListener onDateSetListener = (view, y, m, d) -> m_editend.setText(y + "-" + m + 1 + "-" + d);
                     DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(), onDateSetListener, year, month, day);
@@ -159,7 +159,7 @@ public class TrackQueryFragment extends Fragment implements View.OnClickListener
 
     public void onButtonPressed(Uri uri)
     {
-        if(mListener != null)
+        if (mListener != null)
         {
             mListener.onFragmentInteraction(uri);
         }
@@ -168,7 +168,7 @@ public class TrackQueryFragment extends Fragment implements View.OnClickListener
     public void InitView()
     {
         m_context = getContext();
-        URL = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/LocationInfo/InsertList";
+        URL = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/LocationInfo/FindByDeviceId";
         m_btnReturn = m_trackQueryView.findViewById(R.id.btn_return_trackQuery);
         m_btnReturn.setOnClickListener(this::onClick);
         m_editBegin = m_trackQueryView.findViewById(R.id.editText_beginTime_trackQuery);
@@ -192,7 +192,7 @@ public class TrackQueryFragment extends Fragment implements View.OnClickListener
         public void handleMessage(Message message)
         {
             super.handleMessage(message);
-            switch(message.what)
+            switch (message.what)
             {
                 case MESSAGE_RREQUEST_FAIL:
                 {
@@ -203,10 +203,21 @@ public class TrackQueryFragment extends Fragment implements View.OnClickListener
                 case MESSAGE_RESPONSE_SUCCESS:
                 {
                     String result = (String) message.obj;
-                    if(null == result || "".equals(result))
+                    if (null == result || "".equals(result))
                     {
                         return;
                     }
+                    List<LocationInfo> locationList = JSON.parseArray(result, LocationInfo.class);
+                    List<LatLng> trackPointList = new ArrayList<>();
+                    if (null != locationList)
+                    {
+                        for (LocationInfo locationInfo : locationList)
+                        {
+                            trackPointList.add(MapUtil.convertTrace2Map(new com.baidu.trace.model.LatLng(locationInfo.getM_lat(), locationInfo.getM_lot())));
+                        }
+                    }
+                    //绘制历史轨迹
+                    m_mapUtil.drawHistoryTrack(trackPointList, SortType.asc);
                     break;
                 }
                 case MESSAGE_RESPONSE_FAIL:
@@ -221,27 +232,16 @@ public class TrackQueryFragment extends Fragment implements View.OnClickListener
         }
     };
 
-    private void DrawHistoryTrack()
+    private void QueryHistoryTrack()
     {
         m_startStr = m_editBegin.getText().toString();
         m_endStr = m_editend.getText().toString();
-        //TODO:获取位置记录
-        List<LocationInfo> locationList = ReadFile();
-        if(null != locationList)
-        {
-            for(LocationInfo locationInfo : locationList)
-            {
-                m_trackPointList.add(MapUtil.convertTrace2Map(new com.baidu.trace.model.LatLng(locationInfo.getM_lat(), locationInfo.getM_lot())));
-            }
-        }
-        String jsonData = JSON.toJSONString(locationList);
-        int a = 1;
         new Thread(() ->
         {
             Looper.prepare();
             //实例化并设置连接超时时间、读取超时时间
             OkHttpClient okHttpClient = new OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS).readTimeout(10, TimeUnit.SECONDS).build();
-            RequestBody requestBody = FormBody.create(jsonData, MediaType.parse("application/json; charset=utf-8"));
+            RequestBody requestBody = FormBody.create("", MediaType.parse("application/json; charset=utf-8"));
             //创建Post请求的方式
             Request request = new Request.Builder().post(requestBody).url(URL).build();
             Call call = okHttpClient.newCall(request);
@@ -261,7 +261,7 @@ public class TrackQueryFragment extends Fragment implements View.OnClickListener
                 {
                     String responseStr = response.body().string();
                     Log.i(TAG, "响应内容:" + responseStr);
-                    if(response.isSuccessful())
+                    if (response.isSuccessful())
                     {
                         Message message = handler.obtainMessage(MESSAGE_RESPONSE_SUCCESS, responseStr);
                         handler.sendMessage(message);
@@ -275,79 +275,6 @@ public class TrackQueryFragment extends Fragment implements View.OnClickListener
             });
             Looper.loop();
         }).start();
-        //绘制历史轨迹
-        //m_mapUtil.drawHistoryTrack(m_trackPointList, SortType.asc);
-        m_mapUtil.drawHistoryTrack(m_trackPointList, SortType.asc);
-    }
-
-    private List<LocationInfo> ReadFile()
-    {
-        List<LocationInfo> list = new ArrayList<>();
-        InputStream inputStream = m_context.getClassLoader().getResourceAsStream("assets/gprs_info.txt");
-        InputStreamReader inputStreamReader = null;
-        BufferedReader bufferedReader = null;
-        try
-        {
-            inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
-            bufferedReader = new BufferedReader(inputStreamReader);
-            //过滤空行
-            Stream<String> streams = bufferedReader.lines().filter(p -> p != null && !"".equals(p) && p.contains("L"));
-            String[] array = streams.toArray(String[]::new);
-            for(String line : array)
-            {
-                String[] strArray1 = line.split("L");
-                //设备编号
-                String deviceId = strArray1[0].trim();
-                String[] tempArray1 = strArray1[1].split("  ");
-                //时间
-                String time1 = tempArray1[1];
-                String time2 = tempArray1[2];
-                //经纬度
-                try
-                {
-                    String latStr = tempArray1[3].trim();
-                    double lat = Double.valueOf(latStr);
-                    String lotStr = tempArray1[4].trim();
-                    double lot = Double.valueOf(lotStr);
-                    //TODO:其它参数不知道什么意思
-                    if(lat != 0.0 && lot != 0.0)
-                    {
-                        LocationInfo locationInfo = new LocationInfo();
-                        locationInfo.setM_lat(lat);
-                        locationInfo.setM_lot(lot);
-                        list.add(locationInfo);
-                    }
-                }
-                catch(Exception e)
-                {
-                    e.printStackTrace();
-                    continue;
-                }
-            }
-        }
-        catch(Exception e)
-        {
-            e.printStackTrace();
-        }
-        finally
-        {
-            try
-            {
-                if(null != bufferedReader)
-                {
-                    bufferedReader.close();
-                }
-                if(null != inputStreamReader)
-                {
-                    inputStreamReader.close();
-                }
-            }
-            catch(IOException e)
-            {
-                e.printStackTrace();
-            }
-        }
-        return list;
     }
 
     @Override
@@ -360,7 +287,7 @@ public class TrackQueryFragment extends Fragment implements View.OnClickListener
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        if(getArguments() != null)
+        if (getArguments() != null)
         {
             m_deviceInfo = getArguments().getParcelable("DEVICEINFO");
         }
@@ -378,7 +305,7 @@ public class TrackQueryFragment extends Fragment implements View.OnClickListener
     public void onAttach(Context context)
     {
         super.onAttach(context);
-        if(context instanceof OnFragmentInteractionListener)
+        if (context instanceof OnFragmentInteractionListener)
         {
             mListener = (OnFragmentInteractionListener) context;
         }
