@@ -54,11 +54,13 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
@@ -78,6 +80,7 @@ public class TrackQueryFragment extends Fragment implements View.OnClickListener
     private static final int MESSAGE_RREQUEST_FAIL = 1;
     private static final int MESSAGE_RESPONSE_FAIL = 2;
     private static final int MESSAGE_RESPONSE_SUCCESS = 3;
+    private static final SimpleDateFormat SIMPLEDATEFORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static String URL;
     private Context m_context;
     private View m_trackQueryView;
@@ -111,12 +114,23 @@ public class TrackQueryFragment extends Fragment implements View.OnClickListener
         imm.hideSoftInputFromWindow(v.getApplicationWindowToken(), 0);
         switch (v.getId())
         {
+            case R.id.editText_beginTime_trackQuery:
+                break;
+            case R.id.editText_endTime_trackQuery:
+                break;
             case R.id.btn_return_trackQuery:
                 MapFragment mapFragment = MapFragment.newInstance(m_deviceInfo);
                 getFragmentManager().beginTransaction().replace(R.id.fragment_current, mapFragment, "mapFragment").commitNow();
                 break;
             case R.id.btn_query_trackQuery:
-                QueryHistoryTrack();
+                try
+                {
+                    QueryHistoryTrack();
+                }
+                catch (ParseException e)
+                {
+                    e.printStackTrace();
+                }
                 break;
         }
     }
@@ -126,24 +140,26 @@ public class TrackQueryFragment extends Fragment implements View.OnClickListener
     {
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH);
+        int month = calendar.get(Calendar.MONTH) + 1;
         int day = calendar.get(Calendar.DAY_OF_MONTH);
         switch (v.getId())
         {
             case R.id.editText_beginTime_trackQuery:
                 if (hasFocus)
                 {
-                    DatePickerDialog.OnDateSetListener onDateSetListener = (view, y, m, d) -> m_editBegin.setText(y + "-" + m + 1 + "-" + d);
+                    DatePickerDialog.OnDateSetListener onDateSetListener = (view, y, m, d) -> m_editBegin.setText(y + "-" + m + "-" + d);
                     DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(), onDateSetListener, year, month, day);
                     datePickerDialog.show();
+                    m_editBegin.clearFocus();
                 }
                 break;
             case R.id.editText_endTime_trackQuery:
                 if (hasFocus)
                 {
-                    DatePickerDialog.OnDateSetListener onDateSetListener = (view, y, m, d) -> m_editend.setText(y + "-" + m + 1 + "-" + d);
+                    DatePickerDialog.OnDateSetListener onDateSetListener = (view, y, m, d) -> m_editend.setText(y + "-" + m + "-" + d);
                     DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(), onDateSetListener, year, month, day);
                     datePickerDialog.show();
+                    m_editend.clearFocus();
                 }
                 break;
         }
@@ -168,7 +184,7 @@ public class TrackQueryFragment extends Fragment implements View.OnClickListener
     public void InitView()
     {
         m_context = getContext();
-        URL = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/LocationInfo/FindByDeviceId";
+        URL = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/LocationInfo/FindByDeviceIdAndBetweenTime";
         m_btnReturn = m_trackQueryView.findViewById(R.id.btn_return_trackQuery);
         m_btnReturn.setOnClickListener(this::onClick);
         m_editBegin = m_trackQueryView.findViewById(R.id.editText_beginTime_trackQuery);
@@ -205,6 +221,7 @@ public class TrackQueryFragment extends Fragment implements View.OnClickListener
                     String result = (String) message.obj;
                     if (null == result || "".equals(result))
                     {
+                        m_mapUtil.clear();
                         return;
                     }
                     List<LocationInfo> locationList = JSON.parseArray(result, LocationInfo.class);
@@ -232,16 +249,23 @@ public class TrackQueryFragment extends Fragment implements View.OnClickListener
         }
     };
 
-    private void QueryHistoryTrack()
+    private void QueryHistoryTrack() throws ParseException
     {
-        m_startStr = m_editBegin.getText().toString();
-        m_endStr = m_editend.getText().toString();
+        m_startStr = m_editBegin.getText() + " 00:00:00";
+        m_endStr = m_editend.getText() + " 23:59:59";
+        Date startDate = SIMPLEDATEFORMAT.parse(m_startStr);
+        Date endDate = SIMPLEDATEFORMAT.parse(m_endStr);
         new Thread(() ->
         {
             Looper.prepare();
             //实例化并设置连接超时时间、读取超时时间
             OkHttpClient okHttpClient = new OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS).readTimeout(10, TimeUnit.SECONDS).build();
-            RequestBody requestBody = FormBody.create("", MediaType.parse("application/json; charset=utf-8"));
+            //RequestBody requestBody = FormBody.create("", MediaType.parse("application/json; charset=utf-8"));
+            FormBody.Builder builder = new FormBody.Builder();
+            builder.add("deviceId", m_deviceInfo.getM_deviceId());
+            builder.add("startTime", startDate.getTime() + "");
+            builder.add("endTime", endDate.getTime() + "");
+            RequestBody requestBody = builder.build();
             //创建Post请求的方式
             Request request = new Request.Builder().post(requestBody).url(URL).build();
             Call call = okHttpClient.newCall(request);
