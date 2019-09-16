@@ -145,21 +145,21 @@ public class TrackQueryFragment extends Fragment implements View.OnClickListener
         switch (v.getId())
         {
             case R.id.editText_beginTime_trackQuery:
+                m_editend.clearFocus();
                 if (hasFocus)
                 {
                     DatePickerDialog.OnDateSetListener onDateSetListener = (view, y, m, d) -> m_editBegin.setText(y + "-" + m + "-" + d);
                     DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(), onDateSetListener, year, month, day);
                     datePickerDialog.show();
-                    m_editBegin.clearFocus();
                 }
                 break;
             case R.id.editText_endTime_trackQuery:
+                m_editBegin.clearFocus();
                 if (hasFocus)
                 {
                     DatePickerDialog.OnDateSetListener onDateSetListener = (view, y, m, d) -> m_editend.setText(y + "-" + m + "-" + d);
                     DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(), onDateSetListener, year, month, day);
                     datePickerDialog.show();
-                    m_editend.clearFocus();
                 }
                 break;
         }
