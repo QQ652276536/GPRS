@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -74,7 +75,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class TrackQueryFragment extends Fragment implements View.OnClickListener, View.OnFocusChangeListener
+public class TrackQueryFragment extends Fragment implements View.OnClickListener
 {
     private static final String TAG = "TrackQueryFragment";
     private static final int MESSAGE_RREQUEST_FAIL = 1;
@@ -109,15 +110,31 @@ public class TrackQueryFragment extends Fragment implements View.OnClickListener
     @Override
     public void onClick(View v)
     {
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
         //隐藏键盘
         InputMethodManager imm = (InputMethodManager) v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(v.getApplicationWindowToken(), 0);
-        switch (v.getId())
+        switch(v.getId())
         {
             case R.id.editText_beginTime_trackQuery:
+            {
+                m_editend.clearFocus();
+                DatePickerDialog.OnDateSetListener onDateSetListener = (view, y, m, d) -> m_editBegin.setText(y + "-" + ++m + "-" + d);
+                DatePickerDialog datePickerDialog = new DatePickerDialog(m_context, onDateSetListener, year, month, day);
+                datePickerDialog.show();
                 break;
+            }
             case R.id.editText_endTime_trackQuery:
+            {
+                m_editBegin.clearFocus();
+                DatePickerDialog.OnDateSetListener onDateSetListener = (view, y, m, d) -> m_editend.setText(y + "-" + ++m + "-" + d);
+                DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(), onDateSetListener, year, month, day);
+                datePickerDialog.show();
                 break;
+            }
             case R.id.btn_return_trackQuery:
                 MapFragment mapFragment = MapFragment.newInstance(m_deviceInfo);
                 getFragmentManager().beginTransaction().replace(R.id.fragment_current, mapFragment, "mapFragment").commitNow();
@@ -127,39 +144,9 @@ public class TrackQueryFragment extends Fragment implements View.OnClickListener
                 {
                     QueryHistoryTrack();
                 }
-                catch (ParseException e)
+                catch(ParseException e)
                 {
                     e.printStackTrace();
-                }
-                break;
-        }
-    }
-
-    @Override
-    public void onFocusChange(View v, boolean hasFocus)
-    {
-        Calendar calendar = Calendar.getInstance();
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH) + 1;
-        int day = calendar.get(Calendar.DAY_OF_MONTH);
-        switch (v.getId())
-        {
-            case R.id.editText_beginTime_trackQuery:
-                m_editend.clearFocus();
-                if (hasFocus)
-                {
-                    DatePickerDialog.OnDateSetListener onDateSetListener = (view, y, m, d) -> m_editBegin.setText(y + "-" + m + "-" + d);
-                    DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(), onDateSetListener, year, month, day);
-                    datePickerDialog.show();
-                }
-                break;
-            case R.id.editText_endTime_trackQuery:
-                m_editBegin.clearFocus();
-                if (hasFocus)
-                {
-                    DatePickerDialog.OnDateSetListener onDateSetListener = (view, y, m, d) -> m_editend.setText(y + "-" + m + "-" + d);
-                    DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(), onDateSetListener, year, month, day);
-                    datePickerDialog.show();
                 }
                 break;
         }
@@ -175,7 +162,7 @@ public class TrackQueryFragment extends Fragment implements View.OnClickListener
 
     public void onButtonPressed(Uri uri)
     {
-        if (mListener != null)
+        if(mListener != null)
         {
             mListener.onFragmentInteraction(uri);
         }
@@ -188,10 +175,10 @@ public class TrackQueryFragment extends Fragment implements View.OnClickListener
         m_btnReturn = m_trackQueryView.findViewById(R.id.btn_return_trackQuery);
         m_btnReturn.setOnClickListener(this::onClick);
         m_editBegin = m_trackQueryView.findViewById(R.id.editText_beginTime_trackQuery);
-        m_editBegin.setOnFocusChangeListener(this::onFocusChange);
+        m_editBegin.setOnClickListener(this::onClick);
         m_editBegin.setInputType(InputType.TYPE_NULL);
         m_editend = m_trackQueryView.findViewById(R.id.editText_endTime_trackQuery);
-        m_editend.setOnFocusChangeListener(this::onFocusChange);
+        m_editend.setOnClickListener(this::onClick);
         m_editend.setInputType(InputType.TYPE_NULL);
         m_btnQuery = m_trackQueryView.findViewById(R.id.btn_query_trackQuery);
         m_btnQuery.setOnClickListener(this::onClick);
@@ -208,7 +195,7 @@ public class TrackQueryFragment extends Fragment implements View.OnClickListener
         public void handleMessage(Message message)
         {
             super.handleMessage(message);
-            switch (message.what)
+            switch(message.what)
             {
                 case MESSAGE_RREQUEST_FAIL:
                 {
@@ -219,16 +206,16 @@ public class TrackQueryFragment extends Fragment implements View.OnClickListener
                 case MESSAGE_RESPONSE_SUCCESS:
                 {
                     String result = (String) message.obj;
-                    if (null == result || "".equals(result))
+                    if(null == result || "".equals(result))
                     {
                         m_mapUtil.clear();
                         return;
                     }
                     List<LocationInfo> locationList = JSON.parseArray(result, LocationInfo.class);
                     List<LatLng> trackPointList = new ArrayList<>();
-                    if (null != locationList)
+                    if(null != locationList)
                     {
-                        for (LocationInfo locationInfo : locationList)
+                        for(LocationInfo locationInfo : locationList)
                         {
                             trackPointList.add(MapUtil.convertTrace2Map(new com.baidu.trace.model.LatLng(locationInfo.getM_lat(), locationInfo.getM_lot())));
                         }
@@ -285,7 +272,7 @@ public class TrackQueryFragment extends Fragment implements View.OnClickListener
                 {
                     String responseStr = response.body().string();
                     Log.i(TAG, "响应内容:" + responseStr);
-                    if (response.isSuccessful())
+                    if(response.isSuccessful())
                     {
                         Message message = handler.obtainMessage(MESSAGE_RESPONSE_SUCCESS, responseStr);
                         handler.sendMessage(message);
@@ -311,7 +298,7 @@ public class TrackQueryFragment extends Fragment implements View.OnClickListener
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null)
+        if(getArguments() != null)
         {
             m_deviceInfo = getArguments().getParcelable("DEVICEINFO");
         }
@@ -329,7 +316,7 @@ public class TrackQueryFragment extends Fragment implements View.OnClickListener
     public void onAttach(Context context)
     {
         super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener)
+        if(context instanceof OnFragmentInteractionListener)
         {
             mListener = (OnFragmentInteractionListener) context;
         }
