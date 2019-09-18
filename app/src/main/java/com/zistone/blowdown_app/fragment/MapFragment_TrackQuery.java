@@ -89,7 +89,7 @@ public class MapFragment_TrackQuery extends Fragment implements View.OnClickList
         //隐藏键盘
         InputMethodManager imm = (InputMethodManager) v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(v.getApplicationWindowToken(), 0);
-        switch(v.getId())
+        switch (v.getId())
         {
             case R.id.editText_beginTime_trackQuery:
             {
@@ -116,7 +116,7 @@ public class MapFragment_TrackQuery extends Fragment implements View.OnClickList
                 {
                     QueryHistoryTrack();
                 }
-                catch(ParseException e)
+                catch (ParseException e)
                 {
                     e.printStackTrace();
                 }
@@ -134,7 +134,7 @@ public class MapFragment_TrackQuery extends Fragment implements View.OnClickList
 
     public void onButtonPressed(Uri uri)
     {
-        if(mListener != null)
+        if (mListener != null)
         {
             mListener.onFragmentInteraction(uri);
         }
@@ -167,7 +167,7 @@ public class MapFragment_TrackQuery extends Fragment implements View.OnClickList
         public void handleMessage(Message message)
         {
             super.handleMessage(message);
-            switch(message.what)
+            switch (message.what)
             {
                 case MESSAGE_RREQUEST_FAIL:
                 {
@@ -178,16 +178,16 @@ public class MapFragment_TrackQuery extends Fragment implements View.OnClickList
                 case MESSAGE_RESPONSE_SUCCESS:
                 {
                     String result = (String) message.obj;
-                    if(null == result || "".equals(result))
+                    if (null == result || "".equals(result))
                     {
                         m_mapUtil.clear();
                         return;
                     }
                     List<LocationInfo> locationList = JSON.parseArray(result, LocationInfo.class);
                     List<LatLng> trackPointList = new ArrayList<>();
-                    if(null != locationList)
+                    if (null != locationList)
                     {
-                        for(LocationInfo locationInfo : locationList)
+                        for (LocationInfo locationInfo : locationList)
                         {
                             trackPointList.add(MapUtil.convertTrace2Map(new com.baidu.trace.model.LatLng(locationInfo.getM_lat(), locationInfo.getM_lot())));
                         }
@@ -244,7 +244,7 @@ public class MapFragment_TrackQuery extends Fragment implements View.OnClickList
                 {
                     String responseStr = response.body().string();
                     Log.i(TAG, "响应内容:" + responseStr);
-                    if(response.isSuccessful())
+                    if (response.isSuccessful())
                     {
                         Message message = handler.obtainMessage(MESSAGE_RESPONSE_SUCCESS, responseStr);
                         handler.sendMessage(message);
@@ -270,7 +270,7 @@ public class MapFragment_TrackQuery extends Fragment implements View.OnClickList
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        if(getArguments() != null)
+        if (getArguments() != null)
         {
             m_deviceInfo = getArguments().getParcelable("DEVICEINFO");
         }
@@ -288,7 +288,7 @@ public class MapFragment_TrackQuery extends Fragment implements View.OnClickList
     public void onAttach(Context context)
     {
         super.onAttach(context);
-        if(context instanceof OnFragmentInteractionListener)
+        if (context instanceof OnFragmentInteractionListener)
         {
             mListener = (OnFragmentInteractionListener) context;
         }
