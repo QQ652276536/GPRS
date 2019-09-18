@@ -8,7 +8,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AlertDialog;
 import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,60 +15,33 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
-import com.baidu.mapapi.map.Marker;
-import com.baidu.mapapi.map.MarkerOptions;
-import com.baidu.mapapi.map.OverlayOptions;
 import com.baidu.mapapi.model.LatLng;
-import com.baidu.trace.api.analysis.DrivingBehaviorRequest;
-import com.baidu.trace.api.analysis.OnAnalysisListener;
-import com.baidu.trace.api.analysis.StayPointRequest;
-import com.baidu.trace.api.track.DistanceResponse;
-import com.baidu.trace.api.track.HistoryTrackRequest;
-import com.baidu.trace.api.track.HistoryTrackResponse;
-import com.baidu.trace.api.track.LatestPointResponse;
-import com.baidu.trace.api.track.OnTrackListener;
-import com.baidu.trace.api.track.TrackPoint;
-import com.baidu.trace.model.Point;
 import com.baidu.trace.model.SortType;
-import com.baidu.trace.model.StatusCodes;
 import com.zistone.blowdown_app.R;
-import com.zistone.blowdown_app.control.DeviceInfoRecyclerAdapter;
 import com.zistone.blowdown_app.entity.DeviceInfo;
 import com.zistone.blowdown_app.entity.LocationInfo;
-import com.zistone.blowdown_app.util.CommonUtil;
-import com.zistone.blowdown_app.util.Constants;
 import com.zistone.blowdown_app.util.MapUtil;
 import com.zistone.blowdown_app.util.PropertiesUtil;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Stream;
 
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
-import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -137,7 +109,7 @@ public class TrackQueryFragment extends Fragment implements View.OnClickListener
             }
             case R.id.btn_return_trackQuery:
                 MapFragment mapFragment = MapFragment.newInstance(m_deviceInfo);
-                getFragmentManager().beginTransaction().replace(R.id.fragment_current, mapFragment, "mapFragment").commitNow();
+                getFragmentManager().beginTransaction().replace(R.id.fragment_current_map, mapFragment, "mapFragment").commitNow();
                 break;
             case R.id.btn_query_trackQuery:
                 try
@@ -307,7 +279,7 @@ public class TrackQueryFragment extends Fragment implements View.OnClickListener
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        m_trackQueryView = inflater.inflate(R.layout.fragment_track_query, container, false);
+        m_trackQueryView = inflater.inflate(R.layout.fragment_map_track_query, container, false);
         InitView();
         return m_trackQueryView;
     }

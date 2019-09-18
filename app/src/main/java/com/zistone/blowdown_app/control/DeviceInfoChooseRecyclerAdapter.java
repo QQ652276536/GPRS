@@ -115,7 +115,6 @@ public class DeviceInfoChooseRecyclerAdapter extends RecyclerView.Adapter<Device
         TextView m_textView;
         TextView m_textView2;
         ImageView m_imageView;
-        CheckBox m_cbx;
 
         public DeviceInfoChooseViewHolder(@NonNull View itemView)
         {
@@ -123,7 +122,6 @@ public class DeviceInfoChooseRecyclerAdapter extends RecyclerView.Adapter<Device
             m_imageView = itemView.findViewById(R.id.img_choose);
             m_textView = itemView.findViewById(R.id.text_view_choose);
             m_textView2 = itemView.findViewById(R.id.text_view2_choose);
-            m_cbx = itemView.findViewById(R.id.checkBox);
         }
     }
 

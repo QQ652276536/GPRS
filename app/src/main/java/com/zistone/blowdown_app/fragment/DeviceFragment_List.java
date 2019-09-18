@@ -90,7 +90,7 @@ public class DeviceListFragment extends Fragment implements View.OnClickListener
     @Override
     public void onClick(View v)
     {
-        switch(v.getId())
+        switch (v.getId())
         {
             case R.id.btn_return_device_list:
                 DeviceManageFragment deviceManageFragment = DeviceManageFragment.newInstance("", "");
@@ -109,7 +109,7 @@ public class DeviceListFragment extends Fragment implements View.OnClickListener
 
     public void onButtonPressed(Uri uri)
     {
-        if(mListener != null)
+        if (mListener != null)
         {
             mListener.onFragmentInteraction(uri);
         }
@@ -143,7 +143,7 @@ public class DeviceListFragment extends Fragment implements View.OnClickListener
         m_ToolbarTextView = m_deviceListView.findViewById(R.id.textView_toolbar);
         m_recyclerView = m_deviceListView.findViewById(R.id.device_recycler);
         m_deviceState = getArguments().getInt("DEVICESTATE");
-        if(m_deviceState == 1)
+        if (m_deviceState == 1)
         {
             m_ToolbarTextView.setText("可用设备列表");
         }
@@ -207,7 +207,7 @@ public class DeviceListFragment extends Fragment implements View.OnClickListener
      */
     private void SetDeviceInfoRecyclerAdapterListener()
     {
-        if(null != m_deviceInfoRecyclerAdapter)
+        if (null != m_deviceInfoRecyclerAdapter)
         {
             m_deviceInfoRecyclerAdapter.SetOnItemClickListener(new DeviceInfoRecyclerAdapter.OnItemClickListener()
             {
@@ -215,23 +215,8 @@ public class DeviceListFragment extends Fragment implements View.OnClickListener
                 public void OnClick(int position)
                 {
                     DeviceInfo tempDevice = m_deviceList.get(position);
-                    //Toast.makeText(m_context, tempDevice.getM_name(), Toast.LENGTH_SHORT).show();
-                    int fragmentSize = getParentFragment().getFragmentManager().getFragments().size();
-                    //使用父级的去获取Fragment管理器
-                    Fragment deviceFragment = getParentFragment().getFragmentManager().findFragmentByTag("deviceFragment");
-                    //隐藏当前设备页
-                    getParentFragment().getFragmentManager().beginTransaction().hide(deviceFragment).commitNow();
-                    //地图页已经实例化过则从管理器中移除之前的地图页
-                    Fragment oldMapFragment = getParentFragment().getFragmentManager().findFragmentByTag("mapFragment");
-                    if(oldMapFragment != null)
-                    {
-                        getParentFragment().getFragmentManager().beginTransaction().remove(oldMapFragment).commitNow();
-                    }
-                    //重新实例化地图碎片实现重新加载设备位置
-                    MapFragment newMapFragment = MapFragment.newInstance(tempDevice);
-                    getParentFragment().getFragmentManager().beginTransaction().add(R.id.fragment_current, newMapFragment, "mapFragment").show(newMapFragment).commitNow();
-                    //通过点击设备列表切换到地图时修改bottomNavigation控件的选中效果
-                    m_bottomNavigationView.setSelectedItemId(m_bottomNavigationView.getMenu().getItem(0).getItemId());
+                    DeviceInfoFragment deviceInfoFragment = DeviceInfoFragment.newInstance(tempDevice);
+                    getFragmentManager().beginTransaction().replace(R.id.fragment_current_device, deviceInfoFragment, "deviceInfoFragment").commitNow();
                 }
 
                 @Override
@@ -249,7 +234,7 @@ public class DeviceListFragment extends Fragment implements View.OnClickListener
         public void handleMessage(Message message)
         {
             super.handleMessage(message);
-            switch(message.what)
+            switch (message.what)
             {
                 case MESSAGE_RREQUEST_FAIL:
                 {
@@ -260,13 +245,13 @@ public class DeviceListFragment extends Fragment implements View.OnClickListener
                 case MESSAGE_RESPONSE_SUCCESS:
                 {
                     String result = (String) message.obj;
-                    if(null == result || "".equals(result))
+                    if (null == result || "".equals(result))
                     {
                         return;
                     }
                     m_deviceList = JSON.parseArray(result, DeviceInfo.class);
                     //在线设备
-                    if(m_deviceState == 1)
+                    if (m_deviceState == 1)
                     {
                         //过滤掉离线设备
                         m_deviceList.removeIf(p -> p.getM_state() == 0);
@@ -328,7 +313,7 @@ public class DeviceListFragment extends Fragment implements View.OnClickListener
                 {
                     String result = response.body().string();
                     Log.i(TAG, "响应内容:" + result);
-                    if(response.isSuccessful())
+                    if (response.isSuccessful())
                     {
                         Message message = handler.obtainMessage(MESSAGE_RESPONSE_SUCCESS, result);
                         handler.sendMessage(message);
@@ -355,7 +340,7 @@ public class DeviceListFragment extends Fragment implements View.OnClickListener
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        if(getArguments() != null)
+        if (getArguments() != null)
         {
         }
     }
@@ -372,7 +357,7 @@ public class DeviceListFragment extends Fragment implements View.OnClickListener
     public void onAttach(Context context)
     {
         super.onAttach(context);
-        if(context instanceof OnFragmentInteractionListener)
+        if (context instanceof OnFragmentInteractionListener)
         {
             mListener = (OnFragmentInteractionListener) context;
         }

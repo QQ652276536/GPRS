@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -30,8 +29,6 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
@@ -43,15 +40,22 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class DeviceBindFragment extends Fragment implements View.OnClickListener
+public class DeviceChooseFragment extends Fragment implements View.OnClickListener
 {
-    private static final String TAG = "DeviceBindFragment";
+    private static final String TAG = "DeviceChooseFragment";
     private static final int MESSAGE_RREQUEST_FAIL = 1;
     private static final int MESSAGE_RESPONSE_FAIL = 2;
     private static final int MESSAGE_RESPONSE_SUCCESS = 3;
     private static String URL;
     private Context m_context;
-    private View m_deviceBindView;
+    private View m_deviceListView;
+    private List<DeviceInfo> m_deviceList = new ArrayList<>();
+    //下拉刷新控件
+    private MaterialRefreshLayout m_materialRefreshLayout;
+    //RecyclerView
+    private RecyclerView m_recyclerView;
+    //适配器
+    private DeviceInfoChooseRecyclerAdapter m_deviceInfoChooseRecyclerAdapter;
     private ImageButton m_btnReturn;
     private OnFragmentInteractionListener mListener;
     private DeviceInfo m_deviceInfo;
@@ -60,9 +64,9 @@ public class DeviceBindFragment extends Fragment implements View.OnClickListener
      * @param deviceInfo
      * @return
      */
-    public static DeviceBindFragment newInstance(DeviceInfo deviceInfo)
+    public static DeviceChooseFragment newInstance(DeviceInfo deviceInfo)
     {
-        DeviceBindFragment fragment = new DeviceBindFragment();
+        DeviceChooseFragment fragment = new DeviceChooseFragment();
         Bundle args = new Bundle();
         args.putParcelable("DEVICEINFO", deviceInfo);
         fragment.setArguments(args);
@@ -72,12 +76,12 @@ public class DeviceBindFragment extends Fragment implements View.OnClickListener
     @Override
     public void onClick(View v)
     {
-        switch(v.getId())
+        switch (v.getId())
         {
-            case R.id.btn_return_device_bind:
+            case R.id.btn_return_device_choose:
                 //重新实例化地图碎片实现重新加载设备位置
-                DeviceChooseFragment deviceChooseFragment = DeviceChooseFragment.newInstance(m_deviceInfo);
-                getFragmentManager().beginTransaction().replace(R.id.fragment_current, deviceChooseFragment, "mapFragment").show(deviceChooseFragment).commitNow();
+                MapFragment newMapFragment = MapFragment.newInstance(m_deviceInfo);
+                getFragmentManager().beginTransaction().replace(R.id.fragment_current_map, newMapFragment, "mapFragment").show(newMapFragment).commitNow();
                 break;
         }
     }
@@ -92,7 +96,7 @@ public class DeviceBindFragment extends Fragment implements View.OnClickListener
 
     public void onButtonPressed(Uri uri)
     {
-        if(mListener != null)
+        if (mListener != null)
         {
             mListener.onFragmentInteraction(uri);
         }
@@ -100,13 +104,97 @@ public class DeviceBindFragment extends Fragment implements View.OnClickListener
 
     public void InitView()
     {
-        m_context = m_deviceBindView.getContext();
-        URL = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/DeviceInfo/Update";
-        m_btnReturn = m_deviceBindView.findViewById(R.id.btn_return_device_bind);
+        m_context = m_deviceListView.getContext();
+        URL = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/DeviceInfo/FindAll";
+        m_btnReturn = m_deviceListView.findViewById(R.id.btn_return_device_choose);
         m_btnReturn.setOnClickListener(this::onClick);
+        m_recyclerView = m_deviceListView.findViewById(R.id.device_recycler_choose);
+        //下拉刷新控件
+        m_materialRefreshLayout = m_deviceListView.findViewById(R.id.refresh_choose);
+        //启用加载更多
+        m_materialRefreshLayout.setLoadMore(true);
+        m_materialRefreshLayout.setMaterialRefreshListener(new MaterialRefreshListener()
+        {
+            /**
+             * 下拉刷新
+             * @param materialRefreshLayout
+             */
+            @Override
+            public void onRefresh(final MaterialRefreshLayout materialRefreshLayout)
+            {
+                materialRefreshLayout.postDelayed(() ->
+                {
+                    SendWithOkHttp();
+                    //结束下拉刷新
+                    materialRefreshLayout.finishRefresh();
+                }, 1 * 1000);
+            }
 
+            /**
+             * 加载完毕
+             */
+            @Override
+            public void onfinish()
+            {
+                //Toast.makeText(m_context, "完成", Toast.LENGTH_LONG).show();
+            }
+
+            /**
+             * 加载更多
+             * @param materialRefreshLayout
+             */
+            @Override
+            public void onRefreshLoadMore(MaterialRefreshLayout materialRefreshLayout)
+            {
+                Toast.makeText(m_context, "别滑了,到底了", Toast.LENGTH_SHORT).show();
+            }
+        });
+        //自动刷新
+        m_materialRefreshLayout.autoRefresh();
+        //使用线性布局
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(m_context);
+        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        //设置布局
+        m_recyclerView.setLayoutManager(linearLayoutManager);
+        //TODO:设置适配器是在异步回调里设的,所以启动时会有No adapter attached; skipping layout异常
     }
 
+    /**
+     * 给下拉控件设置事件
+     */
+    private void SetDeviceInfoRecyclerAdapterListener()
+    {
+        if (null != m_deviceInfoChooseRecyclerAdapter)
+        {
+            m_deviceInfoChooseRecyclerAdapter.SetOnItemClickListener(new DeviceInfoChooseRecyclerAdapter.OnItemClickListener()
+            {
+                @Override
+                public void OnClick(int position)
+                {
+                    m_deviceInfo = m_deviceList.get(position);
+                    //重新实例化地图碎片实现重新加载设备位置
+                    MapFragment newMapFragment = MapFragment.newInstance(m_deviceInfo);
+                    getFragmentManager().beginTransaction().replace(R.id.fragment_current_map, newMapFragment, "mapFragment").show(newMapFragment).commitNow();
+                }
+
+                @Override
+                public void OnLongClick(int position)
+                {
+                    //Toast.makeText(m_context, "当前长按 " + position, Toast.LENGTH_SHORT).show();
+                }
+            });
+            m_deviceInfoChooseRecyclerAdapter.SetOnClickListener(position ->
+            {
+                m_deviceInfo = m_deviceList.get(position);
+                if (null == m_deviceInfo)
+                {
+                    return;
+                }
+                DeviceBindFragment deviceBindFragment = DeviceBindFragment.newInstance(m_deviceInfo);
+                getFragmentManager().beginTransaction().replace(R.id.fragment_current_device, deviceBindFragment, "deviceBindFragment").commitNow();
+            });
+        }
+    }
 
     private Handler handler = new Handler()
     {
@@ -114,7 +202,7 @@ public class DeviceBindFragment extends Fragment implements View.OnClickListener
         public void handleMessage(Message message)
         {
             super.handleMessage(message);
-            switch(message.what)
+            switch (message.what)
             {
                 case MESSAGE_RREQUEST_FAIL:
                 {
@@ -125,10 +213,17 @@ public class DeviceBindFragment extends Fragment implements View.OnClickListener
                 case MESSAGE_RESPONSE_SUCCESS:
                 {
                     String result = (String) message.obj;
-                    if(null == result || "".equals(result))
+                    if (null == result || "".equals(result))
                     {
                         return;
                     }
+                    m_deviceList = JSON.parseArray(result, DeviceInfo.class);
+                    //过滤掉离线设备
+                    m_deviceList.removeIf(p -> p.getM_state() == 0);
+                    m_deviceInfoChooseRecyclerAdapter = new DeviceInfoChooseRecyclerAdapter(m_context, m_deviceList);
+                    //设置适配器
+                    m_recyclerView.setAdapter(m_deviceInfoChooseRecyclerAdapter);
+                    SetDeviceInfoRecyclerAdapterListener();
                     break;
                 }
                 case MESSAGE_RESPONSE_FAIL:
@@ -176,7 +271,7 @@ public class DeviceBindFragment extends Fragment implements View.OnClickListener
                 {
                     String result = response.body().string();
                     Log.i(TAG, "响应内容:" + result);
-                    if(response.isSuccessful())
+                    if (response.isSuccessful())
                     {
                         Message message = handler.obtainMessage(MESSAGE_RESPONSE_SUCCESS, result);
                         handler.sendMessage(message);
@@ -202,7 +297,7 @@ public class DeviceBindFragment extends Fragment implements View.OnClickListener
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        if(getArguments() != null)
+        if (getArguments() != null)
         {
             //获取设备信息
             m_deviceInfo = getArguments().getParcelable("DEVICEINFO");
@@ -212,16 +307,16 @@ public class DeviceBindFragment extends Fragment implements View.OnClickListener
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        m_deviceBindView = inflater.inflate(R.layout.fragment_device_bind, container, false);
+        m_deviceListView = inflater.inflate(R.layout.fragment_map_device_choose, container, false);
         InitView();
-        return m_deviceBindView;
+        return m_deviceListView;
     }
 
     @Override
     public void onAttach(Context context)
     {
         super.onAttach(context);
-        if(context instanceof OnFragmentInteractionListener)
+        if (context instanceof OnFragmentInteractionListener)
         {
             mListener = (OnFragmentInteractionListener) context;
         }

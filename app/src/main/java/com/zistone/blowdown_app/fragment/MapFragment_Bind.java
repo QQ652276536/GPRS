@@ -6,35 +6,21 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
 import android.widget.ImageButton;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.alibaba.fastjson.JSON;
 import com.zistone.blowdown_app.R;
-import com.zistone.blowdown_app.control.DeviceInfoChooseRecyclerAdapter;
 import com.zistone.blowdown_app.entity.DeviceInfo;
 import com.zistone.blowdown_app.util.PropertiesUtil;
-import com.zistone.material_refresh_layout.MaterialRefreshLayout;
-import com.zistone.material_refresh_layout.MaterialRefreshListener;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
@@ -46,22 +32,15 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class DeviceChooseFragment extends Fragment implements View.OnClickListener
+public class DeviceBindFragment extends Fragment implements View.OnClickListener
 {
-    private static final String TAG = "DeviceChooseFragment";
+    private static final String TAG = "DeviceBindFragment";
     private static final int MESSAGE_RREQUEST_FAIL = 1;
     private static final int MESSAGE_RESPONSE_FAIL = 2;
     private static final int MESSAGE_RESPONSE_SUCCESS = 3;
     private static String URL;
     private Context m_context;
-    private View m_deviceListView;
-    private List<DeviceInfo> m_deviceList = new ArrayList<>();
-    //下拉刷新控件
-    private MaterialRefreshLayout m_materialRefreshLayout;
-    //RecyclerView
-    private RecyclerView m_recyclerView;
-    //适配器
-    private DeviceInfoChooseRecyclerAdapter m_deviceInfoChooseRecyclerAdapter;
+    private View m_deviceBindView;
     private ImageButton m_btnReturn;
     private OnFragmentInteractionListener mListener;
     private DeviceInfo m_deviceInfo;
@@ -70,9 +49,9 @@ public class DeviceChooseFragment extends Fragment implements View.OnClickListen
      * @param deviceInfo
      * @return
      */
-    public static DeviceChooseFragment newInstance(DeviceInfo deviceInfo)
+    public static DeviceBindFragment newInstance(DeviceInfo deviceInfo)
     {
-        DeviceChooseFragment fragment = new DeviceChooseFragment();
+        DeviceBindFragment fragment = new DeviceBindFragment();
         Bundle args = new Bundle();
         args.putParcelable("DEVICEINFO", deviceInfo);
         fragment.setArguments(args);
@@ -84,10 +63,10 @@ public class DeviceChooseFragment extends Fragment implements View.OnClickListen
     {
         switch(v.getId())
         {
-            case R.id.btn_return_device_choose:
+            case R.id.btn_return_device_bind:
                 //重新实例化地图碎片实现重新加载设备位置
-                MapFragment newMapFragment = MapFragment.newInstance(m_deviceInfo);
-                getFragmentManager().beginTransaction().replace(R.id.fragment_current, newMapFragment, "mapFragment").show(newMapFragment).commitNow();
+                DeviceChooseFragment deviceChooseFragment = DeviceChooseFragment.newInstance(m_deviceInfo);
+                getFragmentManager().beginTransaction().replace(R.id.fragment_current_map, deviceChooseFragment, "mapFragment").commitNow();
                 break;
         }
     }
@@ -110,95 +89,13 @@ public class DeviceChooseFragment extends Fragment implements View.OnClickListen
 
     public void InitView()
     {
-        m_context = m_deviceListView.getContext();
-        URL = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/DeviceInfo/FindAll";
-        m_btnReturn = m_deviceListView.findViewById(R.id.btn_return_device_choose);
+        m_context = m_deviceBindView.getContext();
+        URL = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/DeviceInfo/Update";
+        m_btnReturn = m_deviceBindView.findViewById(R.id.btn_return_device_bind);
         m_btnReturn.setOnClickListener(this::onClick);
-        m_recyclerView = m_deviceListView.findViewById(R.id.device_recycler_choose);
-        //下拉刷新控件
-        m_materialRefreshLayout = m_deviceListView.findViewById(R.id.refresh_choose);
-        //启用加载更多
-        m_materialRefreshLayout.setLoadMore(true);
-        m_materialRefreshLayout.setMaterialRefreshListener(new MaterialRefreshListener()
-        {
-            /**
-             * 下拉刷新
-             * @param materialRefreshLayout
-             */
-            @Override
-            public void onRefresh(final MaterialRefreshLayout materialRefreshLayout)
-            {
-                materialRefreshLayout.postDelayed(() ->
-                {
-                    SendWithOkHttp();
-                    //结束下拉刷新
-                    materialRefreshLayout.finishRefresh();
-                }, 1 * 1000);
-            }
 
-            /**
-             * 加载完毕
-             */
-            @Override
-            public void onfinish()
-            {
-                //Toast.makeText(m_context, "完成", Toast.LENGTH_LONG).show();
-            }
-
-            /**
-             * 加载更多
-             * @param materialRefreshLayout
-             */
-            @Override
-            public void onRefreshLoadMore(MaterialRefreshLayout materialRefreshLayout)
-            {
-                Toast.makeText(m_context, "别滑了,到底了", Toast.LENGTH_SHORT).show();
-            }
-        });
-        //自动刷新
-        m_materialRefreshLayout.autoRefresh();
-        //使用线性布局
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(m_context);
-        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        //设置布局
-        m_recyclerView.setLayoutManager(linearLayoutManager);
-        //TODO:设置适配器是在异步回调里设的,所以启动时会有No adapter attached; skipping layout异常
     }
 
-    /**
-     * 给下拉控件设置事件
-     */
-    private void SetDeviceInfoRecyclerAdapterListener()
-    {
-        if(null != m_deviceInfoChooseRecyclerAdapter)
-        {
-            m_deviceInfoChooseRecyclerAdapter.SetOnItemClickListener(new DeviceInfoChooseRecyclerAdapter.OnItemClickListener()
-            {
-                @Override
-                public void OnClick(int position)
-                {
-                    m_deviceInfo = m_deviceList.get(position);
-                    Toast.makeText(m_context, "AAA-------------->" + position, Toast.LENGTH_SHORT).show();
-                }
-
-                @Override
-                public void OnLongClick(int position)
-                {
-                    //Toast.makeText(m_context, "当前长按 " + position, Toast.LENGTH_SHORT).show();
-                }
-            });
-            m_deviceInfoChooseRecyclerAdapter.SetOnClickListener(position ->
-            {
-                m_deviceInfo = m_deviceList.get(position);
-                if(null == m_deviceInfo)
-                {
-                    return;
-                }
-                DeviceBindFragment deviceBindFragment = DeviceBindFragment.newInstance(m_deviceInfo);
-                getFragmentManager().beginTransaction().replace(R.id.fragment_current, deviceBindFragment, "deviceBindFragment").commitNow();
-            });
-        }
-    }
 
     private Handler handler = new Handler()
     {
@@ -221,13 +118,6 @@ public class DeviceChooseFragment extends Fragment implements View.OnClickListen
                     {
                         return;
                     }
-                    m_deviceList = JSON.parseArray(result, DeviceInfo.class);
-                    //过滤掉离线设备
-                    m_deviceList.removeIf(p -> p.getM_state() == 0);
-                    m_deviceInfoChooseRecyclerAdapter = new DeviceInfoChooseRecyclerAdapter(m_context, m_deviceList);
-                    //设置适配器
-                    m_recyclerView.setAdapter(m_deviceInfoChooseRecyclerAdapter);
-                    SetDeviceInfoRecyclerAdapterListener();
                     break;
                 }
                 case MESSAGE_RESPONSE_FAIL:
@@ -311,9 +201,9 @@ public class DeviceChooseFragment extends Fragment implements View.OnClickListen
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        m_deviceListView = inflater.inflate(R.layout.fragment_device_choose, container, false);
+        m_deviceBindView = inflater.inflate(R.layout.fragment_map_device_bind, container, false);
         InitView();
-        return m_deviceListView;
+        return m_deviceBindView;
     }
 
     @Override

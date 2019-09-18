@@ -11,36 +11,50 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.baidu.mapapi.map.MapFragment;
 import com.zistone.blowdown_app.R;
-import com.zistone.blowdown_app.fragment.DeviceBindFragment;
-import com.zistone.blowdown_app.fragment.DeviceChooseFragment;
+import com.zistone.blowdown_app.fragment.MapFragment_Bind;
+import com.zistone.blowdown_app.fragment.MapFragment_Choose;
+import com.zistone.blowdown_app.fragment.DeviceFragment_Info;
+import com.zistone.blowdown_app.fragment.MapFragment_Map;
+import com.zistone.blowdown_app.fragment.MapFragment_TrackQuery;
+import com.zistone.blowdown_app.fragment.UserFragment_Forget;
+import com.zistone.blowdown_app.fragment.UserFragment_Info;
+import com.zistone.blowdown_app.fragment.UserFragment_Login;
+import com.zistone.blowdown_app.fragment.UserFragment_Register;
 import com.zistone.blowdown_app.util.UserSharedPreference;
-import com.zistone.blowdown_app.fragment.DeviceAddFragment;
+import com.zistone.blowdown_app.fragment.DeviceFragment_Add;
 import com.zistone.blowdown_app.fragment.DeviceFragment;
-import com.zistone.blowdown_app.fragment.DeviceListFragment;
-import com.zistone.blowdown_app.fragment.DeviceManageFragment;
-import com.zistone.blowdown_app.fragment.ForgetFragment;
-import com.zistone.blowdown_app.fragment.LoginFragment;
-import com.zistone.blowdown_app.fragment.MapFragment;
-import com.zistone.blowdown_app.fragment.RegisterFragment;
-import com.zistone.blowdown_app.fragment.TrackQueryFragment;
+import com.zistone.blowdown_app.fragment.DeviceFragment_List;
+import com.zistone.blowdown_app.fragment.DeviceFragment_Manage;
 import com.zistone.blowdown_app.fragment.UserFragment;
-import com.zistone.blowdown_app.fragment.UserInfoFragment;
 
 import java.io.Serializable;
 
-public class MainActivity extends AppCompatActivity implements DeviceBindFragment.OnFragmentInteractionListener,
-        DeviceChooseFragment.OnFragmentInteractionListener, TrackQueryFragment.OnFragmentInteractionListener,
-        MapFragment.OnFragmentInteractionListener, DeviceFragment.OnFragmentInteractionListener,
-        DeviceManageFragment.OnFragmentInteractionListener, DeviceListFragment.OnFragmentInteractionListener,
-        DeviceAddFragment.OnFragmentInteractionListener, UserFragment.OnFragmentInteractionListener,
-        LoginFragment.OnFragmentInteractionListener, RegisterFragment.OnFragmentInteractionListener,
-        ForgetFragment.OnFragmentInteractionListener, UserInfoFragment.OnFragmentInteractionListener, Serializable
+public class MainActivity extends AppCompatActivity implements
+        //位置
+        com.zistone.blowdown_app.fragment.MapFragment.OnFragmentInteractionListener,
+        MapFragment_Map.OnFragmentInteractionListener,
+        MapFragment_Bind.OnFragmentInteractionListener,
+        MapFragment_Choose.OnFragmentInteractionListener,
+        MapFragment_TrackQuery.OnFragmentInteractionListener,
+        //设备
+        DeviceFragment.OnFragmentInteractionListener,
+        DeviceFragment_Info.OnFragmentInteractionListener,
+        DeviceFragment_Manage.OnFragmentInteractionListener,
+        DeviceFragment_List.OnFragmentInteractionListener,
+        DeviceFragment_Add.OnFragmentInteractionListener,
+        //用户
+        UserFragment.OnFragmentInteractionListener,
+        UserFragment_Login.OnFragmentInteractionListener,
+        UserFragment_Register.OnFragmentInteractionListener,
+        UserFragment_Forget.OnFragmentInteractionListener,
+        UserFragment_Info.OnFragmentInteractionListener
 {
     //当前页,用来切换
     public Fragment m_currentFragment;
     //地图页
-    public MapFragment m_mapFragment;
+    public com.zistone.blowdown_app.fragment.MapFragment m_mapFragment;
     //设备页
     public DeviceFragment m_deviceFragment;
     //用户页
@@ -62,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements DeviceBindFragmen
         //启动时如果已经登录过则在设备页,否则跳转至用户页的登录界面
         String realName = UserSharedPreference.GetRealName(this);
         int state = UserSharedPreference.GetState(this);
-        if(!"".equals(realName) && 1 == state)
+        if (!"".equals(realName) && 1 == state)
         {
             m_deviceFragment = DeviceFragment.newInstance("", "");
             m_bottomNavigationView.setSelectedItemId(m_bottomNavigationView.getMenu().getItem(1).getItemId());
@@ -84,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements DeviceBindFragmen
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem menuItem)
         {
-            switch(menuItem.getItemId())
+            switch (menuItem.getItemId())
             {
                 case R.id.navigation_map:
                     ClickMapItem();
@@ -93,7 +107,7 @@ public class MainActivity extends AppCompatActivity implements DeviceBindFragmen
                 case R.id.navigation_device:
                     String realName = UserSharedPreference.GetRealName(getApplicationContext());
                     int state = UserSharedPreference.GetState(getApplicationContext());
-                    if(!"".equals(realName) && 1 == state)
+                    if (!"".equals(realName) && 1 == state)
                     {
                         ClickDeviceItem();
                     }
@@ -119,7 +133,7 @@ public class MainActivity extends AppCompatActivity implements DeviceBindFragmen
 
     private void ClickUserItem()
     {
-        if(m_userFragment == null)
+        if (m_userFragment == null)
         {
             m_userFragment = UserFragment.newInstance("", "");
         }
@@ -128,7 +142,7 @@ public class MainActivity extends AppCompatActivity implements DeviceBindFragmen
 
     private void ClickDeviceItem()
     {
-        if(m_deviceFragment == null)
+        if (m_deviceFragment == null)
         {
             m_deviceFragment = DeviceFragment.newInstance("", "");
         }
@@ -137,22 +151,22 @@ public class MainActivity extends AppCompatActivity implements DeviceBindFragmen
 
     private void ClickMapItem()
     {
-        m_mapFragment = (MapFragment) getSupportFragmentManager().findFragmentByTag("mapFragment");
-        if(m_mapFragment == null)
+        m_mapFragment = (com.zistone.blowdown_app.fragment.MapFragment) getSupportFragmentManager().findFragmentByTag("mapFragment");
+        if (m_mapFragment == null)
         {
-            m_mapFragment = MapFragment.newInstance(null);
+            m_mapFragment = com.zistone.blowdown_app.fragment.MapFragment.newInstance("", "");
         }
         AddOrShowFragment(getSupportFragmentManager().beginTransaction(), m_mapFragment, "mapFragment");
     }
 
     private void AddOrShowFragment(FragmentTransaction transaction, Fragment fragment, String tagStr)
     {
-        if(m_currentFragment == null)
+        if (m_currentFragment == null)
         {
             return;
         }
         //如果当前的Fragment未被添加到管理器中
-        if(!fragment.isAdded())
+        if (!fragment.isAdded())
         {
             transaction.hide(m_currentFragment).add(R.id.fragment_current, fragment, tagStr).commitNow();
         }
