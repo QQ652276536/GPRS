@@ -47,9 +47,9 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class TrackQueryFragment extends Fragment implements View.OnClickListener
+public class MapFragment_TrackQuery extends Fragment implements View.OnClickListener
 {
-    private static final String TAG = "TrackQueryFragment";
+    private static final String TAG = "MapFragment_TrackQuery";
     private static final int MESSAGE_RREQUEST_FAIL = 1;
     private static final int MESSAGE_RESPONSE_FAIL = 2;
     private static final int MESSAGE_RESPONSE_SUCCESS = 3;
@@ -70,9 +70,9 @@ public class TrackQueryFragment extends Fragment implements View.OnClickListener
     //查询轨迹的结束时间
     private String m_endStr;
 
-    public static TrackQueryFragment newInstance(DeviceInfo deviceInfo)
+    public static MapFragment_TrackQuery newInstance(DeviceInfo deviceInfo)
     {
-        TrackQueryFragment fragment = new TrackQueryFragment();
+        MapFragment_TrackQuery fragment = new MapFragment_TrackQuery();
         Bundle args = new Bundle();
         args.putParcelable("DEVICEINFO", deviceInfo);
         fragment.setArguments(args);
@@ -108,8 +108,8 @@ public class TrackQueryFragment extends Fragment implements View.OnClickListener
                 break;
             }
             case R.id.btn_return_trackQuery:
-                MapFragment mapFragment = MapFragment.newInstance(m_deviceInfo);
-                getFragmentManager().beginTransaction().replace(R.id.fragment_current_map, mapFragment, "mapFragment").commitNow();
+                MapFragment_Map mapFragment_map = MapFragment_Map.newInstance(m_deviceInfo);
+                getFragmentManager().beginTransaction().replace(R.id.fragment_current_map, mapFragment_map, "mapFragment_map").commitNow();
                 break;
             case R.id.btn_query_trackQuery:
                 try

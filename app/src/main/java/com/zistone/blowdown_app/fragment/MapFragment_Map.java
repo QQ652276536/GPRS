@@ -70,9 +70,9 @@ import java.util.List;
 
 import static android.content.Context.SENSOR_SERVICE;
 
-public class MapFragment extends Fragment implements BaiduMap.OnMapClickListener, View.OnClickListener, SensorEventListener, OnGetGeoCoderResultListener, Serializable, BaiduMap.OnMarkerClickListener
+public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickListener, View.OnClickListener, SensorEventListener, OnGetGeoCoderResultListener, Serializable, BaiduMap.OnMarkerClickListener
 {
-    private static final String TAG = "MapFragment";
+    private static final String TAG = "MapFragment_Map";
     private static final BitmapDescriptor ICON_MARKER = BitmapDescriptorFactory.fromResource(R.drawable.icon_mark2);
     private Context m_context;
     private MyLocationListener m_locationListener = new MyLocationListener();
@@ -116,9 +116,9 @@ public class MapFragment extends Fragment implements BaiduMap.OnMapClickListener
     private boolean m_trafficEnabled;
     private Button m_btnMonitorTarget;
 
-    public static MapFragment newInstance(DeviceInfo deviceInfo)
+    public static MapFragment_Map newInstance(DeviceInfo deviceInfo)
     {
-        MapFragment fragment = new MapFragment();
+        MapFragment_Map fragment = new MapFragment_Map();
         Bundle args = new Bundle();
         args.putParcelable("DEVICEINFO", deviceInfo);
         fragment.setArguments(args);
@@ -746,8 +746,8 @@ public class MapFragment extends Fragment implements BaiduMap.OnMapClickListener
         switch (v.getId())
         {
             case R.id.btn_monitor_target:
-                DeviceChooseFragment deviceChooseFragment = DeviceChooseFragment.newInstance(m_deviceInfo);
-                getFragmentManager().beginTransaction().replace(R.id.fragment_current_map, deviceChooseFragment, "deviceChooseFragment").commitNow();
+                MapFragment_Choose mapFragment_choose = MapFragment_Choose.newInstance(m_deviceInfo);
+                getFragmentManager().beginTransaction().replace(R.id.fragment_current_map, mapFragment_choose, "mapFragment_choose").commitNow();
                 break;
             case R.id.btn_location_baidu:
                 if (null != m_deviceInfo)
@@ -772,7 +772,7 @@ public class MapFragment extends Fragment implements BaiduMap.OnMapClickListener
             case R.id.btn_locus_baidu:
                 if (null != m_deviceInfo)
                 {
-                    TrackQueryFragment trackQueryFragment = TrackQueryFragment.newInstance(m_deviceInfo);
+                    MapFragment_TrackQuery trackQueryFragment = MapFragment_TrackQuery.newInstance(m_deviceInfo);
                     getFragmentManager().beginTransaction().replace(R.id.fragment_current_map, trackQueryFragment, "trackQueryFragment").commitNow();
                 }
                 else

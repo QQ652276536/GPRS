@@ -44,9 +44,9 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class DeviceListFragment extends Fragment implements View.OnClickListener
+public class DeviceFragment_List extends Fragment implements View.OnClickListener
 {
-    private static final String TAG = "DeviceListFragment";
+    private static final String TAG = "DeviceFragment_List";
     private static final String ARG_PARAM1 = "DEVICESTATE";
     private static final String ARG_PARAM2 = "param2";
     private static final int TIMEINTERVAL = 30 * 1000;
@@ -77,9 +77,9 @@ public class DeviceListFragment extends Fragment implements View.OnClickListener
      * @param param2
      * @return
      */
-    public static DeviceListFragment newInstance(int param1, String param2)
+    public static DeviceFragment_List newInstance(int param1, String param2)
     {
-        DeviceListFragment fragment = new DeviceListFragment();
+        DeviceFragment_List fragment = new DeviceFragment_List();
         Bundle args = new Bundle();
         args.putInt(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -93,8 +93,8 @@ public class DeviceListFragment extends Fragment implements View.OnClickListener
         switch (v.getId())
         {
             case R.id.btn_return_device_list:
-                DeviceManageFragment deviceManageFragment = DeviceManageFragment.newInstance("", "");
-                getFragmentManager().beginTransaction().replace(R.id.fragment_current_device, deviceManageFragment, "deviceManageFragment").commitNow();
+                DeviceFragment_Manage deviceFragment_manage = DeviceFragment_Manage.newInstance("", "");
+                getFragmentManager().beginTransaction().replace(R.id.fragment_current_device, deviceFragment_manage, "deviceFragment_manage").commitNow();
                 break;
         }
     }
@@ -215,8 +215,8 @@ public class DeviceListFragment extends Fragment implements View.OnClickListener
                 public void OnClick(int position)
                 {
                     DeviceInfo tempDevice = m_deviceList.get(position);
-                    DeviceInfoFragment deviceInfoFragment = DeviceInfoFragment.newInstance(tempDevice);
-                    getFragmentManager().beginTransaction().replace(R.id.fragment_current_device, deviceInfoFragment, "deviceInfoFragment").commitNow();
+                    DeviceFragment_Info deviceFragment_info = DeviceFragment_Info.newInstance(tempDevice);
+                    getFragmentManager().beginTransaction().replace(R.id.fragment_current_device, deviceFragment_info, "deviceFragment_info").commitNow();
                 }
 
                 @Override

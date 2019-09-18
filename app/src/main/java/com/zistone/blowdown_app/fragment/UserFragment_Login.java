@@ -41,9 +41,9 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class LoginFragment extends Fragment implements View.OnClickListener, View.OnFocusChangeListener
+public class UserFragment_Login extends Fragment implements View.OnClickListener, View.OnFocusChangeListener
 {
-    private static final String TAG = "LoginFragment";
+    private static final String TAG = "UserFragment_Login";
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     private static final int MESSAGE_RREQUEST_FAIL = 1;
@@ -70,9 +70,9 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
     private BottomNavigationView m_bottomNavigationView;
     private OnFragmentInteractionListener mListener;
 
-    public static LoginFragment newInstance(String param1, String param2)
+    public static UserFragment_Login newInstance(String param1, String param2)
     {
-        LoginFragment fragment = new LoginFragment();
+        UserFragment_Login fragment = new UserFragment_Login();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -182,8 +182,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
             Log.i(TAG, "登录成功,用户真实姓名为:" + userInfo.getM_realName());
             //本地存储用户基本信息
             UserSharedPreference.LoginSuccess(m_context, userInfo);
-            UserInfoFragment userInfoFragment = UserInfoFragment.newInstance("", "");
-            getFragmentManager().beginTransaction().replace(R.id.fragment_current_user, userInfoFragment, "userInfoFragment").commitNow();
+            UserFragment_Info userFragment_info = UserFragment_Info.newInstance("", "");
+            getFragmentManager().beginTransaction().replace(R.id.fragment_current_user, userFragment_info, "userFragment_info").commitNow();
             //当前碎片切换为设备碎片
             m_bottomNavigationView.setSelectedItemId(m_bottomNavigationView.getMenu().getItem(1).getItemId());
         }
@@ -377,13 +377,13 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Vie
                 break;
             //注册,这里是跳转至注册页面
             case R.id.btn_register_login:
-                RegisterFragment registerFragment = RegisterFragment.newInstance("", "");
-                getFragmentManager().beginTransaction().replace(R.id.fragment_current_user, registerFragment, "registerFragment").commitNow();
+                UserFragment_Register userFragment_register = UserFragment_Register.newInstance("", "");
+                getFragmentManager().beginTransaction().replace(R.id.fragment_current_user, userFragment_register, "userFragment_register").commitNow();
                 break;
             //忘记密码,这里是跳转至找回密码页
             case R.id.btn_forget_login:
-                ForgetFragment forgetFragment = ForgetFragment.newInstance("", "");
-                getFragmentManager().beginTransaction().replace(R.id.fragment_current_user, forgetFragment, "forgetFragment").commitNow();
+                UserFragment_Forget userFragment_forget = UserFragment_Forget.newInstance("", "");
+                getFragmentManager().beginTransaction().replace(R.id.fragment_current_user, userFragment_forget, "userFragment_forget").commitNow();
                 break;
         }
     }

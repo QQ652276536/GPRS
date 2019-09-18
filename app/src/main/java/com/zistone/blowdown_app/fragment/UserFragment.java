@@ -46,15 +46,15 @@ public class UserFragment extends Fragment
         //已经登录过则显示用户信息页面,否则显示登录页面
         int id = UserSharedPreference.GetUserId(m_context);
         int state = UserSharedPreference.GetState(m_context);
-        if(id != 0 && 1 == state)
+        if (id != 0 && 1 == state)
         {
-            UserInfoFragment userInfoFragment = UserInfoFragment.newInstance("", "");
-            getChildFragmentManager().beginTransaction().add(R.id.fragment_current_user, userInfoFragment, "userInfoFragment").show(userInfoFragment).commitNow();
+            UserFragment_Info userFragment_info = UserFragment_Info.newInstance("", "");
+            getChildFragmentManager().beginTransaction().add(R.id.fragment_current_user, userFragment_info, "userFragment_info").show(userFragment_info).commitNow();
         }
         else
         {
-            LoginFragment loginFragment = LoginFragment.newInstance("", "");
-            getChildFragmentManager().beginTransaction().add(R.id.fragment_current_user, loginFragment, "loginFragment").show(loginFragment).commitNow();
+            UserFragment_Login userFragment_login = UserFragment_Login.newInstance("", "");
+            getChildFragmentManager().beginTransaction().add(R.id.fragment_current_user, userFragment_login, "userFragment_login").show(userFragment_login).commitNow();
         }
     }
 
@@ -81,7 +81,7 @@ public class UserFragment extends Fragment
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        if(getArguments() != null)
+        if (getArguments() != null)
         {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -106,7 +106,7 @@ public class UserFragment extends Fragment
 
     public void onButtonPressed(Uri uri)
     {
-        if(mListener != null)
+        if (mListener != null)
         {
             mListener.onFragmentInteraction(uri);
         }
@@ -116,7 +116,7 @@ public class UserFragment extends Fragment
     public void onAttach(Context context)
     {
         super.onAttach(context);
-        if(context instanceof OnFragmentInteractionListener)
+        if (context instanceof OnFragmentInteractionListener)
         {
             mListener = (OnFragmentInteractionListener) context;
         }

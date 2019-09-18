@@ -40,9 +40,9 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class DeviceChooseFragment extends Fragment implements View.OnClickListener
+public class MapFragment_Choose extends Fragment implements View.OnClickListener
 {
-    private static final String TAG = "DeviceChooseFragment";
+    private static final String TAG = "MapFragment_Choose";
     private static final int MESSAGE_RREQUEST_FAIL = 1;
     private static final int MESSAGE_RESPONSE_FAIL = 2;
     private static final int MESSAGE_RESPONSE_SUCCESS = 3;
@@ -64,9 +64,9 @@ public class DeviceChooseFragment extends Fragment implements View.OnClickListen
      * @param deviceInfo
      * @return
      */
-    public static DeviceChooseFragment newInstance(DeviceInfo deviceInfo)
+    public static MapFragment_Choose newInstance(DeviceInfo deviceInfo)
     {
-        DeviceChooseFragment fragment = new DeviceChooseFragment();
+        MapFragment_Choose fragment = new MapFragment_Choose();
         Bundle args = new Bundle();
         args.putParcelable("DEVICEINFO", deviceInfo);
         fragment.setArguments(args);
@@ -80,8 +80,8 @@ public class DeviceChooseFragment extends Fragment implements View.OnClickListen
         {
             case R.id.btn_return_device_choose:
                 //重新实例化地图碎片实现重新加载设备位置
-                MapFragment newMapFragment = MapFragment.newInstance(m_deviceInfo);
-                getFragmentManager().beginTransaction().replace(R.id.fragment_current_map, newMapFragment, "mapFragment").show(newMapFragment).commitNow();
+                MapFragment_Map mapFragment_map = MapFragment_Map.newInstance(m_deviceInfo);
+                getFragmentManager().beginTransaction().replace(R.id.fragment_current_map, mapFragment_map, "mapFragment_map").show(mapFragment_map).commitNow();
                 break;
         }
     }
@@ -173,8 +173,8 @@ public class DeviceChooseFragment extends Fragment implements View.OnClickListen
                 {
                     m_deviceInfo = m_deviceList.get(position);
                     //重新实例化地图碎片实现重新加载设备位置
-                    MapFragment newMapFragment = MapFragment.newInstance(m_deviceInfo);
-                    getFragmentManager().beginTransaction().replace(R.id.fragment_current_map, newMapFragment, "mapFragment").show(newMapFragment).commitNow();
+                    MapFragment_Map mapFragment_map = MapFragment_Map.newInstance(m_deviceInfo);
+                    getFragmentManager().beginTransaction().replace(R.id.fragment_current_map, mapFragment_map, "mapFragment_map").show(mapFragment_map).commitNow();
                 }
 
                 @Override
@@ -190,8 +190,8 @@ public class DeviceChooseFragment extends Fragment implements View.OnClickListen
                 {
                     return;
                 }
-                DeviceBindFragment deviceBindFragment = DeviceBindFragment.newInstance(m_deviceInfo);
-                getFragmentManager().beginTransaction().replace(R.id.fragment_current_device, deviceBindFragment, "deviceBindFragment").commitNow();
+                MapFragment_Bind mapFragment_bind = MapFragment_Bind.newInstance(m_deviceInfo);
+                getFragmentManager().beginTransaction().replace(R.id.fragment_current_map, mapFragment_bind, "mapFragment_bind").commitNow();
             });
         }
     }

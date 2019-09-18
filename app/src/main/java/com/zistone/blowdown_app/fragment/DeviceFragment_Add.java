@@ -37,9 +37,9 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class DeviceAddFragment extends Fragment implements View.OnClickListener
+public class DeviceFragment_Add extends Fragment implements View.OnClickListener
 {
-    private static final String TAG = "DeviceAddFragment";
+    private static final String TAG = "DeviceFragment_Add";
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     private static final int MESSAGE_RREQUEST_FAIL = 1;
@@ -59,9 +59,9 @@ public class DeviceAddFragment extends Fragment implements View.OnClickListener
     private Button m_btnSave;
     private ProgressBar m_progressBar;
 
-    public static DeviceAddFragment newInstance(String param1, String param2)
+    public static DeviceFragment_Add newInstance(String param1, String param2)
     {
-        DeviceAddFragment fragment = new DeviceAddFragment();
+        DeviceFragment_Add fragment = new DeviceFragment_Add();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -93,11 +93,11 @@ public class DeviceAddFragment extends Fragment implements View.OnClickListener
 
     private void AddResult(DeviceInfo deviceInfo)
     {
-        if(deviceInfo != null)
+        if (deviceInfo != null)
         {
             Log.i(TAG, "设备添加成功,设备编号为:" + deviceInfo.getM_deviceId());
-            DeviceManageFragment deviceManageFragment = DeviceManageFragment.newInstance("", "");
-            getFragmentManager().beginTransaction().replace(R.id.fragment_current_device, deviceManageFragment, "deviceManageFragment").commitNow();
+            DeviceFragment_Manage deviceFragment_manage = DeviceFragment_Manage.newInstance("", "");
+            getFragmentManager().beginTransaction().replace(R.id.fragment_current_device, deviceFragment_manage, "deviceFragment_manage").commitNow();
             Toast.makeText(m_context, "设备添加成功", Toast.LENGTH_SHORT).show();
         }
         else
@@ -114,7 +114,7 @@ public class DeviceAddFragment extends Fragment implements View.OnClickListener
         {
             super.handleMessage(message);
             IsAddEnd();
-            switch(message.what)
+            switch (message.what)
             {
                 case MESSAGE_RREQUEST_FAIL:
                 {
@@ -144,11 +144,11 @@ public class DeviceAddFragment extends Fragment implements View.OnClickListener
     @Override
     public void onClick(View v)
     {
-        switch(v.getId())
+        switch (v.getId())
         {
             case R.id.btn_return_device_add:
-                DeviceManageFragment deviceManageFragment = DeviceManageFragment.newInstance("", "");
-                getFragmentManager().beginTransaction().replace(R.id.fragment_current_device, deviceManageFragment, "deviceManageFragment").commitNow();
+                DeviceFragment_Manage deviceFragment_manage = DeviceFragment_Manage.newInstance("", "");
+                getFragmentManager().beginTransaction().replace(R.id.fragment_current_device, deviceFragment_manage, "deviceFragment_manage").commitNow();
                 break;
             case R.id.btn_save_add:
                 String name = m_editText_deviceName.getText().toString();
@@ -157,7 +157,7 @@ public class DeviceAddFragment extends Fragment implements View.OnClickListener
                 String sim = m_editText_simNumber.getText().toString();
                 String comment = m_editText_comment.getText().toString();
                 boolean state = m_switch_state.isChecked();
-                if(null == name || "".equals(name) || null == type || "".equals(type) || null == deviceId || "".equals(deviceId) || null == sim || "".equals(sim) || null == comment || "".equals(comment))
+                if (null == name || "".equals(name) || null == type || "".equals(type) || null == deviceId || "".equals(deviceId) || null == sim || "".equals(sim) || null == comment || "".equals(comment))
                 {
                     Toast.makeText(m_context, "请填写正确的设备信息", Toast.LENGTH_SHORT).show();
                     return;
@@ -196,7 +196,7 @@ public class DeviceAddFragment extends Fragment implements View.OnClickListener
                         {
                             String responseStr = response.body().string();
                             Log.i(TAG, "响应内容:" + responseStr);
-                            if(response.isSuccessful())
+                            if (response.isSuccessful())
                             {
                                 Message message = handler.obtainMessage(MESSAGE_RESPONSE_SUCCESS, responseStr);
                                 handler.sendMessage(message);
@@ -224,7 +224,7 @@ public class DeviceAddFragment extends Fragment implements View.OnClickListener
 
     public void onButtonPressed(Uri uri)
     {
-        if(mListener != null)
+        if (mListener != null)
         {
             mListener.onFragmentInteraction(uri);
         }
@@ -257,7 +257,7 @@ public class DeviceAddFragment extends Fragment implements View.OnClickListener
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        if(getArguments() != null)
+        if (getArguments() != null)
         {
         }
     }
@@ -274,7 +274,7 @@ public class DeviceAddFragment extends Fragment implements View.OnClickListener
     public void onAttach(Context context)
     {
         super.onAttach(context);
-        if(context instanceof OnFragmentInteractionListener)
+        if (context instanceof OnFragmentInteractionListener)
         {
             mListener = (OnFragmentInteractionListener) context;
         }

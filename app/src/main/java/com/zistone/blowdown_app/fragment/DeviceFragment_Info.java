@@ -36,9 +36,9 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class DeviceInfoFragment extends Fragment implements View.OnClickListener
+public class DeviceFragment_Info extends Fragment implements View.OnClickListener
 {
-    private static final String TAG = "DeviceInfoFragment";
+    private static final String TAG = "DeviceFragment_Info";
     private static final int MESSAGE_RREQUEST_FAIL = 1;
     private static final int MESSAGE_RESPONSE_FAIL = 2;
     private static final int MESSAGE_RESPONSE_SUCCESS = 3;
@@ -61,9 +61,9 @@ public class DeviceInfoFragment extends Fragment implements View.OnClickListener
      * @param deviceInfo
      * @return
      */
-    public static DeviceInfoFragment newInstance(DeviceInfo deviceInfo)
+    public static DeviceFragment_Info newInstance(DeviceInfo deviceInfo)
     {
-        DeviceInfoFragment fragment = new DeviceInfoFragment();
+        DeviceFragment_Info fragment = new DeviceFragment_Info();
         Bundle args = new Bundle();
         args.putParcelable("DEVICEINFO", deviceInfo);
         fragment.setArguments(args);
@@ -76,8 +76,8 @@ public class DeviceInfoFragment extends Fragment implements View.OnClickListener
         switch (v.getId())
         {
             case R.id.btn_return_device_info:
-                DeviceListFragment deviceListFragment = DeviceListFragment.newInstance(1, "");
-                getFragmentManager().beginTransaction().replace(R.id.fragment_current_device, deviceListFragment, "deviceListFragment").commitNow();
+                DeviceFragment_List deviceFragment_list = DeviceFragment_List.newInstance(1, "");
+                getFragmentManager().beginTransaction().replace(R.id.fragment_current_device, deviceFragment_list, "deviceFragment_list").commitNow();
                 break;
             case R.id.btn_confirm_device_info:
                 if (m_btnConfirm.getText().equals("编辑"))

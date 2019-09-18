@@ -32,9 +32,9 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class DeviceBindFragment extends Fragment implements View.OnClickListener
+public class MapFragment_Bind extends Fragment implements View.OnClickListener
 {
-    private static final String TAG = "DeviceBindFragment";
+    private static final String TAG = "MapFragment_Bind";
     private static final int MESSAGE_RREQUEST_FAIL = 1;
     private static final int MESSAGE_RESPONSE_FAIL = 2;
     private static final int MESSAGE_RESPONSE_SUCCESS = 3;
@@ -49,9 +49,9 @@ public class DeviceBindFragment extends Fragment implements View.OnClickListener
      * @param deviceInfo
      * @return
      */
-    public static DeviceBindFragment newInstance(DeviceInfo deviceInfo)
+    public static MapFragment_Bind newInstance(DeviceInfo deviceInfo)
     {
-        DeviceBindFragment fragment = new DeviceBindFragment();
+        MapFragment_Bind fragment = new MapFragment_Bind();
         Bundle args = new Bundle();
         args.putParcelable("DEVICEINFO", deviceInfo);
         fragment.setArguments(args);
@@ -61,12 +61,12 @@ public class DeviceBindFragment extends Fragment implements View.OnClickListener
     @Override
     public void onClick(View v)
     {
-        switch(v.getId())
+        switch (v.getId())
         {
             case R.id.btn_return_device_bind:
                 //重新实例化地图碎片实现重新加载设备位置
-                DeviceChooseFragment deviceChooseFragment = DeviceChooseFragment.newInstance(m_deviceInfo);
-                getFragmentManager().beginTransaction().replace(R.id.fragment_current_map, deviceChooseFragment, "mapFragment").commitNow();
+                MapFragment_Choose mapFragment_choose = MapFragment_Choose.newInstance(m_deviceInfo);
+                getFragmentManager().beginTransaction().replace(R.id.fragment_current_map, mapFragment_choose, "mapFragment_choose").commitNow();
                 break;
         }
     }
@@ -81,7 +81,7 @@ public class DeviceBindFragment extends Fragment implements View.OnClickListener
 
     public void onButtonPressed(Uri uri)
     {
-        if(mListener != null)
+        if (mListener != null)
         {
             mListener.onFragmentInteraction(uri);
         }
@@ -103,7 +103,7 @@ public class DeviceBindFragment extends Fragment implements View.OnClickListener
         public void handleMessage(Message message)
         {
             super.handleMessage(message);
-            switch(message.what)
+            switch (message.what)
             {
                 case MESSAGE_RREQUEST_FAIL:
                 {
@@ -114,7 +114,7 @@ public class DeviceBindFragment extends Fragment implements View.OnClickListener
                 case MESSAGE_RESPONSE_SUCCESS:
                 {
                     String result = (String) message.obj;
-                    if(null == result || "".equals(result))
+                    if (null == result || "".equals(result))
                     {
                         return;
                     }
@@ -165,7 +165,7 @@ public class DeviceBindFragment extends Fragment implements View.OnClickListener
                 {
                     String result = response.body().string();
                     Log.i(TAG, "响应内容:" + result);
-                    if(response.isSuccessful())
+                    if (response.isSuccessful())
                     {
                         Message message = handler.obtainMessage(MESSAGE_RESPONSE_SUCCESS, result);
                         handler.sendMessage(message);
@@ -191,7 +191,7 @@ public class DeviceBindFragment extends Fragment implements View.OnClickListener
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        if(getArguments() != null)
+        if (getArguments() != null)
         {
             //获取设备信息
             m_deviceInfo = getArguments().getParcelable("DEVICEINFO");
@@ -210,7 +210,7 @@ public class DeviceBindFragment extends Fragment implements View.OnClickListener
     public void onAttach(Context context)
     {
         super.onAttach(context);
-        if(context instanceof OnFragmentInteractionListener)
+        if (context instanceof OnFragmentInteractionListener)
         {
             mListener = (OnFragmentInteractionListener) context;
         }

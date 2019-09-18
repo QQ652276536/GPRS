@@ -13,9 +13,9 @@ import android.widget.ImageButton;
 import com.zistone.blowdown_app.util.PropertiesUtil;
 import com.zistone.blowdown_app.R;
 
-public class ForgetFragment extends Fragment implements View.OnClickListener
+public class UserFragment_Forget extends Fragment implements View.OnClickListener
 {
-    private static final String TAG = "ForgetFragment";
+    private static final String TAG = "UserFragment_Forget";
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     private static String URL;
@@ -28,9 +28,9 @@ public class ForgetFragment extends Fragment implements View.OnClickListener
 
     private OnFragmentInteractionListener mListener;
 
-    public static ForgetFragment newInstance(String param1, String param2)
+    public static UserFragment_Forget newInstance(String param1, String param2)
     {
-        ForgetFragment fragment = new ForgetFragment();
+        UserFragment_Forget fragment = new UserFragment_Forget();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -101,8 +101,8 @@ public class ForgetFragment extends Fragment implements View.OnClickListener
         switch(v.getId())
         {
             case R.id.btn_return_forget:
-                LoginFragment loginFragment = LoginFragment.newInstance("", "");
-                getFragmentManager().beginTransaction().replace(R.id.fragment_current_user, loginFragment, "loginFragment").commitNow();
+                UserFragment_Login userFragment_login = UserFragment_Login.newInstance("", "");
+                getFragmentManager().beginTransaction().replace(R.id.fragment_current_user, userFragment_login, "userFragment_login").commitNow();
                 break;
         }
     }

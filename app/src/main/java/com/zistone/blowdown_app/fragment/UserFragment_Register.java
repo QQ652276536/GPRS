@@ -39,9 +39,9 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class RegisterFragment extends Fragment implements View.OnClickListener, View.OnFocusChangeListener
+public class UserFragment_Register extends Fragment implements View.OnClickListener, View.OnFocusChangeListener
 {
-    private static final String TAG = "RegisterFragment";
+    private static final String TAG = "UserFragment_Register";
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     private static final int MESSAGE_RREQUEST_FAIL = 1;
@@ -71,9 +71,9 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
 
     private OnFragmentInteractionListener mListener;
 
-    public static RegisterFragment newInstance(String param1, String param2)
+    public static UserFragment_Register newInstance(String param1, String param2)
     {
-        RegisterFragment fragment = new RegisterFragment();
+        UserFragment_Register fragment = new UserFragment_Register();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -163,8 +163,8 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
         switch(v.getId())
         {
             case R.id.btn_return_register:
-                LoginFragment loginFragment = LoginFragment.newInstance("", "");
-                getFragmentManager().beginTransaction().replace(R.id.fragment_current_user, loginFragment, "loginFragment").commitNow();
+                UserFragment_Login userFragment_login = UserFragment_Login.newInstance("", "");
+                getFragmentManager().beginTransaction().replace(R.id.fragment_current_user, userFragment_login, "userFragment_login").commitNow();
                 break;
             case R.id.btn_register_register:
                 if(Pattern.matches(REGEXUSERNAME, m_editText_userName.getText().toString()))
@@ -430,8 +430,8 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
             builder.setPositiveButton("确定", (dialog, which) ->
             {
                 dialog.dismiss();
-                LoginFragment loginFragment = LoginFragment.newInstance("", "");
-                getFragmentManager().beginTransaction().replace(R.id.fragment_current_user, loginFragment, "loginFragment").commitNow();
+                UserFragment_Login userFragment_login = UserFragment_Login.newInstance("", "");
+                getFragmentManager().beginTransaction().replace(R.id.fragment_current_user, userFragment_login, "userFragment_login").commitNow();
             });
             builder.setMessage("注册成功,请牢记你的用户名" + userInfo.getM_userName() + "和密码!");
             builder.show();

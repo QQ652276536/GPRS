@@ -51,9 +51,9 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class UserInfoFragment extends Fragment implements View.OnClickListener, View.OnFocusChangeListener
+public class UserFragment_Info extends Fragment implements View.OnClickListener, View.OnFocusChangeListener
 {
-    private static final String TAG = "UserInfoFragment";
+    private static final String TAG = "UserFragment_Info";
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     private static final int MESSAGE_RREQUEST_FAIL = 1;
@@ -86,13 +86,13 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
     private EditText m_editText_userRealName;
     private EditText m_editText_userPhone;
 
-    public UserInfoFragment()
+    public UserFragment_Info()
     {
     }
 
-    public static UserInfoFragment newInstance(String param1, String param2)
+    public static UserFragment_Info newInstance(String param1, String param2)
     {
-        UserInfoFragment fragment = new UserInfoFragment();
+        UserFragment_Info fragment = new UserFragment_Info();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -510,8 +510,8 @@ public class UserInfoFragment extends Fragment implements View.OnClickListener, 
             //退出登录
             case R.id.btnLogout_userInfo:
                 UserSharedPreference.LogoutSuccess(m_context);
-                LoginFragment loginFragment = new LoginFragment();
-                getFragmentManager().beginTransaction().replace(R.id.fragment_current_user, loginFragment, "loginFragment").commitNow();
+                UserFragment_Login userFragment_login = new UserFragment_Login();
+                getFragmentManager().beginTransaction().replace(R.id.fragment_current_user, userFragment_login, "userFragment_login").commitNow();
                 break;
         }
     }

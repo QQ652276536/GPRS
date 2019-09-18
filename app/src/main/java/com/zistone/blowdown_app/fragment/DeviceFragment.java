@@ -40,7 +40,7 @@ public class DeviceFragment extends Fragment
 
     public void onButtonPressed(Uri uri)
     {
-        if(mListener != null)
+        if (mListener != null)
         {
             mListener.onFragmentInteraction(uri);
         }
@@ -50,8 +50,8 @@ public class DeviceFragment extends Fragment
     {
         m_context = getContext();
         //注意:一个FragmentTransaction只能Commit一次,不要用全局或共享一个FragmentTransaction对象,多个Fragment则多次get
-        DeviceManageFragment deviceManageFragment = DeviceManageFragment.newInstance("", "");
-        getChildFragmentManager().beginTransaction().add(R.id.fragment_current_device, deviceManageFragment, "deviceManageFragment").show(deviceManageFragment).commitNow();
+        DeviceFragment_Manage deviceFragment_manage = DeviceFragment_Manage.newInstance("", "");
+        getChildFragmentManager().beginTransaction().add(R.id.fragment_current_device, deviceFragment_manage, "deviceFragment_manage").show(deviceFragment_manage).commitNow();
     }
 
     @Override
@@ -64,7 +64,7 @@ public class DeviceFragment extends Fragment
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        if(getArguments() != null)
+        if (getArguments() != null)
         {
         }
     }
@@ -81,7 +81,7 @@ public class DeviceFragment extends Fragment
     public void onAttach(Context context)
     {
         super.onAttach(context);
-        if(context instanceof OnFragmentInteractionListener)
+        if (context instanceof OnFragmentInteractionListener)
         {
             mListener = (OnFragmentInteractionListener) context;
         }
