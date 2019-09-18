@@ -32,4 +32,6 @@
     <string name="title_trackQuery">轨迹查询</string>
     <string name="btn_trackQuery">查询</string>
     <string name="font_type">微软雅黑</string>
+    <string name="title_choose">设备选择</string>
+    <string name="title_bind">设备绑定</string>
 </resources>

@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    app:overlay="false"
+    app:progress_backgroud_color="#FFFAFAFA"
+    app:progress_show_arrow="true"
+    app:progress_show_circle_backgroud="true"
+    app:wave_color="@color/colorPrimary"
+    app:wave_height_type="normal"
+    app:wave_show="true">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar_device_bind"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@color/colorPrimary">
+
+        <ImageButton
+            android:id="@+id/btn_return_device_bind"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/transparent"
+            app:srcCompat="@drawable/btn_return" />
+
+        <TextView
+            android:id="@+id/textView_toolbar_bind"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:text="@string/title_bind"
+            android:textColor="@color/white"
+            android:textSize="28sp" />
+
+        <Button
+            android:id="@+id/btn_confirm_device_bind"
+            android:layout_width="60dp"
+            android:layout_height="35dp"
+            android:layout_gravity="right"
+            android:layout_marginRight="10dp"
+            android:background="@color/white"
+            android:text="绑定"
+            android:textColor="@color/colorPrimary" />
+
+    </android.support.v7.widget.Toolbar>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical|left"
+            android:text="目&#12288;&#12288;标:"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/textView1_bind"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical|left"
+            android:text="铱星设备-3"
+            android:textSize="18sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical|left"
+            android:text="终端绑定:"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/textView2_bind"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical|left"
+            android:text="铱星设备003"
+            android:textSize="18sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical|left"
+            android:text="编&#12288;&#12288;号:"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/textView3_bind"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical|left"
+            android:text="234067340900"
+            android:textSize="18sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical|left"
+            android:text="SIM&#160;卡号:"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/textView4_bind"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical|left"
+            android:text=""
+            android:textSize="18sp" />
+    </LinearLayout>
+</LinearLayout>

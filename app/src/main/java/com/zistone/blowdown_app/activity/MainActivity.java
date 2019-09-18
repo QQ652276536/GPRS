@@ -12,6 +12,8 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.zistone.blowdown_app.R;
+import com.zistone.blowdown_app.fragment.DeviceBindFragment;
+import com.zistone.blowdown_app.fragment.DeviceChooseFragment;
 import com.zistone.blowdown_app.util.UserSharedPreference;
 import com.zistone.blowdown_app.fragment.DeviceAddFragment;
 import com.zistone.blowdown_app.fragment.DeviceFragment;
@@ -27,7 +29,13 @@ import com.zistone.blowdown_app.fragment.UserInfoFragment;
 
 import java.io.Serializable;
 
-public class MainActivity extends AppCompatActivity implements TrackQueryFragment.OnFragmentInteractionListener, MapFragment.OnFragmentInteractionListener, DeviceFragment.OnFragmentInteractionListener, DeviceManageFragment.OnFragmentInteractionListener, DeviceListFragment.OnFragmentInteractionListener, DeviceAddFragment.OnFragmentInteractionListener, UserFragment.OnFragmentInteractionListener, LoginFragment.OnFragmentInteractionListener, RegisterFragment.OnFragmentInteractionListener, ForgetFragment.OnFragmentInteractionListener, UserInfoFragment.OnFragmentInteractionListener, Serializable
+public class MainActivity extends AppCompatActivity implements DeviceBindFragment.OnFragmentInteractionListener,
+        DeviceChooseFragment.OnFragmentInteractionListener, TrackQueryFragment.OnFragmentInteractionListener,
+        MapFragment.OnFragmentInteractionListener, DeviceFragment.OnFragmentInteractionListener,
+        DeviceManageFragment.OnFragmentInteractionListener, DeviceListFragment.OnFragmentInteractionListener,
+        DeviceAddFragment.OnFragmentInteractionListener, UserFragment.OnFragmentInteractionListener,
+        LoginFragment.OnFragmentInteractionListener, RegisterFragment.OnFragmentInteractionListener,
+        ForgetFragment.OnFragmentInteractionListener, UserInfoFragment.OnFragmentInteractionListener, Serializable
 {
     //当前页,用来切换
     public Fragment m_currentFragment;

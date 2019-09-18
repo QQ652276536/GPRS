@@ -28,6 +28,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -118,6 +119,7 @@ public class MapFragment extends Fragment implements BaiduMap.OnMapClickListener
     private ImageButton m_btnTask;
     private ImageButton m_btnDefense;
     private boolean m_trafficEnabled;
+    private Button m_btnMonitorTarget;
 
     public static MapFragment newInstance(DeviceInfo deviceInfo)
     {
@@ -591,6 +593,9 @@ public class MapFragment extends Fragment implements BaiduMap.OnMapClickListener
         m_baiduMap.setOnMarkerClickListener(this::onMarkerClick);
         //地图加载完毕回调
         m_baiduMap.setOnMapLoadedCallback(() -> SetMapStateAndMarkOptions());
+        m_btnMonitorTarget = m_mapView.findViewById(R.id.btn_monitor_target);
+        m_btnMonitorTarget.setOnClickListener(this::onClick);
+        m_btnMonitorTarget.setText("监控目标 " + m_deviceInfo.getM_name());
     }
 
     /**
@@ -742,6 +747,10 @@ public class MapFragment extends Fragment implements BaiduMap.OnMapClickListener
     {
         switch(v.getId())
         {
+            case R.id.btn_monitor_target:
+                DeviceChooseFragment deviceChooseFragment = DeviceChooseFragment.newInstance(m_deviceInfo);
+                getFragmentManager().beginTransaction().replace(R.id.fragment_current, deviceChooseFragment, "deviceChooseFragment").commitNow();
+                break;
             case R.id.btn_location_baidu:
                 if(null != m_deviceInfo)
                 {
@@ -764,7 +773,7 @@ public class MapFragment extends Fragment implements BaiduMap.OnMapClickListener
                 break;
             case R.id.btn_locus_baidu:
                 if(null != m_deviceInfo)
-                                {
+                {
                     TrackQueryFragment trackQueryFragment = TrackQueryFragment.newInstance(m_deviceInfo);
                     getFragmentManager().beginTransaction().replace(R.id.fragment_current, trackQueryFragment, "trackQueryFragment").commitNow();
                 }

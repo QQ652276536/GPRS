@@ -16,6 +16,20 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <Button
+            android:id="@+id/btn_monitor_target"
+            style="@style/Btn_AdaptiveTextSize"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="10dp"
+            android:background="@color/white"
+            android:text="监控目标 GPRS测试-3"
+            android:textColor="@color/colorPrimary"
+            android:textSize="18sp" />
+
         <com.baidu.mapapi.map.MapView
             android:id="@+id/mapView_baidu"
             android:layout_width="fill_parent"
@@ -42,7 +56,7 @@
             android:layout_alignParentRight="true"
             android:layout_marginTop="50dp"
             android:layout_marginRight="5dp"
-            android:background="@color/black"
+            android:background="@color/white"
             android:orientation="vertical">
 
             <ImageButton
