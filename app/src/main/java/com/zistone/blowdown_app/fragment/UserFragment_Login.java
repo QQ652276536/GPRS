@@ -53,7 +53,7 @@ public class UserFragment_Login extends Fragment implements View.OnClickListener
     //间隔时间
     private static int TIMEINTERVAL = 5 * 1000;
     //6~12位字母数字组合或6位中文
-    private static final String REGEXUSERNAME = "([a-zA-Z0-9]{6,12})|[\\u4e00-\\u9fa5]{2,6}";
+    private static final String REGEXUSERNAME = "([a-zA-Z0-9]{4,12})|[\\u4e00-\\u9fa5]{2,6}";
     //首位不能是数字,不能全为数字或字母,6~16位
     private static final String REGEXPASSWORD = "^(?![0-9])(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,16}$";
     private String mParam1;
