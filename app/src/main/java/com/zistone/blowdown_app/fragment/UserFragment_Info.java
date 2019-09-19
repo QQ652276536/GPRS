@@ -464,7 +464,7 @@ public class UserFragment_Info extends Fragment implements View.OnClickListener,
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        m_userInfoView = inflater.inflate(R.layout.fragment_user_userinfo, container, false);
+        m_userInfoView = inflater.inflate(R.layout.fragment_user_info, container, false);
         InitView();
         return m_userInfoView;
     }

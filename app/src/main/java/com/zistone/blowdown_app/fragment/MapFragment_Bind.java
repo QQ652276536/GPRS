@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.zistone.blowdown_app.R;
@@ -44,6 +45,10 @@ public class MapFragment_Bind extends Fragment implements View.OnClickListener
     private ImageButton m_btnReturn;
     private OnFragmentInteractionListener mListener;
     private DeviceInfo m_deviceInfo;
+    private TextView m_textView1;
+    private TextView m_textView2;
+    private TextView m_textView3;
+    private TextView m_textView4;
 
     /**
      * @param deviceInfo
@@ -61,7 +66,7 @@ public class MapFragment_Bind extends Fragment implements View.OnClickListener
     @Override
     public void onClick(View v)
     {
-        switch (v.getId())
+        switch(v.getId())
         {
             case R.id.btn_return_device_bind:
                 //重新实例化地图碎片实现重新加载设备位置
@@ -81,7 +86,7 @@ public class MapFragment_Bind extends Fragment implements View.OnClickListener
 
     public void onButtonPressed(Uri uri)
     {
-        if (mListener != null)
+        if(mListener != null)
         {
             mListener.onFragmentInteraction(uri);
         }
@@ -93,7 +98,17 @@ public class MapFragment_Bind extends Fragment implements View.OnClickListener
         URL = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/DeviceInfo/Update";
         m_btnReturn = m_deviceBindView.findViewById(R.id.btn_return_device_bind);
         m_btnReturn.setOnClickListener(this::onClick);
-
+        m_textView1 = m_deviceBindView.findViewById(R.id.textView1_bind);
+        m_textView2 = m_deviceBindView.findViewById(R.id.textView2_bind);
+        m_textView3 = m_deviceBindView.findViewById(R.id.textView3_bind);
+        m_textView4 = m_deviceBindView.findViewById(R.id.textView4_bind);
+        if(null != m_deviceInfo)
+        {
+            m_textView1.setText(m_deviceInfo.getM_name());
+            m_textView2.setText("");
+            m_textView3.setText(m_deviceInfo.getM_deviceId());
+            m_textView4.setText(String.valueOf(m_deviceInfo.getM_sim()));
+        }
     }
 
 
@@ -103,7 +118,7 @@ public class MapFragment_Bind extends Fragment implements View.OnClickListener
         public void handleMessage(Message message)
         {
             super.handleMessage(message);
-            switch (message.what)
+            switch(message.what)
             {
                 case MESSAGE_RREQUEST_FAIL:
                 {
@@ -114,7 +129,7 @@ public class MapFragment_Bind extends Fragment implements View.OnClickListener
                 case MESSAGE_RESPONSE_SUCCESS:
                 {
                     String result = (String) message.obj;
-                    if (null == result || "".equals(result))
+                    if(null == result || "".equals(result))
                     {
                         return;
                     }
@@ -165,7 +180,7 @@ public class MapFragment_Bind extends Fragment implements View.OnClickListener
                 {
                     String result = response.body().string();
                     Log.i(TAG, "响应内容:" + result);
-                    if (response.isSuccessful())
+                    if(response.isSuccessful())
                     {
                         Message message = handler.obtainMessage(MESSAGE_RESPONSE_SUCCESS, result);
                         handler.sendMessage(message);
@@ -191,7 +206,7 @@ public class MapFragment_Bind extends Fragment implements View.OnClickListener
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null)
+        if(getArguments() != null)
         {
             //获取设备信息
             m_deviceInfo = getArguments().getParcelable("DEVICEINFO");
@@ -210,7 +225,7 @@ public class MapFragment_Bind extends Fragment implements View.OnClickListener
     public void onAttach(Context context)
     {
         super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener)
+        if(context instanceof OnFragmentInteractionListener)
         {
             mListener = (OnFragmentInteractionListener) context;
         }
