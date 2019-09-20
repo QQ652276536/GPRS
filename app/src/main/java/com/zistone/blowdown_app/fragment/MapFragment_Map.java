@@ -115,6 +115,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
     private ImageButton m_btnDefense;
     private boolean m_trafficEnabled;
     private Button m_btnMonitorTarget;
+    private ImageButton m_btnInfoClose;
 
     public static MapFragment_Map newInstance(DeviceInfo deviceInfo)
     {
@@ -127,7 +128,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
 
     public void onButtonPressed(Uri uri)
     {
-        if (mListener != null)
+        if(mListener != null)
         {
             mListener.onFragmentInteraction(uri);
         }
@@ -135,6 +136,10 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
 
     private void CreateInfoWindow()
     {
+        ImageButton buttonClose = m_infoWindow.findViewById(R.id.btn_close_map_device_info);
+        buttonClose.setOnClickListener(this::onClick);
+        TextView textSetting = m_infoWindow.findViewById(R.id.textView2_map_device_info);
+        textSetting.setOnClickListener(this::onClick);
         TextView textName = m_infoWindow.findViewById(R.id.textView4_map_device_info);
         TextView textSIM = m_infoWindow.findViewById(R.id.textView5_map_device_info);
         TextView textUpMode = m_infoWindow.findViewById(R.id.textView8_map_device_info);
@@ -159,7 +164,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
     @Override
     public boolean onMarkerClick(Marker marker)
     {
-        if (null != m_latLng && null != m_deviceInfo)
+        if(null != m_latLng && null != m_deviceInfo)
         {
             CreateInfoWindow();
         }
@@ -169,7 +174,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
     @Override
     public void onMapClick(LatLng latLng)
     {
-        if (null != m_infoWindow)
+        if(null != m_infoWindow)
         {
             m_baiduMap.hideInfoWindow();
             m_baiduMapView.postInvalidate();
@@ -236,7 +241,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
             //此处的BDLocation为定位结果信息类,通过它的各种get方法可获取定位相关的全部结果
             //以下只列举部分获取经纬度相关（常用）的结果信息更多结果信息获取说明,请参照类参考中BDLocation类中的说明
             //BDLocation.TypeServerError:服务端定位失败,请您检查是否禁用获取位置信息权限,尝试重新请求定位
-            if (null == m_baiduMapView || null == location || BDLocation.TypeServerError == location.getLocType())
+            if(null == m_baiduMapView || null == location || BDLocation.TypeServerError == location.getLocType())
             {
                 return;
             }
@@ -299,16 +304,16 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
             //获取周边POI信息
             List<Poi> poiList = location.getPoiList();
             //POI信息包括POI ID、名称等,具体信息请参照类参考中POI类的相关说明
-            if (poiList != null)
+            if(poiList != null)
             {
-                for (Poi poi : poiList)
+                for(Poi poi : poiList)
                 {
                     Log.i(TAG, ">>>" + poi.getId() + "\t" + poi.getName() + "\t" + poi.getRank());
                 }
             }
             Log.i(TAG, ">>>" + sb.toString());
             //GPS定位结果
-            if (location.getLocType() == BDLocation.TypeGpsLocation)
+            if(location.getLocType() == BDLocation.TypeGpsLocation)
             {
                 sb.append("\n速度(km/h) : ");
                 sb.append(location.getSpeed());
@@ -321,10 +326,10 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
                 sb.append("GPS定位成功");
             }
             //网络定位结果
-            else if (location.getLocType() == BDLocation.TypeNetWorkLocation)
+            else if(location.getLocType() == BDLocation.TypeNetWorkLocation)
             {
                 //如果有海拔高度
-                if (location.hasAltitude())
+                if(location.hasAltitude())
                 {
                     sb.append("\n海拔(米) : ");
                     sb.append(location.getAltitude());
@@ -335,19 +340,19 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
                 sb.append("\n网络定位成功");
             }
             //离线定位结果
-            else if (location.getLocType() == BDLocation.TypeOffLineLocation)
+            else if(location.getLocType() == BDLocation.TypeOffLineLocation)
             {
                 sb.append("离线定位成功,离线定位结果也是有效的");
             }
-            else if (location.getLocType() == BDLocation.TypeServerError)
+            else if(location.getLocType() == BDLocation.TypeServerError)
             {
                 sb.append("服务端网络定位失败,可以反馈IMEI号和大体定位时间到loc-bugs@baidu.com,会有人追查原因");
             }
-            else if (location.getLocType() == BDLocation.TypeNetWorkException)
+            else if(location.getLocType() == BDLocation.TypeNetWorkException)
             {
                 sb.append("网络不同导致定位失败,请检查网络是否通畅");
             }
-            else if (location.getLocType() == BDLocation.TypeCriteriaException)
+            else if(location.getLocType() == BDLocation.TypeCriteriaException)
             {
                 sb.append("无法获取有效定位依据导致定位失败,一般是由于手机的原因,处于飞行模式下一般会造成这种结果,可以试着重启手机");
             }
@@ -357,7 +362,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
             //此处设置开发者获取到的方向信息,顺时针0-360
             m_baiduMap.setMyLocationData(m_locationData);
             //如果是首次定位
-            if (m_isFirstLoc)
+            if(m_isFirstLoc)
             {
                 m_isFirstLoc = false;
                 //根据经纬度定位位置
@@ -378,25 +383,25 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
         public void onReceive(Context context, Intent intent)
         {
             String action = intent.getAction();
-            if (TextUtils.isEmpty(action))
+            if(TextUtils.isEmpty(action))
             {
                 return;
             }
             //鉴权错误信息描述
             m_textView.setTextColor(Color.RED);
-            if (action.equals(SDKInitializer.SDK_BROADTCAST_ACTION_STRING_PERMISSION_CHECK_ERROR))
+            if(action.equals(SDKInitializer.SDK_BROADTCAST_ACTION_STRING_PERMISSION_CHECK_ERROR))
             {
                 m_textView.setText("Key验证出错!错误码:" + intent.getIntExtra(SDKInitializer.SDK_BROADTCAST_INTENT_EXTRA_INFO_KEY_ERROR_CODE, 0) + ";错误信息:" + intent.getStringExtra(SDKInitializer.SDK_BROADTCAST_INTENT_EXTRA_INFO_KEY_ERROR_MESSAGE));
                 m_textView.setTextColor(Color.RED);
                 m_textView.setVisibility(View.INVISIBLE);
             }
-            else if (action.equals(SDKInitializer.SDK_BROADCAST_ACTION_STRING_NETWORK_ERROR))
+            else if(action.equals(SDKInitializer.SDK_BROADCAST_ACTION_STRING_NETWORK_ERROR))
             {
                 m_textView.setText("网络出错");
                 m_textView.setTextColor(Color.RED);
                 m_textView.setVisibility(View.INVISIBLE);
             }
-            else if (action.equals(SDKInitializer.SDK_BROADTCAST_ACTION_STRING_PERMISSION_CHECK_OK))
+            else if(action.equals(SDKInitializer.SDK_BROADTCAST_ACTION_STRING_PERMISSION_CHECK_OK))
             {
                 m_textView.setText("Key验证成功!功能可以正常使用");
                 m_textView.setTextColor(Color.GREEN);
@@ -470,22 +475,22 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
      */
     private void RequestPermission()
     {
-        if (Build.VERSION.SDK_INT >= 23 && !m_isPermissionRequested)
+        if(Build.VERSION.SDK_INT >= 23 && !m_isPermissionRequested)
         {
             m_isPermissionRequested = true;
             ArrayList<String> permissionsList = new ArrayList<>();
             String[] permissions = {
                     Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.INTERNET, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.WRITE_SETTINGS, Manifest.permission.ACCESS_WIFI_STATE,
             };
-            for (String perm : permissions)
+            for(String perm : permissions)
             {
-                if (PackageManager.PERMISSION_GRANTED != m_context.checkSelfPermission(perm))
+                if(PackageManager.PERMISSION_GRANTED != m_context.checkSelfPermission(perm))
                 {
                     //进入到这里代表没有权限
                     permissionsList.add(perm);
                 }
             }
-            if (!permissionsList.isEmpty())
+            if(!permissionsList.isEmpty())
             {
                 requestPermissions(permissionsList.toArray(new String[permissionsList.size()]), 0);
             }
@@ -497,7 +502,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
      */
     private void SetMapStateAndMarkOptions()
     {
-        if (null == m_latLng)
+        if(null == m_latLng)
         {
             return;
         }
@@ -528,7 +533,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
      */
     private void DrawMarkerText(LatLng latLng, String str, int foreColor, int backColor)
     {
-        if (null == latLng || "".equals(str) || null == m_activity)
+        if(null == latLng || "".equals(str) || null == m_activity)
         {
             return;
         }
@@ -590,7 +595,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
         m_baiduMap.setOnMapLoadedCallback(() -> SetMapStateAndMarkOptions());
         m_btnMonitorTarget = m_mapView.findViewById(R.id.btn_monitor_target);
         m_btnMonitorTarget.setOnClickListener(this::onClick);
-        if (null != m_deviceInfo)
+        if(null != m_deviceInfo)
         {
             m_btnMonitorTarget.setText("监控目标:" + m_deviceInfo.getM_name());
         }
@@ -604,7 +609,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
     @Override
     public void onGetGeoCodeResult(GeoCodeResult geoCodeResult)
     {
-        if (null == geoCodeResult || SearchResult.ERRORNO.NO_ERROR != geoCodeResult.error)
+        if(null == geoCodeResult || SearchResult.ERRORNO.NO_ERROR != geoCodeResult.error)
         {
             Toast.makeText(m_context, "未能找到结果", Toast.LENGTH_SHORT);
         }
@@ -618,7 +623,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
     @Override
     public void onGetReverseGeoCodeResult(ReverseGeoCodeResult reverseGeoCodeResult)
     {
-        if (null == reverseGeoCodeResult || SearchResult.ERRORNO.NO_ERROR != reverseGeoCodeResult.error)
+        if(null == reverseGeoCodeResult || SearchResult.ERRORNO.NO_ERROR != reverseGeoCodeResult.error)
         {
             Toast.makeText(m_context, "未能找到结果", Toast.LENGTH_SHORT);
         }
@@ -649,7 +654,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
     public void onSensorChanged(SensorEvent event)
     {
         double x = event.values[SensorManager.DATA_X];
-        if (Math.abs(x - m_lastX) > 1.0)
+        if(Math.abs(x - m_lastX) > 1.0)
         {
             m_currentDirection = (int) x;
             m_locationData = new MyLocationData.Builder().accuracy(m_currentAccracy).direction(m_currentDirection).latitude(m_currentLat).longitude(m_currentLon).build();
@@ -687,11 +692,11 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
         //地理编码
         m_geoCoder = GeoCoder.newInstance();
         m_geoCoder.setOnGetGeoCodeResultListener(this);
-        if (getArguments() != null)
+        if(getArguments() != null)
         {
             //获取设备信息
             m_deviceInfo = getArguments().getParcelable("DEVICEINFO");
-            if (null != m_deviceInfo)
+            if(null != m_deviceInfo)
             {
                 m_latLng = new LatLng(m_deviceInfo.getM_lat(), m_deviceInfo.getM_lot());
                 //设置反地理编码坐标
@@ -720,7 +725,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
     public void onAttach(Context context)
     {
         super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener)
+        if(context instanceof OnFragmentInteractionListener)
         {
             mListener = (OnFragmentInteractionListener) context;
         }
@@ -743,14 +748,14 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
     @Override
     public void onClick(View v)
     {
-        switch (v.getId())
+        switch(v.getId())
         {
             case R.id.btn_monitor_target:
                 MapFragment_Choose mapFragment_choose = MapFragment_Choose.newInstance(m_deviceInfo);
                 getFragmentManager().beginTransaction().replace(R.id.fragment_current_map, mapFragment_choose, "mapFragment_choose").commitNow();
                 break;
             case R.id.btn_location_baidu:
-                if (null != m_deviceInfo)
+                if(null != m_deviceInfo)
                 {
                     MapStatus mapStatus = new MapStatus.Builder().target(m_latLng).zoom(16).build();
                     MapStatusUpdate mapStatusUpdate = MapStatusUpdateFactory.newMapStatus(mapStatus);
@@ -758,7 +763,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
                 }
                 break;
             case R.id.btn_trafficlight_baidu:
-                if (!m_trafficEnabled)
+                if(!m_trafficEnabled)
                 {
                     m_baiduMap.setTrafficEnabled(true);
                     m_trafficEnabled = true;
@@ -770,7 +775,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
                 }
                 break;
             case R.id.btn_locus_baidu:
-                if (null != m_deviceInfo)
+                if(null != m_deviceInfo)
                 {
                     MapFragment_TrackQuery trackQueryFragment = MapFragment_TrackQuery.newInstance(m_deviceInfo);
                     getFragmentManager().beginTransaction().replace(R.id.fragment_current_map, trackQueryFragment, "trackQueryFragment").commitNow();
@@ -786,6 +791,13 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
             case R.id.btn_task_baidu:
                 break;
             case R.id.btn_defense_baidu:
+                break;
+            case R.id.textView2_map_device_info:
+
+                break;
+            case R.id.btn_close_map_device_info:
+                m_baiduMap.hideInfoWindow();
+                m_baiduMapView.postInvalidate();
                 break;
         }
     }
