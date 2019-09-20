@@ -17,6 +17,7 @@ import com.zistone.blowdown_app.fragment.MapFragment_Bind;
 import com.zistone.blowdown_app.fragment.MapFragment_Choose;
 import com.zistone.blowdown_app.fragment.DeviceFragment_Info;
 import com.zistone.blowdown_app.fragment.MapFragment_Map;
+import com.zistone.blowdown_app.fragment.MapFragment_Setting;
 import com.zistone.blowdown_app.fragment.MapFragment_TrackQuery;
 import com.zistone.blowdown_app.fragment.UserFragment_Forget;
 import com.zistone.blowdown_app.fragment.UserFragment_Info;
@@ -38,6 +39,7 @@ public class MainActivity extends AppCompatActivity implements
         MapFragment_Bind.OnFragmentInteractionListener,
         MapFragment_Choose.OnFragmentInteractionListener,
         MapFragment_TrackQuery.OnFragmentInteractionListener,
+        MapFragment_Setting.OnFragmentInteractionListener,
         //设备
         DeviceFragment.OnFragmentInteractionListener,
         DeviceFragment_Info.OnFragmentInteractionListener,

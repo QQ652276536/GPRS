@@ -301,14 +301,20 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="10dp"
-        android:orientation="vertical">
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="355dp"
+            android:layout_height="wrap_content"
+            android:text="追踪模式为10秒上报一次位置,连续上报时长为1小时,1小时后恢复监控模式." />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="追踪模式为10秒上报一次位置,连续上报时长为1小时,1小时后恢复监控模式." />
+            android:layout_weight="1" />
 
         <RadioButton
+            android:gravity="right"
             android:id="@+id/radio_track_device_setting"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

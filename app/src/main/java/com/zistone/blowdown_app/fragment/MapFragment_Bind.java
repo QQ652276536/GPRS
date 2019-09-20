@@ -69,7 +69,6 @@ public class MapFragment_Bind extends Fragment implements View.OnClickListener
         switch(v.getId())
         {
             case R.id.btn_return_device_bind:
-                //重新实例化地图碎片实现重新加载设备位置
                 MapFragment_Choose mapFragment_choose = MapFragment_Choose.newInstance(m_deviceInfo);
                 getFragmentManager().beginTransaction().replace(R.id.fragment_current_map, mapFragment_choose, "mapFragment_choose").commitNow();
                 break;

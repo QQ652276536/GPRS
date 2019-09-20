@@ -777,8 +777,8 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
             case R.id.btn_locus_baidu:
                 if(null != m_deviceInfo)
                 {
-                    MapFragment_TrackQuery trackQueryFragment = MapFragment_TrackQuery.newInstance(m_deviceInfo);
-                    getFragmentManager().beginTransaction().replace(R.id.fragment_current_map, trackQueryFragment, "trackQueryFragment").commitNow();
+                    MapFragment_TrackQuery mapFragment_trackQuery = MapFragment_TrackQuery.newInstance(m_deviceInfo);
+                    getFragmentManager().beginTransaction().replace(R.id.fragment_current_map, mapFragment_trackQuery, "mapFragment_trackQuery").commitNow();
                 }
                 else
                 {
@@ -793,7 +793,8 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
             case R.id.btn_defense_baidu:
                 break;
             case R.id.textView2_map_device_info:
-
+                MapFragment_Setting mapFragment_setting = MapFragment_Setting.newInstance(m_deviceInfo);
+                getFragmentManager().beginTransaction().replace(R.id.fragment_current_map, mapFragment_setting, "mapFragment_setting").commitNow();
                 break;
             case R.id.btn_close_map_device_info:
                 m_baiduMap.hideInfoWindow();
