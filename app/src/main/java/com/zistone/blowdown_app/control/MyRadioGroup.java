@@ -28,7 +28,7 @@ public class MyRadioGroup extends LinearLayout
     {
         super(context);
         //设置横纵向
-        setOrientation(HORIZONTAL);
+        setOrientation(VERTICAL);
         init();
     }
 

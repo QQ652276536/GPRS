@@ -83,12 +83,15 @@ public class MapFragment_Setting extends Fragment implements View.OnClickListene
                 getFragmentManager().beginTransaction().replace(R.id.fragment_current_map, mapFragment_map, "mapFragment_map").commitNow();
                 break;
             case R.id.btn_confirm_device_device_setting:
+                //上报间隔为分钟
                 if(m_radio1.isChecked())
                 {
                 }
+                //上报间隔为小时
                 else if(m_radio2.isChecked())
                 {
                 }
+                //追踪模式
                 else if(m_radio3.isChecked())
                 {
                 }
