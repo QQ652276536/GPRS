@@ -6,16 +6,22 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.support.design.chip.ChipGroup;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.ImageButton;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.zistone.blowdown_app.R;
+import com.zistone.blowdown_app.control.MyRadioGroup;
 import com.zistone.blowdown_app.entity.DeviceInfo;
 import com.zistone.blowdown_app.util.PropertiesUtil;
 
@@ -45,10 +51,14 @@ public class MapFragment_Setting extends Fragment implements View.OnClickListene
     private ImageButton m_btnReturn;
     private OnFragmentInteractionListener mListener;
     private DeviceInfo m_deviceInfo;
+    private Button m_btnSave;
     private TextView m_textView1;
     private TextView m_textView2;
     private TextView m_textView3;
     private TextView m_textView4;
+    private RadioButton m_radio1;
+    private RadioButton m_radio2;
+    private RadioButton m_radio3;
 
     /**
      * @param deviceInfo
@@ -69,10 +79,19 @@ public class MapFragment_Setting extends Fragment implements View.OnClickListene
         switch(v.getId())
         {
             case R.id.btn_return_device_device_setting:
-                MapFragment_Choose mapFragment_choose = MapFragment_Choose.newInstance(m_deviceInfo);
-                getFragmentManager().beginTransaction().replace(R.id.fragment_current_map, mapFragment_choose, "mapFragment_choose").commitNow();
+                MapFragment_Map mapFragment_map = MapFragment_Map.newInstance(m_deviceInfo);
+                getFragmentManager().beginTransaction().replace(R.id.fragment_current_map, mapFragment_map, "mapFragment_map").commitNow();
                 break;
             case R.id.btn_confirm_device_device_setting:
+                if(m_radio1.isChecked())
+                {
+                }
+                else if(m_radio2.isChecked())
+                {
+                }
+                else if(m_radio3.isChecked())
+                {
+                }
                 break;
         }
     }
@@ -99,10 +118,15 @@ public class MapFragment_Setting extends Fragment implements View.OnClickListene
         URL = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/DeviceInfo/Update";
         m_btnReturn = m_deviceSettingView.findViewById(R.id.btn_return_device_device_setting);
         m_btnReturn.setOnClickListener(this::onClick);
+        m_btnSave = m_deviceSettingView.findViewById(R.id.btn_confirm_device_device_setting);
+        m_btnSave.setOnClickListener(this::onClick);
         m_textView1 = m_deviceSettingView.findViewById(R.id.textView1_device_setting);
         m_textView2 = m_deviceSettingView.findViewById(R.id.textView2_device_setting);
         m_textView3 = m_deviceSettingView.findViewById(R.id.textView3_device_setting);
         m_textView4 = m_deviceSettingView.findViewById(R.id.textView4_device_setting);
+        m_radio1 = m_deviceSettingView.findViewById(R.id.radio1_setting);
+        m_radio2 = m_deviceSettingView.findViewById(R.id.radio2_setting);
+        m_radio3 = m_deviceSettingView.findViewById(R.id.radio3_setting);
         if(null != m_deviceInfo)
         {
             m_textView1.setText(m_deviceInfo.getM_name());

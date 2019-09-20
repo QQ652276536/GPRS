@@ -611,7 +611,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
     {
         if(null == geoCodeResult || SearchResult.ERRORNO.NO_ERROR != geoCodeResult.error)
         {
-            Toast.makeText(m_context, "未能找到结果", Toast.LENGTH_SHORT);
+            Toast.makeText(m_context, "未能找到结果", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -625,7 +625,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
     {
         if(null == reverseGeoCodeResult || SearchResult.ERRORNO.NO_ERROR != reverseGeoCodeResult.error)
         {
-            Toast.makeText(m_context, "未能找到结果", Toast.LENGTH_SHORT);
+            Toast.makeText(m_context, "未能找到结果", Toast.LENGTH_SHORT).show();
         }
         else
         {
