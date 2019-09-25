@@ -1,5 +1,8 @@
 package com.zistone.blowdown_app.entity;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class LocationInfo
 {
     /**
@@ -23,14 +26,14 @@ public class LocationInfo
     private double m_lot;
 
     /**
-     * 定位时间(单位:秒)
+     * 定位时间
      */
-    private long m_time;
+    private Date m_time;
 
     @Override
     public String toString()
     {
-        return "LocationInfo{" + "m_id='" + m_id + '\'' + ", m_deviceId='" + m_deviceId + '\'' + ", m_lat=" + m_lat + ", m_lot=" + m_lot + ", m_time=" + m_time + '}';
+        return "LocationInfo{" + "m_id='" + m_id + '\'' + ", m_deviceId='" + m_deviceId + '\'' + ", m_lat=" + m_lat + ", m_lot=" + m_lot + ", m_time=" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(m_time) + '}';
     }
 
     public String getM_id()
@@ -73,12 +76,12 @@ public class LocationInfo
         this.m_lot = m_lot;
     }
 
-    public long getM_time()
+    public Date getM_time()
     {
         return m_time;
     }
 
-    public void setM_time(long m_time)
+    public void setM_time(Date m_time)
     {
         this.m_time = m_time;
     }

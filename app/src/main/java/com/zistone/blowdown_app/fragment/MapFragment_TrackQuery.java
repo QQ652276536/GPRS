@@ -178,9 +178,10 @@ public class MapFragment_TrackQuery extends Fragment implements View.OnClickList
                 case MESSAGE_RESPONSE_SUCCESS:
                 {
                     String result = (String) message.obj;
-                    if (null == result || "".equals(result))
+                    if (null == result || "".equals(result) || "[]".equals(result))
                     {
-                        m_mapUtil.clear();
+                        //绘制历史轨迹
+                        m_mapUtil.drawHistoryTrack(null, SortType.asc);
                         return;
                     }
                     List<LocationInfo> locationList = JSON.parseArray(result, LocationInfo.class);
