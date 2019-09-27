@@ -156,25 +156,20 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
         TextView textAddress = m_addAreaInfoWindow.findViewById(R.id.editText_add_area_defense2);
         textAddress.setText(areaDefenseInfo.getM_address());
         TextView textRadius = m_addAreaInfoWindow.findViewById(R.id.editText_add_area_defense3);
-        textRadius.setText(String.valueOf(areaDefenseInfo.getM_radius()));
         m_baiduMap.showInfoWindow(new InfoWindow(m_addAreaInfoWindow, latLng, -100));
         Button btnConirm = m_addAreaInfoWindow.findViewById(R.id.btn_add_defense1);
         btnConirm.setOnClickListener(v ->
         {
-            String name = textName.getText().toString();
-            if(null == name || "".equals(name))
-            {
-                Toast.makeText(m_context, "请输入名称", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            String address = textAddress.getText().toString();
-            if(null == address || "".equals(address))
-            {
-                Toast.makeText(m_context, "地址获取失败,请检查经纬度f", Toast.LENGTH_SHORT).show();
-            }
             String radiusStr = textRadius.getText().toString();
             try
             {
+                String name = textName.getText().toString();
+                String address = textAddress.getText().toString();
+                if(null == name || "".equals(name))
+                {
+                    Toast.makeText(m_context, "名称不能为空", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 double radius = Double.valueOf(radiusStr);
                 areaDefenseInfo.setM_name(name);
                 areaDefenseInfo.setM_address(address);
@@ -184,6 +179,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
             catch(Exception e)
             {
                 e.printStackTrace();
+                Toast.makeText(m_context, "请输入正确的参数", Toast.LENGTH_SHORT).show();
             }
         });
         Button btnCancel = m_addAreaInfoWindow.findViewById(R.id.btn_add_defense2);
@@ -288,15 +284,13 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
                 areaDefenseInfo.setM_deviceId(deviceId);
                 areaDefenseInfo.setM_lat(lat);
                 areaDefenseInfo.setM_lot(lot);
-                Log.i(TAG, ">>>设备" + deviceId + "区域设防,经度" + lot + "纬度" + lat);
                 MarkerOptions markerOptions = new MarkerOptions().position(latLng).icon(m_defenseMark);
                 m_baiduMap.addOverlay(markerOptions);
                 CreateAddAreaWindow(latLng, areaDefenseInfo);
             }
             else
             {
-                Log.e(TAG, ">>>设备" + deviceId + "区域设防失败,该设备缺少设备编号参数");
-                Toast.makeText(m_context, "请选择要设防的设备", Toast.LENGTH_SHORT);
+                Toast.makeText(m_context, "区域设防失败,该设备缺少设备编号", Toast.LENGTH_SHORT);
             }
             m_isAreaDefense = false;
         }
