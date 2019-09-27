@@ -77,7 +77,7 @@
             android:layout_width="70dp"
             android:layout_height="match_parent"
             android:gravity="center_vertical|left"
-            android:text="SIM卡号:" />
+            android:text="SIM&#160;卡号:" />
 
         <TextView
             android:id="@+id/textView5_map_device_info"
@@ -161,7 +161,7 @@
             android:layout_width="70dp"
             android:layout_height="match_parent"
             android:gravity="center_vertical|left"
-            android:text="坐标:" />
+            android:text="坐&#12288;&#12288;标:" />
 
         <TextView
             android:id="@+id/textView14_map_device_info"
@@ -182,7 +182,7 @@
             android:layout_width="70dp"
             android:layout_height="match_parent"
             android:gravity="center_vertical|left"
-            android:text="位置:" />
+            android:text="位&#12288;&#12288;置:" />
 
         <TextView
             android:id="@+id/textView16_map_device_info"
@@ -203,7 +203,7 @@
             android:layout_width="70dp"
             android:layout_height="match_parent"
             android:gravity="center_vertical|left"
-            android:text="温度:" />
+            android:text="温&#12288;&#12288;度:" />
 
         <TextView
             android:id="@+id/textView18_map_device_info"

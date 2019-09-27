@@ -28,6 +28,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -61,6 +62,7 @@ import com.baidu.mapapi.search.geocode.OnGetGeoCoderResultListener;
 import com.baidu.mapapi.search.geocode.ReverseGeoCodeOption;
 import com.baidu.mapapi.search.geocode.ReverseGeoCodeResult;
 import com.zistone.blowdown_app.R;
+import com.zistone.blowdown_app.entity.AreaDefenseInfo;
 import com.zistone.blowdown_app.entity.DeviceInfo;
 
 import java.io.Serializable;
@@ -73,6 +75,7 @@ import static android.content.Context.SENSOR_SERVICE;
 public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickListener, View.OnClickListener, SensorEventListener, OnGetGeoCoderResultListener, Serializable, BaiduMap.OnMarkerClickListener
 {
     private static final String TAG = "MapFragment_Map";
+    private static final String MARKERID_LOCATION = "MARKERID_LOCATION";
     private static final BitmapDescriptor ICON_MARKER = BitmapDescriptorFactory.fromResource(R.drawable.icon_mark2);
     private Context m_context;
     private MyLocationListener m_locationListener = new MyLocationListener();
@@ -107,15 +110,22 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
     private DeviceInfo m_deviceInfo;
     private Activity m_activity;
     private OnFragmentInteractionListener mListener;
-    private LinearLayout m_infoWindow;
+    private LinearLayout m_deviceInfoWindow;
+    private LinearLayout m_defenseInfoWindow;
+    private LinearLayout m_areaInfoWindow;
+    private LinearLayout m_addAreaInfoWindow;
     private ImageButton m_btnLocation;
     private ImageButton m_btnTraffic;
     private ImageButton m_btnLocus;
     private ImageButton m_btnTask;
     private ImageButton m_btnDefense;
-    private boolean m_trafficEnabled;
     private Button m_btnMonitorTarget;
-    private ImageButton m_btnInfoClose;
+    private boolean m_trafficEnabled = false;
+    private boolean m_isAreaDefense = false;
+    private BitmapDescriptor m_defenseMark = BitmapDescriptorFactory.fromResource(R.drawable.icon_mark3);
+    private List<AreaDefenseInfo> m_areaDefenseInfoList;
+    //当前点击的Marker
+    private String m_currentMarkerId;
 
     public static MapFragment_Map newInstance(DeviceInfo deviceInfo)
     {
@@ -134,50 +144,161 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
         }
     }
 
-    private void CreateInfoWindow()
+    /**
+     * 添加区域设防,在点击地图添加完图标以后弹出
+     *
+     * @param latLng          窗体在地图上弹出的位置
+     * @param areaDefenseInfo
+     */
+    private void CreateAddAreaWindow(LatLng latLng, AreaDefenseInfo areaDefenseInfo)
     {
-        ImageButton buttonClose = m_infoWindow.findViewById(R.id.btn_close_map_device_info);
+        TextView textName = m_addAreaInfoWindow.findViewById(R.id.editText_add_area_defense1);
+        TextView textAddress = m_addAreaInfoWindow.findViewById(R.id.editText_add_area_defense2);
+        textAddress.setText(areaDefenseInfo.getM_address());
+        TextView textRadius = m_addAreaInfoWindow.findViewById(R.id.editText_add_area_defense3);
+        textRadius.setText(String.valueOf(areaDefenseInfo.getM_radius()));
+        m_baiduMap.showInfoWindow(new InfoWindow(m_addAreaInfoWindow, latLng, -100));
+        Button btnConirm = m_addAreaInfoWindow.findViewById(R.id.btn_add_defense1);
+        btnConirm.setOnClickListener(v ->
+        {
+            String name = textName.getText().toString();
+            if(null == name || "".equals(name))
+            {
+                Toast.makeText(m_context, "请输入名称", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            String address = textAddress.getText().toString();
+            if(null == address || "".equals(address))
+            {
+                Toast.makeText(m_context, "地址获取失败,请检查经纬度f", Toast.LENGTH_SHORT).show();
+            }
+            String radiusStr = textRadius.getText().toString();
+            try
+            {
+                double radius = Double.valueOf(radiusStr);
+                areaDefenseInfo.setM_name(name);
+                areaDefenseInfo.setM_address(address);
+                areaDefenseInfo.setM_radius(radius);
+                AddAreaDefense(areaDefenseInfo);
+            }
+            catch(Exception e)
+            {
+                e.printStackTrace();
+            }
+        });
+        Button btnCancel = m_addAreaInfoWindow.findViewById(R.id.btn_add_defense2);
+        btnCancel.setOnClickListener(v ->
+        {
+            m_baiduMap.hideInfoWindow();
+            m_baiduMapView.postInvalidate();
+        });
+    }
+
+    private void CreateAreaInfoWindow(LatLng latLng, AreaDefenseInfo areaDefenseInfo)
+    {
+        TextView textName = m_areaInfoWindow.findViewById(R.id.textView1_map_area_info);
+        textName.setText("");
+        TextView textDel = m_areaInfoWindow.findViewById(R.id.btn_close_map_area_info);
+        textDel.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                DelAreaDefense(areaDefenseInfo);
+            }
+        });
+        TextView textAddress = m_areaInfoWindow.findViewById(R.id.textView2_map_area_info);
+        textAddress.setText("");
+        TextView textTime = m_areaInfoWindow.findViewById(R.id.textView3_map_area_info);
+        textTime.setText("");
+        TextView textRadius = m_areaInfoWindow.findViewById(R.id.textView4_map_area_info);
+        textRadius.setText("");
+        m_baiduMap.showInfoWindow(new InfoWindow(m_areaInfoWindow, latLng, -100));
+    }
+
+    private void CreateDeviceInfoWindow()
+    {
+        ImageButton buttonClose = m_deviceInfoWindow.findViewById(R.id.btn_close_map_device_info);
         buttonClose.setOnClickListener(this::onClick);
-        TextView textSetting = m_infoWindow.findViewById(R.id.textView2_map_device_info);
+        TextView textSetting = m_deviceInfoWindow.findViewById(R.id.textView2_map_device_info);
         textSetting.setOnClickListener(this::onClick);
-        TextView textName = m_infoWindow.findViewById(R.id.textView4_map_device_info);
-        TextView textSIM = m_infoWindow.findViewById(R.id.textView5_map_device_info);
-        TextView textUpMode = m_infoWindow.findViewById(R.id.textView8_map_device_info);
-        TextView textUpInterval = m_infoWindow.findViewById(R.id.textView10_map_device_info);
-        TextView textReceiveTime = m_infoWindow.findViewById(R.id.textView12_map_device_info);
-        TextView textLat = m_infoWindow.findViewById(R.id.textView14_map_device_info);
-        TextView textLocation = m_infoWindow.findViewById(R.id.textView16_map_device_info);
-        TextView textTemperature = m_infoWindow.findViewById(R.id.textView18_map_device_info);
-        TextView textLastEct = m_infoWindow.findViewById(R.id.textView20_map_device_info);
+        TextView textName = m_deviceInfoWindow.findViewById(R.id.textView4_map_device_info);
+        TextView textSIM = m_deviceInfoWindow.findViewById(R.id.textView5_map_device_info);
+        TextView textUpMode = m_deviceInfoWindow.findViewById(R.id.textView8_map_device_info);
+        TextView textUpInterval = m_deviceInfoWindow.findViewById(R.id.textView10_map_device_info);
+        TextView textReceiveTime = m_deviceInfoWindow.findViewById(R.id.textView12_map_device_info);
+        TextView textLat = m_deviceInfoWindow.findViewById(R.id.textView14_map_device_info);
+        TextView textLocation = m_deviceInfoWindow.findViewById(R.id.textView16_map_device_info);
+        TextView textTemperature = m_deviceInfoWindow.findViewById(R.id.textView18_map_device_info);
+        TextView textLastEct = m_deviceInfoWindow.findViewById(R.id.textView20_map_device_info);
         textName.setText(m_deviceInfo.getM_name());
         textSIM.setText(String.valueOf(m_deviceInfo.getM_sim()));
         textUpMode.setText("正常模式");
-        textUpInterval.setText("10分钟/次");
+        textUpInterval.setText("180分钟/次");
         textReceiveTime.setText(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(m_deviceInfo.getM_updateTime()));
         textLat.setText(m_deviceInfo.getM_lot() + ", " + m_deviceInfo.getM_lat());
         textLocation.setText(m_latLngStr);
         textTemperature.setText("20℃");
         textLastEct.setText("80%");
-        m_baiduMap.showInfoWindow(new InfoWindow(m_infoWindow, m_latLng, -100));
+        m_baiduMap.showInfoWindow(new InfoWindow(m_deviceInfoWindow, m_latLng, -100));
     }
 
     @Override
     public boolean onMarkerClick(Marker marker)
     {
-        if(null != m_latLng && null != m_deviceInfo)
+        Bundle bundle = marker.getExtraInfo();
+        if(bundle == null)
         {
-            CreateInfoWindow();
+            return false;
         }
-        return false;
+        m_currentMarkerId = bundle.getString(MARKERID_LOCATION);
+        switch(m_currentMarkerId)
+        {
+            case MARKERID_LOCATION:
+                if(null != m_latLng && null != m_deviceInfo)
+                {
+                    CreateDeviceInfoWindow();
+                }
+                break;
+            default:
+                AreaDefenseInfo areaDefenseInfo = null;
+                CreateAreaInfoWindow(marker.getPosition(), areaDefenseInfo);
+                break;
+        }
+        return true;
     }
 
     @Override
     public void onMapClick(LatLng latLng)
     {
-        if(null != m_infoWindow)
+        if(null != m_deviceInfoWindow)
         {
             m_baiduMap.hideInfoWindow();
             m_baiduMapView.postInvalidate();
+        }
+        //添加区域设防
+        if(m_isAreaDefense)
+        {
+            String deviceId = m_deviceInfo.getM_deviceId();
+            if(deviceId != null && !deviceId.equals(""))
+            {
+                AreaDefenseInfo areaDefenseInfo = new AreaDefenseInfo();
+                double lat = latLng.latitude;
+                double lot = latLng.longitude;
+                areaDefenseInfo.setM_deviceId(deviceId);
+                areaDefenseInfo.setM_lat(lat);
+                areaDefenseInfo.setM_lot(lot);
+                Log.i(TAG, ">>>设备" + deviceId + "区域设防,经度" + lot + "纬度" + lat);
+                MarkerOptions markerOptions = new MarkerOptions().position(latLng).icon(m_defenseMark);
+                m_baiduMap.addOverlay(markerOptions);
+                CreateAddAreaWindow(latLng, areaDefenseInfo);
+            }
+            else
+            {
+                Log.e(TAG, ">>>设备" + deviceId + "区域设防失败,该设备缺少设备编号参数");
+                Toast.makeText(m_context, "请选择要设防的设备", Toast.LENGTH_SHORT);
+            }
+            m_isAreaDefense = false;
         }
     }
 
@@ -508,6 +629,10 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
         }
         //设置标记的位置和图标
         MarkerOptions markerOptions = new MarkerOptions().position(m_latLng).icon(ICON_MARKER);
+        Bundle bundle = new Bundle();
+        bundle.putString(MARKERID_LOCATION, MARKERID_LOCATION);
+        //设置Marker覆盖物的额外信息
+        markerOptions.extraInfo(bundle);
         //标记添加至地图中
         m_marker = (Marker) (m_baiduMap.addOverlay(markerOptions));
         //定义地图缩放级别3~16,值越大地图越精细
@@ -558,14 +683,37 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
         m_baiduMap.addOverlay(textOverlayOptions);
     }
 
+    private void GetAllAreaDefense()
+    {
+        m_areaDefenseInfoList = new ArrayList<>();
+    }
+
+    private void AddAreaDefense(AreaDefenseInfo areaDefenseInfo)
+    {
+        m_baiduMap.hideInfoWindow();
+        m_baiduMapView.postInvalidate();
+    }
+
+    private void DelAreaDefense(AreaDefenseInfo areaDefenseInfo)
+    {
+        Log.i(TAG, ">>>删除设备" + areaDefenseInfo.getM_deviceId() + "的区域设防");
+        Toast.makeText(m_context, "执行删除区域设防", Toast.LENGTH_SHORT).show();
+    }
+
     private void InitView()
     {
         m_context = m_mapView.getContext();
         m_activity = getActivity();
         m_textView = m_mapView.findViewById(R.id.textView_baidu);
         m_baiduMapView = m_mapView.findViewById(R.id.mapView_baidu);
-        m_infoWindow = (LinearLayout) LayoutInflater.from(m_activity).inflate(R.layout.map_info_window, null);
-        m_infoWindow.setOnClickListener(this::onClick);
+        m_deviceInfoWindow = (LinearLayout) LayoutInflater.from(m_activity).inflate(R.layout.map_info_window, null);
+        m_deviceInfoWindow.setOnClickListener(this::onClick);
+        m_defenseInfoWindow = (LinearLayout) LayoutInflater.from(m_activity).inflate(R.layout.defense_info_window, null);
+        m_defenseInfoWindow.setOnClickListener(this::onClick);
+        m_areaInfoWindow = (LinearLayout) LayoutInflater.from(m_activity).inflate(R.layout.area_info_window, null);
+        m_areaInfoWindow.setOnClickListener(this::onClick);
+        m_addAreaInfoWindow = (LinearLayout) LayoutInflater.from(m_activity).inflate(R.layout.add_area_defense_window, null);
+        m_addAreaInfoWindow.setOnClickListener(this::onClick);
         m_btnLocation = m_mapView.findViewById(R.id.btn_location_baidu);
         m_btnLocation.setOnClickListener(this::onClick);
         m_btnTraffic = m_mapView.findViewById(R.id.btn_trafficlight_baidu);
@@ -703,6 +851,8 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
                 m_geoCoder.reverseGeoCode(new ReverseGeoCodeOption().location(m_latLng).newVersion(1).radius(500));
             }
         }
+        //获取该设备所有区域设防的位置
+        GetAllAreaDefense();
     }
 
     /**
@@ -789,14 +939,56 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
                 }
                 break;
             case R.id.btn_task_baidu:
+                if(m_deviceInfo != null)
+                {
+                }
+                else
+                {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    builder.setPositiveButton("确定", (dialog, which) -> dialog.dismiss());
+                    builder.setMessage("请选择设备");
+                    builder.show();
+                }
                 break;
             case R.id.btn_defense_baidu:
+                if(m_deviceInfo != null)
+                {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(m_context);
+                    final AlertDialog dialog = builder.create();
+                    View view = View.inflate(m_context, R.layout.defense_info_window, null);
+                    Button btnWarning = view.findViewById(R.id.btn_warning_defense);
+                    btnWarning.setOnClickListener(v1 ->
+                    {
+                        //TODO:区域报警列表
+                    });
+                    Button btnArea = view.findViewById(R.id.btn_area_defense);
+                    btnArea.setOnClickListener(v12 ->
+                    {
+                        dialog.cancel();
+                        m_isAreaDefense = true;
+                    });
+                    dialog.setView(view);
+                    dialog.show();
+                    dialog.setCanceledOnTouchOutside(true);
+                }
+                else
+                {
+                    m_isAreaDefense = false;
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    builder.setPositiveButton("确定", (dialog, which) -> dialog.dismiss());
+                    builder.setMessage("请选择设备");
+                    builder.show();
+                }
                 break;
             case R.id.textView2_map_device_info:
                 MapFragment_Setting mapFragment_setting = MapFragment_Setting.newInstance(m_deviceInfo);
                 getFragmentManager().beginTransaction().replace(R.id.fragment_current_map, mapFragment_setting, "mapFragment_setting").commitNow();
                 break;
             case R.id.btn_close_map_device_info:
+                m_baiduMap.hideInfoWindow();
+                m_baiduMapView.postInvalidate();
+                break;
+            case R.id.btn_close_map_area_info:
                 m_baiduMap.hideInfoWindow();
                 m_baiduMapView.postInvalidate();
                 break;
