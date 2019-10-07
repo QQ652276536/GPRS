@@ -6,3 +6,4 @@
 build/
 /captures
 .externalNativeBuild
+/caches/gradle_models.ser
