@@ -26,6 +26,7 @@ import com.zistone.blowdown_app.entity.DeviceInfo;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
@@ -91,22 +92,6 @@ public class DeviceFragment_Add extends Fragment implements View.OnClickListener
         m_switch_state.setEnabled(true);
     }
 
-    private void AddResult(DeviceInfo deviceInfo)
-    {
-        if (deviceInfo != null)
-        {
-            Log.i(TAG, "设备添加成功,设备编号为:" + deviceInfo.getM_deviceId());
-            DeviceFragment_Manage deviceFragment_manage = DeviceFragment_Manage.newInstance("", "");
-            getFragmentManager().beginTransaction().replace(R.id.fragment_current_device, deviceFragment_manage, "deviceFragment_manage").commitNow();
-            Toast.makeText(m_context, "设备添加成功", Toast.LENGTH_SHORT).show();
-        }
-        else
-        {
-            Log.i(TAG, "设备添加失败");
-            Toast.makeText(m_context, "用户名或密码错误", Toast.LENGTH_SHORT).show();
-        }
-    }
-
     private Handler handler = new Handler()
     {
         @Override
@@ -126,7 +111,18 @@ public class DeviceFragment_Add extends Fragment implements View.OnClickListener
                 {
                     String result = (String) message.obj;
                     DeviceInfo deviceInfo = JSON.parseObject(result, DeviceInfo.class);
-                    AddResult(deviceInfo);
+                    if (deviceInfo != null)
+                    {
+                        Log.i(TAG, "设备添加成功,设备编号为:" + deviceInfo.getM_deviceId());
+                        DeviceFragment_Manage deviceFragment_manage = DeviceFragment_Manage.newInstance("", "");
+                        getFragmentManager().beginTransaction().replace(R.id.fragment_current_device, deviceFragment_manage, "deviceFragment_manage").commitNow();
+                        Toast.makeText(m_context, "设备添加成功", Toast.LENGTH_SHORT).show();
+                    }
+                    else
+                    {
+                        Log.i(TAG, "设备添加失败");
+                        Toast.makeText(m_context, "设备添加失败", Toast.LENGTH_SHORT).show();
+                    }
                     break;
                 }
                 case MESSAGE_RESPONSE_FAIL:
@@ -170,6 +166,8 @@ public class DeviceFragment_Add extends Fragment implements View.OnClickListener
                 deviceInfo.setM_sim(Integer.valueOf(sim));
                 deviceInfo.setM_comment(comment);
                 deviceInfo.setM_state(state ? 1 : 0);
+                deviceInfo.setM_createTime(new Date());
+                deviceInfo.setM_updateTime(new Date());
                 String jsonData = JSON.toJSONString(deviceInfo);
                 new Thread(() ->
                 {
@@ -233,7 +231,7 @@ public class DeviceFragment_Add extends Fragment implements View.OnClickListener
     public void InitView()
     {
         m_context = getContext();
-        URL = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/DeviceInfo/Insert";
+        URL = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/DeviceInfo/InsertByDeviceId";
         m_btnReturn = m_addDeviceView.findViewById(R.id.btn_return_device_add);
         m_btnReturn.setOnClickListener(this);
         m_editText_deviceName = m_addDeviceView.findViewById(R.id.editText_deviceName_add);
