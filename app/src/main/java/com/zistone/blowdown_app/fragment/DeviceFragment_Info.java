@@ -18,6 +18,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.alibaba.fastjson.JSON;
 import com.zistone.blowdown_app.R;
 import com.zistone.blowdown_app.entity.DeviceInfo;
 import com.zistone.blowdown_app.util.PropertiesUtil;
@@ -91,6 +92,54 @@ public class DeviceFragment_Info extends Fragment implements View.OnClickListene
                     m_btnConfirm.setText("编辑");
                     m_toolbartextView.setText("设备详情");
                     SetControlEnabled(false);
+                    //更新设备信息
+                    m_deviceInfo.setM_name(m_editText1.getText().toString());
+                    m_deviceInfo.setM_type(m_editText2.getText().toString());
+                    m_deviceInfo.setM_deviceId(m_editText3.getText().toString());
+                    m_deviceInfo.setM_sim(Integer.valueOf(m_editText4.getText().toString()));
+                    m_deviceInfo.setM_comment(m_editText5.getText().toString());
+                    m_deviceInfo.setM_state(m_switch.isChecked() ? 1 : 0);
+                    String jsonData = JSON.toJSONString(m_deviceInfo);
+                    new Thread(() ->
+                    {
+                        Looper.prepare();
+                        //实例化并设置连接超时时间、读取超时时间
+                        OkHttpClient okHttpClient = new OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS).readTimeout(10, TimeUnit.SECONDS).build();
+                        RequestBody requestBody = FormBody.create(jsonData, MediaType.parse("application/json; charset=utf-8"));
+                        //创建Post请求的方式
+                        Request request = new Request.Builder().post(requestBody).url(URL).build();
+                        Call call = okHttpClient.newCall(request);
+                        //Android中不允许任何网络的交互在主线程中进行
+                        call.enqueue(new Callback()
+                        {
+                            @Override
+                            public void onFailure(@NotNull Call call, @NotNull IOException e)
+                            {
+                                Log.e(TAG, "请求失败:" + e.toString());
+                                Message message = handler.obtainMessage(MESSAGE_RREQUEST_FAIL, "请求失败:" + e.toString());
+                                handler.sendMessage(message);
+                            }
+
+                            @Override
+                            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException
+                            {
+                                String responseStr = response.body().string();
+                                Log.i(TAG, "响应内容:" + responseStr);
+                                if (response.isSuccessful())
+                                {
+                                    Message message = handler.obtainMessage(MESSAGE_RESPONSE_SUCCESS, responseStr);
+                                    handler.sendMessage(message);
+                                }
+                                else
+                                {
+                                    Message message = handler.obtainMessage(MESSAGE_RESPONSE_FAIL, responseStr);
+                                    handler.sendMessage(message);
+                                }
+                            }
+
+                        });
+                        Looper.loop();
+                    }).start();
                 }
                 break;
             default:
@@ -151,7 +200,7 @@ public class DeviceFragment_Info extends Fragment implements View.OnClickListene
                     m_switch.setChecked(false);
                     break;
                 case 1:
-                    m_switch.setChecked(false);
+                    m_switch.setChecked(true);
                     break;
                 default:
                     break;
@@ -181,6 +230,7 @@ public class DeviceFragment_Info extends Fragment implements View.OnClickListene
                     {
                         return;
                     }
+                    Toast.makeText(m_context, "设备信息更新成功", Toast.LENGTH_SHORT).show();
                     break;
                 }
                 case MESSAGE_RESPONSE_FAIL:
