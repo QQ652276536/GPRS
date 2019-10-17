@@ -1,5 +1,7 @@
 package com.zistone.blowdown_app.fragment;
 
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
@@ -12,8 +14,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -23,11 +27,13 @@ import android.widget.Toast;
 import com.zistone.blowdown_app.R;
 import com.zistone.blowdown_app.control.MyRadioGroup;
 import com.zistone.blowdown_app.entity.DeviceInfo;
+import com.zistone.blowdown_app.util.ConvertUtil;
 import com.zistone.blowdown_app.util.PropertiesUtil;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
@@ -56,9 +62,13 @@ public class MapFragment_Setting extends Fragment implements View.OnClickListene
     private TextView m_textView2;
     private TextView m_textView3;
     private TextView m_textView4;
+    private EditText m_editText1;
+    private EditText m_editText2;
+    private EditText m_editText3;
     private RadioButton m_radio1;
     private RadioButton m_radio2;
     private RadioButton m_radio3;
+    private String m_data;
 
     /**
      * @param deviceInfo
@@ -83,18 +93,67 @@ public class MapFragment_Setting extends Fragment implements View.OnClickListene
                 getFragmentManager().beginTransaction().replace(R.id.fragment_current_map, mapFragment_map, "mapFragment_map").commitNow();
                 break;
             case R.id.btn_confirm_device_device_setting:
-                //上报间隔为分钟
-                if(m_radio1.isChecked())
+                String timeStr = m_editText1.getText().toString();
+                String time1 = timeStr.split(":")[0];
+                String time2 = timeStr.split(":")[1];
+                if(time1.length() < 2)
                 {
+                    time1 = "0" + time1;
                 }
-                //上报间隔为小时
-                else if(m_radio2.isChecked())
+                if(time2.length() < 2)
                 {
+                    time2 = "0" + time2;
+                }
+                //每天上报起始时间
+                String hexStartTime = "000000090400" + time1 + time2 + "00";
+                //监控模式
+                if(m_radio1.isChecked() || m_radio2.isChecked())
+                {
+                    int second;
+                    if(m_radio1.isChecked())
+                    {
+                        String minue = m_editText2.getText().toString();
+                        second = Integer.valueOf(minue) * 60;
+                    }
+                    else
+                    {
+                        String hour = m_editText3.getText().toString();
+                        second = Integer.valueOf(hour) * 60 * 60;
+                    }
+                    String hexStrSecond = ConvertUtil.IntToHexStr(second);
+                    int i = 8 - hexStrSecond.length();
+                    StringBuffer stringBuffer = new StringBuffer(hexStrSecond);
+                    for(; i > 0; i--)
+                    {
+                        stringBuffer.insert(0, "0");
+                    }
+                    //上报间隔,秒
+                    hexStrSecond = "0000002904" + stringBuffer.toString();
+                    if(m_deviceInfo.getM_type().contains("铱星"))
+                    {
+                        m_data = "YX&" + m_deviceInfo.getM_deviceId() + "&02" + hexStartTime + hexStrSecond;
+                    }
+                    else
+                    {
+                        m_data = "GPRS&" + m_deviceInfo.getM_deviceId() + "&02" + hexStartTime + hexStrSecond;
+                    }
+
                 }
                 //追踪模式
                 else if(m_radio3.isChecked())
                 {
+                    m_data = "GPRS&" + m_deviceInfo.getM_deviceId() + "&020000000A040000000A0000000B0400000E10";
                 }
+                break;
+            case R.id.editText_upStart_device_setting:
+                //隐藏键盘
+                InputMethodManager imm = (InputMethodManager) v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(v.getApplicationWindowToken(), 0);
+                m_editText1.clearFocus();
+                Calendar calendar = Calendar.getInstance();
+                TimePickerDialog.OnTimeSetListener onTimeSetListener = (view, h, m) -> m_editText1.setText(h + ":" + m);
+                TimePickerDialog timePickerDialog = new TimePickerDialog(m_context, onTimeSetListener, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true);
+                timePickerDialog.show();
                 break;
         }
     }
@@ -130,12 +189,24 @@ public class MapFragment_Setting extends Fragment implements View.OnClickListene
         m_radio1 = m_deviceSettingView.findViewById(R.id.radio1_setting);
         m_radio2 = m_deviceSettingView.findViewById(R.id.radio2_setting);
         m_radio3 = m_deviceSettingView.findViewById(R.id.radio3_setting);
+        m_editText1 = m_deviceSettingView.findViewById(R.id.editText_upStart_device_setting);
+        m_editText1.setOnClickListener(this::onClick);
+        m_editText2 = m_deviceSettingView.findViewById(R.id.editText_upForMinute_device_setting);
+        m_editText3 = m_deviceSettingView.findViewById(R.id.editText_upForHour_device_setting);
         if(null != m_deviceInfo)
         {
             m_textView1.setText(m_deviceInfo.getM_name());
             m_textView2.setText(m_deviceInfo.getM_deviceId());
             m_textView3.setText(String.valueOf(m_deviceInfo.getM_sim()));
             m_textView4.setText("");
+            if(m_deviceInfo.getM_type().contains("铱星"))
+            {
+                m_radio3.setEnabled(false);
+            }
+            else
+            {
+                m_radio3.setEnabled(true);
+            }
         }
     }
 

@@ -195,14 +195,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
         TextView textName = m_areaInfoWindow.findViewById(R.id.textView1_map_area_info);
         textName.setText("");
         TextView textDel = m_areaInfoWindow.findViewById(R.id.btn_close_map_area_info);
-        textDel.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                DelAreaDefense(areaDefenseInfo);
-            }
-        });
+        textDel.setOnClickListener(v -> DelAreaDefense(areaDefenseInfo));
         TextView textAddress = m_areaInfoWindow.findViewById(R.id.textView2_map_area_info);
         textAddress.setText("");
         TextView textTime = m_areaInfoWindow.findViewById(R.id.textView3_map_area_info);

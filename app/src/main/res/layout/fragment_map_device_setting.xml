@@ -181,6 +181,38 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="每日起始时间"
+                        android:textSize="18sp" />
+
+                    <EditText
+                        android:id="@+id/editText_upStart_device_setting"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ems="3"
+                        android:inputType="number"
+                        android:text="9:00"
+                        android:textSize="18sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="默认以每天早9:00为上报计时开始时间,逐一分配各具体上报时间." />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
                 <TextView
@@ -215,38 +247,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="数值最短为10分钟,最长为60分钟." />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="每日起始时间"
-                        android:textSize="18sp" />
-
-                    <EditText
-                        android:id="@+id/editText_upStart_device_setting"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:ems="3"
-                        android:inputType="number"
-                        android:text="9:00"
-                        android:textSize="18sp" />
-                </LinearLayout>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="默认以每天早9:00为上报计时开始时间,逐一分配各具体上报时间." />
-            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
