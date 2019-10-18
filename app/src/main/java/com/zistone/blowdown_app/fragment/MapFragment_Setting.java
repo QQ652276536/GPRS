@@ -32,7 +32,10 @@ import com.zistone.blowdown_app.util.PropertiesUtil;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.net.Socket;
 import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 
@@ -68,7 +71,6 @@ public class MapFragment_Setting extends Fragment implements View.OnClickListene
     private RadioButton m_radio1;
     private RadioButton m_radio2;
     private RadioButton m_radio3;
-    private String m_data;
 
     /**
      * @param deviceInfo
@@ -93,6 +95,7 @@ public class MapFragment_Setting extends Fragment implements View.OnClickListene
                 getFragmentManager().beginTransaction().replace(R.id.fragment_current_map, mapFragment_map, "mapFragment_map").commitNow();
                 break;
             case R.id.btn_confirm_device_device_setting:
+                String data = "";
                 String timeStr = m_editText1.getText().toString();
                 String time1 = timeStr.split(":")[0];
                 String time2 = timeStr.split(":")[1];
@@ -131,18 +134,25 @@ public class MapFragment_Setting extends Fragment implements View.OnClickListene
                     hexStrSecond = "0000002904" + stringBuffer.toString();
                     if(m_deviceInfo.getM_type().contains("铱星"))
                     {
-                        m_data = "YX&" + m_deviceInfo.getM_deviceId() + "&02" + hexStartTime + hexStrSecond;
+                        data = "YX&" + m_deviceInfo.getM_deviceId() + "&02" + hexStartTime + hexStrSecond;
                     }
                     else
                     {
-                        m_data = "GPRS&" + m_deviceInfo.getM_deviceId() + "&02" + hexStartTime + hexStrSecond;
+                        data = "GPRS&" + m_deviceInfo.getM_deviceId() + "&02" + hexStartTime + hexStrSecond;
                     }
-
                 }
                 //追踪模式
                 else if(m_radio3.isChecked())
                 {
-                    m_data = "GPRS&" + m_deviceInfo.getM_deviceId() + "&020000000A040000000A0000000B0400000E10";
+                    data = "GPRS&" + m_deviceInfo.getM_deviceId() + "&020000000A040000000A0000000B0400000E10";
+                }
+                if(!data.equals(""))
+                {
+                    SendWithSocket(data);
+                }
+                else
+                {
+                    Toast.makeText(m_context, "请检查参数无误", Toast.LENGTH_SHORT).show();
                 }
                 break;
             case R.id.editText_upStart_device_setting:
@@ -246,51 +256,33 @@ public class MapFragment_Setting extends Fragment implements View.OnClickListene
         }
     };
 
-    /**
-     * 用OkHttp发送网络请求,并在里面开启线程
-     */
-    private void SendWithOkHttp()
+    private void SendWithSocket(String data)
     {
         new Thread(() ->
         {
             Looper.prepare();
-            //实例化并设置连接超时时间、读取超时时间
-            OkHttpClient okHttpClient = new OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS).readTimeout(10, TimeUnit.SECONDS).build();
-            RequestBody requestBody = FormBody.create("", MediaType.parse("application/json; charset=utf-8"));
-            //创建Post请求的方式
-            Request request = new Request.Builder().post(requestBody).url(URL).build();
-            Call call = okHttpClient.newCall(request);
-            //Android中不允许任何网络的交互在主线程中进行
-            call.enqueue(new Callback()
+            Socket socket;
+            try
             {
-                @Override
-                public void onFailure(@NotNull Call call, @NotNull IOException e)
+                socket = new Socket("129.204.165.206", 10799);
+                DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
+                dataOutputStream.writeUTF(data);
+                dataOutputStream.flush();
+                DataInputStream dataInputStream = new DataInputStream(socket.getInputStream());
+                String result = dataInputStream.readUTF();
+                if(result.contains("OK"))
                 {
-                    Log.e(TAG, "请求失败:" + e.toString());
-                    Message message = handler.obtainMessage(MESSAGE_RREQUEST_FAIL, "请求失败:" + e.toString());
-                    handler.sendMessage(message);
+                    Toast.makeText(m_context, "参数设置成功", Toast.LENGTH_SHORT).show();
                 }
-
-                //获得请求响应的字符串:response.body().string()该方法只能被调用一次!另:toString()返回的是对象地址
-                //获得请求响应的二进制字节数组:response.body().bytes()
-                //获得请求响应的inputStream:response.body().byteStream()
-                @Override
-                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException
-                {
-                    String result = response.body().string();
-                    Log.i(TAG, "响应内容:" + result);
-                    if(response.isSuccessful())
-                    {
-                        Message message = handler.obtainMessage(MESSAGE_RESPONSE_SUCCESS, result);
-                        handler.sendMessage(message);
-                    }
-                    else
-                    {
-                        Message message = handler.obtainMessage(MESSAGE_RESPONSE_FAIL, result);
-                        handler.sendMessage(message);
-                    }
-                }
-            });
+                dataInputStream.close();
+                dataOutputStream.close();
+                socket.close();
+            }
+            catch(IOException e)
+            {
+                e.printStackTrace();
+                Toast.makeText(m_context, "参数设置失败,请检查与服务的连接", Toast.LENGTH_SHORT).show();
+            }
             Looper.loop();
         }).start();
     }

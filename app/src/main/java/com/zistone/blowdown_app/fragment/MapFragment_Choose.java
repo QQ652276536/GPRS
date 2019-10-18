@@ -236,9 +236,6 @@ public class MapFragment_Choose extends Fragment implements View.OnClickListener
         }
     };
 
-    /**
-     * 用OkHttp发送网络请求,并在里面开启线程
-     */
     private void SendWithOkHttp()
     {
         new Thread(() ->

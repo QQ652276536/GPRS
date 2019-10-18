@@ -280,9 +280,6 @@ public class DeviceFragment_List extends Fragment implements View.OnClickListene
         }
     };
 
-    /**
-     * 用OkHttp发送网络请求,并在里面开启线程
-     */
     private void SendWithOkHttp()
     {
         new Thread(() ->

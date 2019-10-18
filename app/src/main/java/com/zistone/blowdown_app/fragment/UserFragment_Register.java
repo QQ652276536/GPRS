@@ -361,9 +361,6 @@ public class UserFragment_Register extends Fragment implements View.OnClickListe
         }
     };
 
-    /**
-     * 用OkHttp发送网络请求,并在里面开启线程
-     */
     private void SendWithOkHttp()
     {
         new Thread(() ->
