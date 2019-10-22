@@ -150,6 +150,8 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
     private LinearLayout m_areaInfoWindow;
     private LinearLayout m_addAreaInfoWindow;
     private ImageButton m_btnLocation;
+    private ImageButton m_btnUpLocation;
+    private ImageButton m_btnDownLocation;
     private ImageButton m_btnTraffic;
     private ImageButton m_btnLocus;
     private ImageButton m_btnTask;
@@ -159,9 +161,11 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
     private boolean m_isAreaDefense = false;
     private BitmapDescriptor m_defenseMark = BitmapDescriptorFactory.fromResource(R.drawable.icon_mark3);
     private List<AreaDefenseInfo> m_areaDefenseInfoList;
-    private List<LocationInfo> m_locationNowMonthEverDayList;
+    private List<LocationInfo> m_locationNowMonthEverDayList = new ArrayList<>();
     //当前点击的Marker
     private String m_currentMarkerId;
+    //本月历史位置所在集合的下标
+    private int m_nowMonthHistoryLocationIndex = 0;
 
     public static MapFragment_Map newInstance(DeviceInfo deviceInfo)
     {
@@ -232,6 +236,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
         public void handleMessage(Message message)
         {
             m_baiduMap.clear();
+            m_locationNowMonthEverDayList.clear();
             super.handleMessage(message);
             switch(message.what)
             {
@@ -250,7 +255,6 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
                     }
                     List<LocationInfo> list = JSON.parseArray(result, LocationInfo.class);
                     List<String> keyList = new ArrayList<>();
-                    m_locationNowMonthEverDayList = new ArrayList<>();
                     for(LocationInfo locationInfo : list)
                     {
                         String timeStr = SIMPLEDATEFORMAT.format(locationInfo.getM_createTime());
@@ -292,10 +296,6 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
                                 break;
                             }
                         }
-                    }
-                    for(int i = 0; i < m_locationNowMonthEverDayList.size(); i++)
-                    {
-                        System.out.println(m_locationNowMonthEverDayList.get(i).toString());
                     }
                     for(LocationInfo tempLocationInfo : m_locationNowMonthEverDayList)
                     {
@@ -913,6 +913,10 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
         m_addAreaInfoWindow.setOnClickListener(this::onClick);
         m_btnLocation = m_mapView.findViewById(R.id.btn_location_baidu);
         m_btnLocation.setOnClickListener(this::onClick);
+        m_btnUpLocation = m_mapView.findViewById(R.id.btn_up_baidu);
+        m_btnUpLocation.setOnClickListener(this::onClick);
+        m_btnDownLocation = m_mapView.findViewById(R.id.btn_down_baidu);
+        m_btnDownLocation.setOnClickListener(this::onClick);
         m_btnTraffic = m_mapView.findViewById(R.id.btn_trafficlight_baidu);
         m_btnTraffic.setOnClickListener(this::onClick);
         m_btnLocus = m_mapView.findViewById(R.id.btn_locus_baidu);
@@ -1095,6 +1099,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
     @Override
     public void onClick(View v)
     {
+        int historyLocationTotal = m_locationNowMonthEverDayList.size();
         switch(v.getId())
         {
             case R.id.btn_monitor_target:
@@ -1107,6 +1112,36 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
                     MapStatus mapStatus = new MapStatus.Builder().target(m_latLng).zoom(16).build();
                     MapStatusUpdate mapStatusUpdate = MapStatusUpdateFactory.newMapStatus(mapStatus);
                     m_baiduMap.setMapStatus(mapStatusUpdate);
+                }
+                break;
+            case R.id.btn_up_baidu:
+                if(m_nowMonthHistoryLocationIndex < historyLocationTotal)
+                {
+                    LocationInfo locationInfo = m_locationNowMonthEverDayList.get(m_nowMonthHistoryLocationIndex);
+                    LatLng latLng = new LatLng(locationInfo.getM_lat(), locationInfo.getM_lot());
+                    MapStatus mapStatus = new MapStatus.Builder().target(latLng).zoom(16).build();
+                    MapStatusUpdate mapStatusUpdate = MapStatusUpdateFactory.newMapStatus(mapStatus);
+                    m_baiduMap.setMapStatus(mapStatusUpdate);
+                    m_nowMonthHistoryLocationIndex++;
+                }
+                else
+                {
+                    Toast.makeText(m_context, "已到起始日", Toast.LENGTH_SHORT).show();
+                }
+                break;
+            case R.id.btn_down_baidu:
+                if(m_nowMonthHistoryLocationIndex > 0 && m_nowMonthHistoryLocationIndex < historyLocationTotal)
+                {
+                    m_nowMonthHistoryLocationIndex--;
+                    LocationInfo locationInfo = m_locationNowMonthEverDayList.get(m_nowMonthHistoryLocationIndex);
+                    LatLng latLng = new LatLng(locationInfo.getM_lat(), locationInfo.getM_lot());
+                    MapStatus mapStatus = new MapStatus.Builder().target(latLng).zoom(16).build();
+                    MapStatusUpdate mapStatusUpdate = MapStatusUpdateFactory.newMapStatus(mapStatus);
+                    m_baiduMap.setMapStatus(mapStatusUpdate);
+                }
+                else
+                {
+                    Toast.makeText(m_context, "已到截止日", Toast.LENGTH_SHORT).show();
                 }
                 break;
             case R.id.btn_trafficlight_baidu:

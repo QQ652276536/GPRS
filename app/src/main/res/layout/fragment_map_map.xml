@@ -38,17 +38,6 @@
 
         </com.baidu.mapapi.map.MapView>
 
-        <ImageButton
-            android:id="@+id/btn_location_baidu"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginLeft="5dp"
-            android:layout_marginBottom="60dp"
-            android:background="@color/transparent"
-            app:srcCompat="@drawable/location1" />
-
         <LinearLayout
             android:layout_width="40dp"
             android:layout_height="210dp"
@@ -68,6 +57,14 @@
                 android:background="@color/transparent"
                 app:srcCompat="@drawable/trafficlight1" />
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
+                android:background="@color/black"
+                android:orientation="vertical" />
+
             <ImageButton
                 android:id="@+id/btn_locus_baidu"
                 android:layout_width="40dp"
@@ -76,6 +73,14 @@
                 android:layout_marginTop="10dp"
                 android:background="@color/transparent"
                 app:srcCompat="@drawable/locus1" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
+                android:background="@color/black"
+                android:orientation="vertical" />
 
             <ImageButton
                 android:id="@+id/btn_task_baidu"
@@ -86,6 +91,14 @@
                 android:background="@color/transparent"
                 app:srcCompat="@drawable/task1" />
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
+                android:background="@color/black"
+                android:orientation="vertical" />
+
             <ImageButton
                 android:id="@+id/btn_defense_baidu"
                 android:layout_width="40dp"
@@ -94,6 +107,60 @@
                 android:layout_marginTop="10dp"
                 android:background="@color/transparent"
                 app:srcCompat="@drawable/defense1" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="40dp"
+            android:layout_height="157.5dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginLeft="5dp"
+            android:layout_marginBottom="80dp"
+            android:background="@color/white"
+            android:orientation="vertical">
+
+            <ImageButton
+                android:id="@+id/btn_up_baidu"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="10dp"
+                android:background="@color/transparent"
+                app:srcCompat="@drawable/up1" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
+                android:background="@color/black"
+                android:orientation="vertical" />
+
+            <ImageButton
+                android:id="@+id/btn_down_baidu"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="10dp"
+                android:background="@color/transparent"
+                app:srcCompat="@drawable/down1" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
+                android:background="@color/black"
+                android:orientation="vertical" />
+
+            <ImageButton
+                android:id="@+id/btn_location_baidu"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="10dp"
+                android:background="@color/transparent"
+                app:srcCompat="@drawable/location1" />
         </LinearLayout>
     </RelativeLayout>
 
