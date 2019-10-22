@@ -17,6 +17,9 @@ import android.hardware.SensorManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
@@ -33,6 +36,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.alibaba.fastjson.JSON;
 import com.baidu.location.BDAbstractLocationListener;
 import com.baidu.location.BDLocation;
 import com.baidu.location.LocationClient;
@@ -61,22 +65,53 @@ import com.baidu.mapapi.search.geocode.GeoCoder;
 import com.baidu.mapapi.search.geocode.OnGetGeoCoderResultListener;
 import com.baidu.mapapi.search.geocode.ReverseGeoCodeOption;
 import com.baidu.mapapi.search.geocode.ReverseGeoCodeResult;
+import com.baidu.trace.model.SortType;
 import com.zistone.blowdown_app.R;
 import com.zistone.blowdown_app.entity.AreaDefenseInfo;
 import com.zistone.blowdown_app.entity.DeviceInfo;
+import com.zistone.blowdown_app.entity.LocationInfo;
+import com.zistone.blowdown_app.util.MapUtil;
+import com.zistone.blowdown_app.util.PropertiesUtil;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.io.IOException;
 import java.io.Serializable;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.temporal.TemporalAdjuster;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.FormBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 import static android.content.Context.SENSOR_SERVICE;
 
 public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickListener, View.OnClickListener, SensorEventListener, OnGetGeoCoderResultListener, Serializable, BaiduMap.OnMarkerClickListener
 {
+    private static final SimpleDateFormat SIMPLEDATEFORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static final String TAG = "MapFragment_Map";
     private static final String MARKERID_LOCATION = "MARKERID_LOCATION";
-    private static final BitmapDescriptor ICON_MARKER = BitmapDescriptorFactory.fromResource(R.drawable.icon_mark2);
+    private static final BitmapDescriptor ICON_MARKER1 = BitmapDescriptorFactory.fromResource(R.drawable.icon_mark1);
+    private static final BitmapDescriptor ICON_MARKER2 = BitmapDescriptorFactory.fromResource(R.drawable.icon_mark2);
+    private static final int MESSAGE_RREQUEST_FAIL = 1;
+    private static final int MESSAGE_RESPONSE_FAIL = 2;
+    private static final int MESSAGE_RESPONSE_SUCCESS = 3;
+    private static String URL;
     private Context m_context;
     private MyLocationListener m_locationListener = new MyLocationListener();
     private LocationClient m_locationClient;
@@ -124,6 +159,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
     private boolean m_isAreaDefense = false;
     private BitmapDescriptor m_defenseMark = BitmapDescriptorFactory.fromResource(R.drawable.icon_mark3);
     private List<AreaDefenseInfo> m_areaDefenseInfoList;
+    private List<LocationInfo> m_locationNowMonthEverDayList;
     //当前点击的Marker
     private String m_currentMarkerId;
 
@@ -188,6 +224,170 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
             m_baiduMap.hideInfoWindow();
             m_baiduMapView.postInvalidate();
         });
+    }
+
+    private Handler handler = new Handler()
+    {
+        @Override
+        public void handleMessage(Message message)
+        {
+            m_baiduMap.clear();
+            super.handleMessage(message);
+            switch(message.what)
+            {
+                case MESSAGE_RREQUEST_FAIL:
+                {
+                    String result = (String) message.obj;
+                    Toast.makeText(m_context, "网络连接超时,请检查网络环境", Toast.LENGTH_SHORT).show();
+                    break;
+                }
+                case MESSAGE_RESPONSE_SUCCESS:
+                {
+                    String result = (String) message.obj;
+                    if(null == result || "".equals(result) || "[]".equals(result))
+                    {
+                        return;
+                    }
+                    List<LocationInfo> list = JSON.parseArray(result, LocationInfo.class);
+                    List<String> keyList = new ArrayList<>();
+                    m_locationNowMonthEverDayList = new ArrayList<>();
+                    for(LocationInfo locationInfo : list)
+                    {
+                        String timeStr = SIMPLEDATEFORMAT.format(locationInfo.getM_createTime());
+                        timeStr = timeStr.split(" ")[0];
+                        keyList.add(timeStr);
+                    }
+                    //当天日期为键,当天所有位置为值
+                    Map<String, List<LocationInfo>> map_locationsForDay = new HashMap<>();
+                    for(String tempStr : keyList)
+                    {
+                        List<LocationInfo> tempList = new ArrayList<>();
+                        for(LocationInfo locationInfo : list)
+                        {
+                            String timeStr = SIMPLEDATEFORMAT.format(locationInfo.getM_createTime());
+                            timeStr = timeStr.split(" ")[0];
+                            if(tempStr.equals(timeStr))
+                            {
+                                tempList.add(locationInfo);
+                            }
+                        }
+                        map_locationsForDay.put(tempStr, tempList);
+                    }
+                    for(Map.Entry<String, List<LocationInfo>> entry : map_locationsForDay.entrySet())
+                    {
+                        List<LocationInfo> locationInfos = entry.getValue();
+                        List<Date> dates = new ArrayList<>();
+                        //当天所有位置的新增时间
+                        for(LocationInfo tempLocationInfo : locationInfos)
+                        {
+                            dates.add(tempLocationInfo.getM_createTime());
+                        }
+                        //当天最后一条记录的新增时间
+                        Date lastTime = Collections.max(dates);
+                        for(LocationInfo tempLocationInfo : locationInfos)
+                        {
+                            if(lastTime == tempLocationInfo.getM_createTime())
+                            {
+                                m_locationNowMonthEverDayList.add(tempLocationInfo);
+                                break;
+                            }
+                        }
+                    }
+                    for(int i = 0; i < m_locationNowMonthEverDayList.size(); i++)
+                    {
+                        System.out.println(m_locationNowMonthEverDayList.get(i).toString());
+                    }
+                    for(LocationInfo tempLocationInfo : m_locationNowMonthEverDayList)
+                    {
+                        LatLng latLng = new LatLng(tempLocationInfo.getM_lat(), tempLocationInfo.getM_lot());
+                        MarkerOptions markerOptions = new MarkerOptions().position(latLng).icon(ICON_MARKER1);
+                        //标记添加至地图中
+                        m_baiduMap.addOverlay(markerOptions);
+                    }
+                    break;
+                }
+                case MESSAGE_RESPONSE_FAIL:
+                {
+                    String result = (String) message.obj;
+                    Toast.makeText(m_context, "获取本月定位数据失败,请与管理员联系", Toast.LENGTH_SHORT).show();
+                    break;
+                }
+                default:
+                    break;
+            }
+            //设置当前位置的图标
+            MarkerOptions markerOptions = new MarkerOptions().position(m_latLng).icon(ICON_MARKER2);
+            Bundle bundle = new Bundle();
+            bundle.putString(MARKERID_LOCATION, MARKERID_LOCATION);
+            //设置Marker覆盖物的额外信息
+            markerOptions.extraInfo(bundle);
+            //标记添加至地图中
+            m_marker = (Marker) (m_baiduMap.addOverlay(markerOptions));
+            //定义地图缩放级别3~16,值越大地图越精细
+            MapStatus mapStatus = new MapStatus.Builder().target(m_latLng).zoom(16).build();
+            MapStatusUpdate mapStatusUpdate = MapStatusUpdateFactory.newMapStatus(mapStatus);
+            //改变地图状态
+            m_baiduMap.setMapStatus(mapStatusUpdate);
+            //添加平移动画
+            m_marker.setAnimation(Transformation());
+            m_marker.startAnimation();
+        }
+    };
+
+    private void QueryHistoryTrack() throws ParseException
+    {
+        Calendar calendar = Calendar.getInstance();
+        String yearStr = String.valueOf(calendar.get(Calendar.YEAR));
+        String monthStr = String.valueOf(calendar.get(Calendar.MONTH) + 1);
+        String dayStr = String.valueOf(calendar.get(Calendar.DAY_OF_MONTH));
+        String startStr = yearStr + "-" + monthStr + "-" + "01" + " 00:00:00";
+        String endStr = yearStr + "-" + monthStr + "-" + dayStr + " 23:59:59";
+        Date startDate = SIMPLEDATEFORMAT.parse(startStr);
+        Date endDate = SIMPLEDATEFORMAT.parse(endStr);
+        new Thread(() ->
+        {
+            Looper.prepare();
+            //实例化并设置连接超时时间、读取超时时间
+            OkHttpClient okHttpClient = new OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS).readTimeout(10, TimeUnit.SECONDS).build();
+            //RequestBody requestBody = FormBody.create("", MediaType.parse("application/json; charset=utf-8"));
+            FormBody.Builder builder = new FormBody.Builder();
+            builder.add("deviceId", m_deviceInfo.getM_deviceId());
+            builder.add("startTime", startDate.getTime() + "");
+            builder.add("endTime", endDate.getTime() + "");
+            RequestBody requestBody = builder.build();
+            //创建Post请求的方式
+            Request request = new Request.Builder().post(requestBody).url(URL).build();
+            Call call = okHttpClient.newCall(request);
+            //Android中不允许任何网络的交互在主线程中进行
+            call.enqueue(new Callback()
+            {
+                @Override
+                public void onFailure(@NotNull Call call, @NotNull IOException e)
+                {
+                    Log.e(TAG, "请求失败:" + e.toString());
+                    Message message = handler.obtainMessage(MESSAGE_RREQUEST_FAIL, "请求失败:" + e.toString());
+                    handler.sendMessage(message);
+                }
+
+                @Override
+                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException
+                {
+                    String responseStr = response.body().string();
+                    Log.i(TAG, "响应内容:" + responseStr);
+                    if(response.isSuccessful())
+                    {
+                        Message message = handler.obtainMessage(MESSAGE_RESPONSE_SUCCESS, responseStr);
+                        handler.sendMessage(message);
+                    }
+                    else
+                    {
+                        Message message = handler.obtainMessage(MESSAGE_RESPONSE_FAIL, responseStr);
+                        handler.sendMessage(message);
+                    }
+                }
+            });
+            Looper.loop();
+        }).start();
     }
 
     private void CreateAreaInfoWindow(LatLng latLng, AreaDefenseInfo areaDefenseInfo)
@@ -614,22 +814,31 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
         {
             return;
         }
-        //设置标记的位置和图标
-        MarkerOptions markerOptions = new MarkerOptions().position(m_latLng).icon(ICON_MARKER);
-        Bundle bundle = new Bundle();
-        bundle.putString(MARKERID_LOCATION, MARKERID_LOCATION);
-        //设置Marker覆盖物的额外信息
-        markerOptions.extraInfo(bundle);
-        //标记添加至地图中
-        m_marker = (Marker) (m_baiduMap.addOverlay(markerOptions));
-        //定义地图缩放级别3~16,值越大地图越精细
-        MapStatus mapStatus = new MapStatus.Builder().target(m_latLng).zoom(16).build();
-        MapStatusUpdate mapStatusUpdate = MapStatusUpdateFactory.newMapStatus(mapStatus);
-        //改变地图状态
-        m_baiduMap.setMapStatus(mapStatusUpdate);
-        //添加平移动画
-        m_marker.setAnimation(Transformation());
-        m_marker.startAnimation();
+        //        //设置标记的位置和图标
+        //        MarkerOptions markerOptions = new MarkerOptions().position(m_latLng).icon(ICON_MARKER2);
+        //        Bundle bundle = new Bundle();
+        //        bundle.putString(MARKERID_LOCATION, MARKERID_LOCATION);
+        //        //设置Marker覆盖物的额外信息
+        //        markerOptions.extraInfo(bundle);
+        //        //本月每天最后一次的上报位置
+        try
+        {
+            QueryHistoryTrack();
+        }
+        catch(ParseException e)
+        {
+            e.printStackTrace();
+        }
+        //        //标记添加至地图中
+        //        m_marker = (Marker) (m_baiduMap.addOverlay(markerOptions));
+        //        //定义地图缩放级别3~16,值越大地图越精细
+        //        MapStatus mapStatus = new MapStatus.Builder().target(m_latLng).zoom(16).build();
+        //        MapStatusUpdate mapStatusUpdate = MapStatusUpdateFactory.newMapStatus(mapStatus);
+        //        //改变地图状态
+        //        m_baiduMap.setMapStatus(mapStatusUpdate);
+        //        //添加平移动画
+        //        m_marker.setAnimation(Transformation());
+        //        m_marker.startAnimation();
     }
 
     /**
@@ -690,6 +899,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
     private void InitView()
     {
         m_context = m_mapView.getContext();
+        URL = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/LocationInfo/FindByDeviceIdAndBetweenTime";
         m_activity = getActivity();
         m_textView = m_mapView.findViewById(R.id.textView_baidu);
         m_baiduMapView = m_mapView.findViewById(R.id.mapView_baidu);

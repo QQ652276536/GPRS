@@ -2,6 +2,8 @@ package com.example.blowdown_app;
 
 import org.junit.Test;
 
+import java.time.LocalDate;
+
 import static org.junit.Assert.*;
 
 /**
@@ -12,6 +14,8 @@ import static org.junit.Assert.*;
 public class ExampleUnitTest {
     @Test
     public void addition_isCorrect() {
-        assertEquals(4, 2 + 2);
+
+        LocalDate today = LocalDate.now();
+        String sss = today.toString();
     }
 }

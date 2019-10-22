@@ -28,12 +28,12 @@ public class LocationInfo
     /**
      * 定位时间
      */
-    private Date m_time;
+    private Date m_createTime;
 
     @Override
     public String toString()
     {
-        return "LocationInfo{" + "m_id='" + m_id + '\'' + ", m_deviceId='" + m_deviceId + '\'' + ", m_lat=" + m_lat + ", m_lot=" + m_lot + ", m_time=" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(m_time) + '}';
+        return "LocationInfo{" + "m_id='" + m_id + '\'' + ", m_deviceId='" + m_deviceId + '\'' + ", m_lat=" + m_lat + ", m_lot=" + m_lot + ", m_createTime=" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(m_createTime) + '}';
     }
 
     public String getM_id()
@@ -76,13 +76,13 @@ public class LocationInfo
         this.m_lot = m_lot;
     }
 
-    public Date getM_time()
+    public Date getM_createTime()
     {
-        return m_time;
+        return m_createTime;
     }
 
-    public void setM_time(Date m_time)
+    public void setM_createTime(Date m_createTime)
     {
-        this.m_time = m_time;
+        this.m_createTime = m_createTime;
     }
 }
