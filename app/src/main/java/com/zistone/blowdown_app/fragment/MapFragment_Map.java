@@ -85,6 +85,7 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -297,6 +298,19 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
                             }
                         }
                     }
+                    Collections.sort(m_locationNowMonthEverDayList, (o1, o2) ->
+                    {
+                        //降序排列
+                        if(o1.getM_createTime().before(o2.getM_createTime()))
+                        {
+                            return 1;
+                        }
+                        if(o1.getM_createTime() == o2.getM_createTime())
+                        {
+                            return 0;
+                        }
+                        return -1;
+                    });
                     for(LocationInfo tempLocationInfo : m_locationNowMonthEverDayList)
                     {
                         LatLng latLng = new LatLng(tempLocationInfo.getM_lat(), tempLocationInfo.getM_lot());
