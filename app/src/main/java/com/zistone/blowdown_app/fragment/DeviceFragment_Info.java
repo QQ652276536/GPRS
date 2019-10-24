@@ -74,20 +74,20 @@ public class DeviceFragment_Info extends Fragment implements View.OnClickListene
     @Override
     public void onClick(View v)
     {
-        switch (v.getId())
+        switch(v.getId())
         {
             case R.id.btn_return_device_info:
                 DeviceFragment_List deviceFragment_list = DeviceFragment_List.newInstance(1, "");
                 getFragmentManager().beginTransaction().replace(R.id.fragment_current_device, deviceFragment_list, "deviceFragment_list").commitNow();
                 break;
             case R.id.btn_confirm_device_info:
-                if (m_btnConfirm.getText().equals("编辑"))
+                if(m_btnConfirm.getText().equals("编辑"))
                 {
                     m_btnConfirm.setText("保存");
                     m_toolbartextView.setText("设备编辑");
                     SetControlEnabled(true);
                 }
-                else if (m_btnConfirm.getText().equals("保存"))
+                else if(m_btnConfirm.getText().equals("保存"))
                 {
                     m_btnConfirm.setText("编辑");
                     m_toolbartextView.setText("设备详情");
@@ -96,7 +96,7 @@ public class DeviceFragment_Info extends Fragment implements View.OnClickListene
                     m_deviceInfo.setM_name(m_editText1.getText().toString());
                     m_deviceInfo.setM_type(m_editText2.getText().toString());
                     m_deviceInfo.setM_deviceId(m_editText3.getText().toString());
-                    m_deviceInfo.setM_sim(Integer.valueOf(m_editText4.getText().toString()));
+                    m_deviceInfo.setM_sim(m_editText4.getText().toString());
                     m_deviceInfo.setM_comment(m_editText5.getText().toString());
                     m_deviceInfo.setM_state(m_switch.isChecked() ? 1 : 0);
                     String jsonData = JSON.toJSONString(m_deviceInfo);
@@ -125,7 +125,7 @@ public class DeviceFragment_Info extends Fragment implements View.OnClickListene
                             {
                                 String responseStr = response.body().string();
                                 Log.i(TAG, "响应内容:" + responseStr);
-                                if (response.isSuccessful())
+                                if(response.isSuccessful())
                                 {
                                     Message message = handler.obtainMessage(MESSAGE_RESPONSE_SUCCESS, responseStr);
                                     handler.sendMessage(message);
@@ -166,7 +166,7 @@ public class DeviceFragment_Info extends Fragment implements View.OnClickListene
 
     public void onButtonPressed(Uri uri)
     {
-        if (mListener != null)
+        if(mListener != null)
         {
             mListener.onFragmentInteraction(uri);
         }
@@ -187,14 +187,14 @@ public class DeviceFragment_Info extends Fragment implements View.OnClickListene
         m_editText4 = m_deviceInfoView.findViewById(R.id.editText4_device_info);
         m_editText5 = m_deviceInfoView.findViewById(R.id.editText5_device_info);
         m_switch = m_deviceInfoView.findViewById(R.id.switch_device_info);
-        if (null != m_deviceInfo)
+        if(null != m_deviceInfo)
         {
             m_editText1.setText(m_deviceInfo.getM_name());
             m_editText2.setText(m_deviceInfo.getM_type());
             m_editText3.setText(m_deviceInfo.getM_deviceId());
-            m_editText4.setText(String.valueOf(m_deviceInfo.getM_sim()));
+            m_editText4.setText(m_deviceInfo.getM_sim());
             m_editText5.setText(m_deviceInfo.getM_comment());
-            switch (m_deviceInfo.getM_state())
+            switch(m_deviceInfo.getM_state())
             {
                 case 0:
                     m_switch.setChecked(false);
@@ -215,7 +215,7 @@ public class DeviceFragment_Info extends Fragment implements View.OnClickListene
         public void handleMessage(Message message)
         {
             super.handleMessage(message);
-            switch (message.what)
+            switch(message.what)
             {
                 case MESSAGE_RREQUEST_FAIL:
                 {
@@ -226,7 +226,7 @@ public class DeviceFragment_Info extends Fragment implements View.OnClickListene
                 case MESSAGE_RESPONSE_SUCCESS:
                 {
                     String result = (String) message.obj;
-                    if (null == result || "".equals(result))
+                    if(null == result || "".equals(result))
                     {
                         return;
                     }
@@ -275,7 +275,7 @@ public class DeviceFragment_Info extends Fragment implements View.OnClickListene
                 {
                     String result = response.body().string();
                     Log.i(TAG, "响应内容:" + result);
-                    if (response.isSuccessful())
+                    if(response.isSuccessful())
                     {
                         Message message = handler.obtainMessage(MESSAGE_RESPONSE_SUCCESS, result);
                         handler.sendMessage(message);
@@ -301,7 +301,7 @@ public class DeviceFragment_Info extends Fragment implements View.OnClickListene
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null)
+        if(getArguments() != null)
         {
             //获取设备信息
             m_deviceInfo = getArguments().getParcelable("DEVICEINFO");
@@ -320,7 +320,7 @@ public class DeviceFragment_Info extends Fragment implements View.OnClickListene
     public void onAttach(Context context)
     {
         super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener)
+        if(context instanceof OnFragmentInteractionListener)
         {
             mListener = (OnFragmentInteractionListener) context;
         }

@@ -13,6 +13,8 @@ import java.util.Date;
 
 public class DeviceInfo implements Parcelable
 {
+    private static final SimpleDateFormat SIMPLEDATEFORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
     public static final Creator<DeviceInfo> CREATOR = new Creator<DeviceInfo>()
     {
         @Override
@@ -27,19 +29,21 @@ public class DeviceInfo implements Parcelable
             deviceInfo.setM_lot(bundle.getDouble("m_lot"));
             deviceInfo.setM_state(bundle.getInt("m_state"));
             deviceInfo.setM_deviceId(bundle.getString("m_deviceId"));
-            deviceInfo.setM_sim(bundle.getInt("m_sim"));
+            deviceInfo.setM_sim(bundle.getString("m_sim"));
             deviceInfo.setM_comment(bundle.getString("m_comment"));
             try
             {
-                deviceInfo.setM_createTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(bundle.getString("m_createTime")));
-                deviceInfo.setM_updateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(bundle.getString("m_updateTime")));
+                deviceInfo.setM_createTime(SIMPLEDATEFORMAT.parse(bundle.getString("m_createTime")));
+                deviceInfo.setM_updateTime(SIMPLEDATEFORMAT.parse(bundle.getString("m_updateTime")));
             }
-            catch (ParseException e)
+            catch(ParseException e)
             {
                 e.printStackTrace();
             }
             deviceInfo.setM_akCode(bundle.getString("m_akCode"));
             deviceInfo.setM_height(bundle.getDouble("m_height"));
+            deviceInfo.setM_temperature(bundle.getInt("m_temperature"));
+            deviceInfo.setM_electricity(bundle.getInt("m_electricity"));
             return deviceInfo;
         }
 
@@ -63,7 +67,7 @@ public class DeviceInfo implements Parcelable
     /**
      * SIM卡号
      */
-    private int m_sim;
+    private String m_sim;
 
     /**
      * 设备名
@@ -114,10 +118,20 @@ public class DeviceInfo implements Parcelable
      */
     private String m_akCode;
 
+    /**
+     * 温度
+     */
+    private int m_temperature;
+
+    /**
+     * 剩余电量
+     */
+    private int m_electricity;
+
     @Override
     public String toString()
     {
-        return "DeviceInfo{" + "m_id=" + m_id + ", m_deviceId='" + m_deviceId + '\'' + ", m_sim=" + m_sim + ", m_name='" + m_name + '\'' + ", m_type='" + m_type + '\'' + ", m_state=" + m_state + ", m_lat=" + m_lat + ", m_lot=" + m_lot + ", m_height=" + m_height + ", m_createTime=" + m_createTime + ", m_updateTime=" + m_updateTime + ", m_comment='" + m_comment + '\'' + ", m_akCode='" + m_akCode + '\'' + '}';
+        return "DeviceInfo{" + "m_id=" + m_id + ", m_deviceId='" + m_deviceId + '\'' + ", m_sim=" + m_sim + ", m_name='" + m_name + '\'' + ", m_type='" + m_type + '\'' + ", m_state=" + m_state + ", m_lat=" + m_lat + ", m_lot=" + m_lot + ", m_height=" + m_height + ", m_createTime=" + SIMPLEDATEFORMAT.format(m_createTime) + ", m_updateTime=" + SIMPLEDATEFORMAT.format(m_updateTime) + ", m_comment='" + m_comment + '\'' + ", m_akCode='" + m_akCode + '\'' + ", m_temperature=" + m_temperature + ", m_electricity=" + m_electricity + '}';
     }
 
     @Override
@@ -136,9 +150,9 @@ public class DeviceInfo implements Parcelable
         dest.writeDouble(m_lot);
         dest.writeInt(m_state);
         dest.writeString(m_deviceId);
-        dest.writeInt(m_sim);
+        dest.writeString(m_sim);
         dest.writeString(m_comment);
-        if (null != m_createTime)
+        if(null != m_createTime)
         {
             dest.writeString(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(m_createTime));
         }
@@ -146,7 +160,7 @@ public class DeviceInfo implements Parcelable
         {
             dest.writeString(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
         }
-        if (null != m_updateTime)
+        if(null != m_updateTime)
         {
             dest.writeString(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(m_updateTime));
         }
@@ -156,6 +170,8 @@ public class DeviceInfo implements Parcelable
         }
         dest.writeString(m_akCode);
         dest.writeDouble(m_height);
+        dest.writeInt(m_temperature);
+        dest.writeInt(m_electricity);
     }
 
     public int getM_id()
@@ -268,12 +284,12 @@ public class DeviceInfo implements Parcelable
         this.m_deviceId = m_deviceId;
     }
 
-    public int getM_sim()
+    public String getM_sim()
     {
         return m_sim;
     }
 
-    public void setM_sim(int m_sim)
+    public void setM_sim(String m_sim)
     {
         this.m_sim = m_sim;
     }
@@ -286,5 +302,25 @@ public class DeviceInfo implements Parcelable
     public void setM_comment(String m_comment)
     {
         this.m_comment = m_comment;
+    }
+
+    public int getM_temperature()
+    {
+        return m_temperature;
+    }
+
+    public void setM_temperature(int m_temperature)
+    {
+        this.m_temperature = m_temperature;
+    }
+
+    public int getM_electricity()
+    {
+        return m_electricity;
+    }
+
+    public void setM_electricity(int m_electricity)
+    {
+        this.m_electricity = m_electricity;
     }
 }

@@ -163,7 +163,7 @@ public class DeviceFragment_Add extends Fragment implements View.OnClickListener
                 deviceInfo.setM_name(name);
                 deviceInfo.setM_type(type);
                 deviceInfo.setM_deviceId(deviceId);
-                deviceInfo.setM_sim(Integer.valueOf(sim));
+                deviceInfo.setM_sim(sim);
                 deviceInfo.setM_comment(comment);
                 deviceInfo.setM_state(state ? 1 : 0);
                 deviceInfo.setM_createTime(new Date());

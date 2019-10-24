@@ -106,10 +106,9 @@ public class MapFragment_Bind extends Fragment implements View.OnClickListener
             m_textView1.setText(m_deviceInfo.getM_name());
             m_textView2.setText("");
             m_textView3.setText(m_deviceInfo.getM_deviceId());
-            m_textView4.setText(String.valueOf(m_deviceInfo.getM_sim()));
+            m_textView4.setText(m_deviceInfo.getM_sim());
         }
     }
-
 
     private Handler handler = new Handler()
     {

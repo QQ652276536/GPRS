@@ -5,6 +5,8 @@ import java.util.Date;
 
 public class LocationInfo
 {
+    private static final SimpleDateFormat SIMPLEDATEFORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
     /**
      * 自增主键(由数据库生成)
      */
@@ -26,6 +28,11 @@ public class LocationInfo
     private double m_lot;
 
     /**
+     * 海拔
+     */
+    private int m_height;
+
+    /**
      * 定位时间
      */
     private Date m_createTime;
@@ -33,7 +40,7 @@ public class LocationInfo
     @Override
     public String toString()
     {
-        return "LocationInfo{" + "m_id='" + m_id + '\'' + ", m_deviceId='" + m_deviceId + '\'' + ", m_lat=" + m_lat + ", m_lot=" + m_lot + ", m_createTime=" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(m_createTime) + '}';
+        return "LocationInfo{" + "m_id='" + m_id + '\'' + ", m_deviceId='" + m_deviceId + '\'' + ", m_lat=" + m_lat + ", m_lot=" + m_lot + ", m_height=" + m_height + ", m_createTime=" + SIMPLEDATEFORMAT.format(m_createTime) + '}';
     }
 
     public String getM_id()
@@ -84,5 +91,15 @@ public class LocationInfo
     public void setM_createTime(Date m_createTime)
     {
         this.m_createTime = m_createTime;
+    }
+
+    public int getM_height()
+    {
+        return m_height;
+    }
+
+    public void setM_height(int m_height)
+    {
+        this.m_height = m_height;
     }
 }

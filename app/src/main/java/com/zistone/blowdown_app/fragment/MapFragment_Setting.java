@@ -207,7 +207,7 @@ public class MapFragment_Setting extends Fragment implements View.OnClickListene
         {
             m_textView1.setText(m_deviceInfo.getM_name());
             m_textView2.setText(m_deviceInfo.getM_deviceId());
-            m_textView3.setText(String.valueOf(m_deviceInfo.getM_sim()));
+            m_textView3.setText(m_deviceInfo.getM_sim());
             m_textView4.setText("");
             if(m_deviceInfo.getM_type().contains("铱星"))
             {
