@@ -681,9 +681,9 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
                 areaDefenseInfo.setM_deviceId(deviceId);
                 areaDefenseInfo.setM_lat(lat);
                 areaDefenseInfo.setM_lot(lot);
-                //                MarkerOptions markerOptions = new MarkerOptions().position(latLng).icon(m_defenseMark);
-                //                m_baiduMap.addOverlay(markerOptions);
-                CreateFence(0);
+                MarkerOptions markerOptions = new MarkerOptions().position(latLng).icon(m_defenseMark);
+                m_baiduMap.addOverlay(markerOptions);
+                //CreateFence(0);
                 CreateAddAreaWindow(latLng, areaDefenseInfo);
             }
             else
