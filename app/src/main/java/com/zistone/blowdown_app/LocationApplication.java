@@ -12,6 +12,7 @@ import com.baidu.trace.model.OnCustomAttributeListener;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 主Application,所有百度定位SDK的接口说明请参考线上文档：http://developer.baidu.com/map/loc_refer/index.html
@@ -26,6 +27,8 @@ public class LocationApplication extends Application
      * 轨迹客户端
      */
     public LBSTraceClient m_traceClient = null;
+
+    private AtomicInteger mSequenceGenerator = new AtomicInteger();
 
     @Override
     public void onCreate()
@@ -61,6 +64,16 @@ public class LocationApplication extends Application
                 return map;
             }
         });
+    }
+
+    /**
+     * 获取请求标识
+     *
+     * @return
+     */
+    public int getTag()
+    {
+        return mSequenceGenerator.incrementAndGet();
     }
 
 }

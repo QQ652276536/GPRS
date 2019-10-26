@@ -195,15 +195,15 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
     //操作围栏时,正在操作的围栏标识,格式:fenceType_fenceId
     private String m_fenceKey;
     //圆形围栏默认半径
-    private double radius = 1000;
+    private double m_radius = 1000;
     //去噪（默认不去噪）
-    private int denoise = 0;
+    private int m_denoise = 0;
     //围栏名称
-    private String fenceName = null;
+    private String m_fenceName = null;
     //地图工具
-    private MapUtil mapUtil = null;
+    private MapUtil m_mapUtil = null;
     //圆形围栏中心点坐标
-    private LatLng circleCenter = null;
+    private LatLng m_circleCenter = null;
     public LocationApplication m_locationApplication = null;
     //围栏监听器
     private OnFenceListener m_fenceListener = null;
@@ -250,7 +250,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
             @Override
             public void onDeleteFenceCallback(DeleteFenceResponse response)
             {
-                mapUtil.refresh();
+                m_mapUtil.refresh();
             }
 
             @Override
@@ -280,23 +280,13 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
                     LatLng latLng = MapUtil.convertTrace2Map(circleFence.getCenter());
                     double radius = circleFence.getRadius();
                     CircleOptions circleOptions = new CircleOptions().fillColor(0x000000FF).center(latLng).radius((int) radius);
-                    if(FenceType.local == fenceType)
-                    {
-                        circleOptions.stroke(new Stroke(5, Color.rgb(0x23, 0x19, 0xDC)));
-                        overlay = mapUtil.baiduMap.addOverlay(circleOptions);
-                        overlay.setVisible(false);
-                        m_overlaysMap.put(fenceKey, overlay);
-                    }
-                    else
-                    {
-                        circleOptions.stroke(new Stroke(5, Color.rgb(0xFF, 0x06, 0x01)));
-                        overlay = mapUtil.baiduMap.addOverlay(circleOptions);
-                        overlay.setVisible(false);
-                        m_overlaysMap.put(fenceKey, overlay);
-                    }
+                    circleOptions.stroke(new Stroke(5, Color.rgb(0xFF, 0x06, 0x01)));
+                    overlay = m_mapUtil.baiduMap.addOverlay(circleOptions);
+                    overlay.setVisible(false);
+                    m_overlaysMap.put(fenceKey, overlay);
                     points.add(latLng);
                 }
-                mapUtil.animateMapStatus(points);
+                m_mapUtil.animateMapStatus(points);
             }
 
             @Override
@@ -333,12 +323,10 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
 
     /**
      * 创建围栏
-     *
-     * @param tag
      */
-    private void CreateFence(int tag)
+    private void CreateFence()
     {
-        CreateFenceRequest request = CreateFenceRequest.buildServerCircleRequest(tag, 216097, fenceName, "TestFence", mapUtil.convertMap2Trace(circleCenter), radius, denoise, CoordType.bd09ll);
+        CreateFenceRequest request = CreateFenceRequest.buildServerCircleRequest(m_locationApplication.getTag(), 216097, m_fenceName, "myTrace", m_mapUtil.convertMap2Trace(m_circleCenter), m_radius, m_denoise, CoordType.bd09ll);
         m_locationApplication.m_traceClient.createFence(request, m_fenceListener);
     }
 
@@ -363,7 +351,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
      * @param latLng          窗体在地图上弹出的位置
      * @param areaDefenseInfo
      */
-    private void CreateAddAreaWindow(LatLng latLng, AreaDefenseInfo areaDefenseInfo)
+    private boolean CreateAddAreaWindow(LatLng latLng, AreaDefenseInfo areaDefenseInfo)
     {
         TextView textName = m_addAreaInfoWindow.findViewById(R.id.editText_add_area_defense1);
         TextView textAddress = m_addAreaInfoWindow.findViewById(R.id.editText_add_area_defense2);
@@ -384,12 +372,14 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
                     return;
                 }
                 double radius = Double.valueOf(radiusStr);
+                m_fenceName = name;
+                m_radius = radius;
                 areaDefenseInfo.setM_name(name);
                 areaDefenseInfo.setM_address(address);
                 areaDefenseInfo.setM_radius(radius);
-
                 m_baiduMap.hideInfoWindow();
                 m_baiduMapView.postInvalidate();
+                CreateFence();
             }
             catch(Exception e)
             {
@@ -403,6 +393,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
             m_baiduMap.hideInfoWindow();
             m_baiduMapView.postInvalidate();
         });
+        return true;
     }
 
     private Handler handler = new Handler()
@@ -683,7 +674,8 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
                 areaDefenseInfo.setM_lot(lot);
                 MarkerOptions markerOptions = new MarkerOptions().position(latLng).icon(m_defenseMark);
                 m_baiduMap.addOverlay(markerOptions);
-                //CreateFence(0);
+                //设置点击地图的位置为围栏的坐标
+                m_circleCenter = markerOptions.getPosition();
                 CreateAddAreaWindow(latLng, areaDefenseInfo);
             }
             else
@@ -1142,7 +1134,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
         }
         m_locationApplication = (LocationApplication) m_activity.getApplication();
         //地图工具
-        mapUtil = MapUtil.getInstance();
+        m_mapUtil = MapUtil.getInstance();
     }
 
     /**
