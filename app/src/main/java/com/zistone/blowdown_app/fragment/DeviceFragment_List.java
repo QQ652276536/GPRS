@@ -30,6 +30,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -90,7 +91,7 @@ public class DeviceFragment_List extends Fragment implements View.OnClickListene
     @Override
     public void onClick(View v)
     {
-        switch (v.getId())
+        switch(v.getId())
         {
             case R.id.btn_return_device_list:
                 DeviceFragment_Manage deviceFragment_manage = DeviceFragment_Manage.newInstance("", "");
@@ -109,7 +110,7 @@ public class DeviceFragment_List extends Fragment implements View.OnClickListene
 
     public void onButtonPressed(Uri uri)
     {
-        if (mListener != null)
+        if(mListener != null)
         {
             mListener.onFragmentInteraction(uri);
         }
@@ -143,7 +144,7 @@ public class DeviceFragment_List extends Fragment implements View.OnClickListene
         m_ToolbarTextView = m_deviceListView.findViewById(R.id.textView_toolbar);
         m_recyclerView = m_deviceListView.findViewById(R.id.device_recycler);
         m_deviceState = getArguments().getInt("DEVICESTATE");
-        if (m_deviceState == 1)
+        if(m_deviceState == 1)
         {
             m_ToolbarTextView.setText("可用设备列表");
         }
@@ -207,7 +208,7 @@ public class DeviceFragment_List extends Fragment implements View.OnClickListene
      */
     private void SetDeviceInfoRecyclerAdapterListener()
     {
-        if (null != m_deviceInfoRecyclerAdapter)
+        if(null != m_deviceInfoRecyclerAdapter)
         {
             m_deviceInfoRecyclerAdapter.SetOnItemClickListener(new DeviceInfoRecyclerAdapter.OnItemClickListener()
             {
@@ -234,7 +235,7 @@ public class DeviceFragment_List extends Fragment implements View.OnClickListene
         public void handleMessage(Message message)
         {
             super.handleMessage(message);
-            switch (message.what)
+            switch(message.what)
             {
                 case MESSAGE_RREQUEST_FAIL:
                 {
@@ -245,22 +246,37 @@ public class DeviceFragment_List extends Fragment implements View.OnClickListene
                 case MESSAGE_RESPONSE_SUCCESS:
                 {
                     String result = (String) message.obj;
-                    if (null == result || "".equals(result))
+                    if(null == result || "".equals(result))
                     {
                         return;
                     }
                     m_deviceList = JSON.parseArray(result, DeviceInfo.class);
+                    Iterator<DeviceInfo> iterator = m_deviceList.iterator();
                     //在线设备
-                    if (m_deviceState == 1)
+                    if(m_deviceState == 1)
                     {
                         //过滤掉离线设备
-                        m_deviceList.removeIf(p -> p.getM_state() == 0);
+                        while(iterator.hasNext())
+                        {
+                            DeviceInfo temp = iterator.next();
+                            if(temp.getM_state() == 0)
+                            {
+                                iterator.remove();
+                            }
+                        }
                     }
                     //离线设备
                     else
                     {
                         //过滤掉在线设备
-                        m_deviceList.removeIf(p -> p.getM_state() == 1);
+                        while(iterator.hasNext())
+                        {
+                            DeviceInfo temp = iterator.next();
+                            if(temp.getM_state() == 1)
+                            {
+                                iterator.remove();
+                            }
+                        }
                     }
                     m_deviceInfoRecyclerAdapter = new DeviceInfoRecyclerAdapter(m_context, m_deviceList);
                     //设置适配器
@@ -310,7 +326,7 @@ public class DeviceFragment_List extends Fragment implements View.OnClickListene
                 {
                     String result = response.body().string();
                     Log.i(TAG, "响应内容:" + result);
-                    if (response.isSuccessful())
+                    if(response.isSuccessful())
                     {
                         Message message = handler.obtainMessage(MESSAGE_RESPONSE_SUCCESS, result);
                         handler.sendMessage(message);
@@ -337,7 +353,7 @@ public class DeviceFragment_List extends Fragment implements View.OnClickListene
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null)
+        if(getArguments() != null)
         {
         }
     }
@@ -354,7 +370,7 @@ public class DeviceFragment_List extends Fragment implements View.OnClickListene
     public void onAttach(Context context)
     {
         super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener)
+        if(context instanceof OnFragmentInteractionListener)
         {
             mListener = (OnFragmentInteractionListener) context;
         }

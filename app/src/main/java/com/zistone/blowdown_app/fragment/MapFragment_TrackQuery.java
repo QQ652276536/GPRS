@@ -54,6 +54,7 @@ public class MapFragment_TrackQuery extends Fragment implements View.OnClickList
     private static final int MESSAGE_RESPONSE_FAIL = 2;
     private static final int MESSAGE_RESPONSE_SUCCESS = 3;
     private static final SimpleDateFormat SIMPLEDATEFORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static final SimpleDateFormat SIMPLEDATEFORMAT_YMD = new SimpleDateFormat("yyyy-MM-dd");
     private static String URL;
     private Context m_context;
     private View m_trackQueryView;
@@ -89,7 +90,7 @@ public class MapFragment_TrackQuery extends Fragment implements View.OnClickList
         //隐藏键盘
         InputMethodManager imm = (InputMethodManager) v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(v.getApplicationWindowToken(), 0);
-        switch (v.getId())
+        switch(v.getId())
         {
             case R.id.editText_beginTime_trackQuery:
             {
@@ -116,7 +117,7 @@ public class MapFragment_TrackQuery extends Fragment implements View.OnClickList
                 {
                     QueryHistoryTrack();
                 }
-                catch (ParseException e)
+                catch(ParseException e)
                 {
                     e.printStackTrace();
                 }
@@ -134,7 +135,7 @@ public class MapFragment_TrackQuery extends Fragment implements View.OnClickList
 
     public void onButtonPressed(Uri uri)
     {
-        if (mListener != null)
+        if(mListener != null)
         {
             mListener.onFragmentInteraction(uri);
         }
@@ -167,7 +168,7 @@ public class MapFragment_TrackQuery extends Fragment implements View.OnClickList
         public void handleMessage(Message message)
         {
             super.handleMessage(message);
-            switch (message.what)
+            switch(message.what)
             {
                 case MESSAGE_RREQUEST_FAIL:
                 {
@@ -178,7 +179,7 @@ public class MapFragment_TrackQuery extends Fragment implements View.OnClickList
                 case MESSAGE_RESPONSE_SUCCESS:
                 {
                     String result = (String) message.obj;
-                    if (null == result || "".equals(result) || "[]".equals(result))
+                    if(null == result || "".equals(result) || "[]".equals(result))
                     {
                         //绘制历史轨迹
                         m_mapUtil.drawHistoryTrack(null, SortType.asc);
@@ -186,9 +187,9 @@ public class MapFragment_TrackQuery extends Fragment implements View.OnClickList
                     }
                     List<LocationInfo> locationList = JSON.parseArray(result, LocationInfo.class);
                     List<LatLng> trackPointList = new ArrayList<>();
-                    if (null != locationList)
+                    if(null != locationList)
                     {
-                        for (LocationInfo locationInfo : locationList)
+                        for(LocationInfo locationInfo : locationList)
                         {
                             trackPointList.add(MapUtil.convertTrace2Map(new com.baidu.trace.model.LatLng(locationInfo.getM_lat(), locationInfo.getM_lot())));
                         }
@@ -211,8 +212,15 @@ public class MapFragment_TrackQuery extends Fragment implements View.OnClickList
 
     private void QueryHistoryTrack() throws ParseException
     {
-        m_startStr = m_editBegin.getText() + " 00:00:00";
-        m_endStr = m_editend.getText() + " 23:59:59";
+
+        if(m_startStr == null || m_startStr.equals(""))
+            m_startStr = "2019-01-01 00:00:00";
+        else
+            m_startStr = m_editBegin.getText() + " 00:00:00";
+        if(m_endStr == null || m_endStr.equals(""))
+            m_endStr = SIMPLEDATEFORMAT_YMD.format(new Date()) + " 23:59:59";
+        else
+            m_endStr = m_editend.getText() + " 23:59:59";
         Date startDate = SIMPLEDATEFORMAT.parse(m_startStr);
         Date endDate = SIMPLEDATEFORMAT.parse(m_endStr);
         new Thread(() ->
@@ -245,7 +253,7 @@ public class MapFragment_TrackQuery extends Fragment implements View.OnClickList
                 {
                     String responseStr = response.body().string();
                     Log.i(TAG, "响应内容:" + responseStr);
-                    if (response.isSuccessful())
+                    if(response.isSuccessful())
                     {
                         Message message = handler.obtainMessage(MESSAGE_RESPONSE_SUCCESS, responseStr);
                         handler.sendMessage(message);
@@ -271,7 +279,7 @@ public class MapFragment_TrackQuery extends Fragment implements View.OnClickList
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null)
+        if(getArguments() != null)
         {
             m_deviceInfo = getArguments().getParcelable("DEVICEINFO");
         }
@@ -289,7 +297,7 @@ public class MapFragment_TrackQuery extends Fragment implements View.OnClickList
     public void onAttach(Context context)
     {
         super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener)
+        if(context instanceof OnFragmentInteractionListener)
         {
             mListener = (OnFragmentInteractionListener) context;
         }

@@ -134,17 +134,20 @@ public class MapFragment_Setting extends Fragment implements View.OnClickListene
                     hexStrSecond = "0000002904" + stringBuffer.toString();
                     if(m_deviceInfo.getM_type().contains("铱星"))
                     {
-                        data = "YX&" + m_deviceInfo.getM_deviceId() + "&02" + hexStartTime + hexStrSecond;
+                        data =
+                                "YX," + m_deviceInfo.getM_deviceId() + ",02" + hexStartTime + hexStrSecond;
                     }
                     else
                     {
-                        data = "GPRS&" + m_deviceInfo.getM_deviceId() + "&02" + hexStartTime + hexStrSecond;
+                        data =
+                                "GPRS," + m_deviceInfo.getM_deviceId() + ",02" + hexStartTime + hexStrSecond;
                     }
                 }
                 //追踪模式
                 else if(m_radio3.isChecked())
                 {
-                    data = "GPRS&" + m_deviceInfo.getM_deviceId() + "&020000000A040000000A0000000B0400000E10";
+                    data = "GPRS," + m_deviceInfo.getM_deviceId() +
+                            ",020000000A040000000A0000000B0400000E10";
                 }
                 if(!data.equals(""))
                 {

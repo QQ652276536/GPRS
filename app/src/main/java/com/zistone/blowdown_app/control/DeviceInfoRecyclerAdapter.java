@@ -1,6 +1,9 @@
 package com.zistone.blowdown_app.control;
 
 import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.media.Image;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -71,7 +74,7 @@ public class DeviceInfoRecyclerAdapter extends RecyclerView.Adapter<DeviceInfoRe
         if(deviceInfo.getM_state() == 1)
         {
             deviceInfoViewHolder.m_imageView.setImageResource(R.drawable.device3);
-            deviceInfoViewHolder.m_textView.setTextColor(m_context.getColor(R.color.colorPrimary));
+            deviceInfoViewHolder.m_textView.setTextColor(m_context.getResources().getColor(R.color.colorPrimary));
         }
         else
         {

@@ -28,6 +28,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -216,8 +217,16 @@ public class MapFragment_Choose extends Fragment implements View.OnClickListener
                         return;
                     }
                     m_deviceList = JSON.parseArray(result, DeviceInfo.class);
+                    Iterator<DeviceInfo> iterator = m_deviceList.iterator();
                     //过滤掉离线设备
-                    m_deviceList.removeIf(p -> p.getM_state() == 0);
+                    while(iterator.hasNext())
+                    {
+                        DeviceInfo temp = iterator.next();
+                        if(temp.getM_state() == 0)
+                        {
+                            iterator.remove();
+                        }
+                    }
                     m_deviceInfoChooseRecyclerAdapter = new DeviceInfoChooseRecyclerAdapter(m_context, m_deviceList);
                     //设置适配器
                     m_recyclerView.setAdapter(m_deviceInfoChooseRecyclerAdapter);
