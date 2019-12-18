@@ -30,12 +30,11 @@
     <application
         android:name=".LocationApplication"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        android:usesCleartextTraffic="true"><!-- 使用明文通信,不推荐 -->
+        android:windowSoftInputMode="stateAlwaysHidden"><!-- 使用明文通信,不推荐 -->
 
         <!-- meta-data需要写在application中 -->
         <!-- 公司的AK鉴权 -->
@@ -47,7 +46,8 @@
             android:name="com.zistone.blowdown_app.activity.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="stateAlwaysHidden"><!-- Activity启动时默认隐藏软键盘 -->
+            android:usesCleartextTraffic="true"
+            android:windowSoftInputMode="stateAlwaysHidden"><!-- Activity启动时默认隐藏软键盘 --><!-- Activity无标题 --><!-- Activity启动时默认隐藏软键盘-->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

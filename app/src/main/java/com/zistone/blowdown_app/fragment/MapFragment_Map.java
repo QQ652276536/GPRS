@@ -7,9 +7,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Point;
+import android.graphics.drawable.Drawable;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -20,7 +22,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.support.annotation.DrawableRes;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Log;
@@ -207,6 +211,8 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
     public LocationApplication m_locationApplication = null;
     //围栏监听器
     private OnFenceListener m_fenceListener = null;
+    private ImageButton m_btn_up;
+    private ImageButton m_btn_down;
 
     public static MapFragment_Map newInstance(DeviceInfo deviceInfo)
     {
@@ -1080,63 +1086,6 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
         Toast.makeText(m_context, "执行删除区域设防", Toast.LENGTH_SHORT).show();
     }
 
-    private void InitView()
-    {
-        m_context = m_mapView.getContext();
-        URL = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/LocationInfo/FindByDeviceIdAndBetweenTime";
-        m_activity = getActivity();
-        m_textView = m_mapView.findViewById(R.id.textView_baidu);
-        m_baiduMapView = m_mapView.findViewById(R.id.mapView_baidu);
-        m_deviceInfoWindow = (LinearLayout) LayoutInflater.from(m_activity).inflate(R.layout.map_info_window, null);
-        m_deviceInfoWindow.setOnClickListener(this::onClick);
-        m_defenseInfoWindow = (LinearLayout) LayoutInflater.from(m_activity).inflate(R.layout.defense_info_window, null);
-        m_defenseInfoWindow.setOnClickListener(this::onClick);
-        m_areaInfoWindow = (LinearLayout) LayoutInflater.from(m_activity).inflate(R.layout.area_info_window, null);
-        m_areaInfoWindow.setOnClickListener(this::onClick);
-        m_addAreaInfoWindow = (LinearLayout) LayoutInflater.from(m_activity).inflate(R.layout.add_area_defense_window, null);
-        m_addAreaInfoWindow.setOnClickListener(this::onClick);
-        m_btnLocation = m_mapView.findViewById(R.id.btn_location_baidu);
-        m_btnLocation.setOnClickListener(this::onClick);
-        m_btnUpLocation = m_mapView.findViewById(R.id.btn_up_baidu);
-        m_btnUpLocation.setOnClickListener(this::onClick);
-        m_btnDownLocation = m_mapView.findViewById(R.id.btn_down_baidu);
-        m_btnDownLocation.setOnClickListener(this::onClick);
-        m_btnTraffic = m_mapView.findViewById(R.id.btn_trafficlight_baidu);
-        m_btnTraffic.setOnClickListener(this::onClick);
-        m_btnLocus = m_mapView.findViewById(R.id.btn_locus_baidu);
-        m_btnLocus.setOnClickListener(this::onClick);
-        m_btnTask = m_mapView.findViewById(R.id.btn_task_baidu);
-        m_btnTask.setOnClickListener(this::onClick);
-        m_btnDefense = m_mapView.findViewById(R.id.btn_defense_baidu);
-        m_btnDefense.setOnClickListener(this::onClick);
-        //动态获取权限
-        RequestPermission();
-        //注册SDK广播监听者
-        IntentFilter iFilter = new IntentFilter();
-        iFilter.addAction(SDKInitializer.SDK_BROADTCAST_ACTION_STRING_PERMISSION_CHECK_OK);
-        iFilter.addAction(SDKInitializer.SDK_BROADTCAST_ACTION_STRING_PERMISSION_CHECK_ERROR);
-        iFilter.addAction(SDKInitializer.SDK_BROADCAST_ACTION_STRING_NETWORK_ERROR);
-        //获取传感器管理服务
-        m_sensorManager = (SensorManager) m_context.getSystemService(SENSOR_SERVICE);
-        m_sdkReceiver = new SDKReceiver();
-        m_context.registerReceiver(m_sdkReceiver, iFilter);
-        //地图初始化
-        m_baiduMap = m_baiduMapView.getMap();
-        m_baiduMap.setOnMapClickListener(this);
-        m_baiduMap.setOnMarkerClickListener(this::onMarkerClick);
-        //地图加载完毕回调
-        m_baiduMap.setOnMapLoadedCallback(this::onMapLoaded);
-        m_btnMonitorTarget = m_mapView.findViewById(R.id.btn_monitor_target);
-        m_btnMonitorTarget.setOnClickListener(this::onClick);
-        if(null != m_deviceInfo)
-        {
-            m_btnMonitorTarget.setText("监控目标:" + m_deviceInfo.getM_name());
-        }
-        m_locationApplication = (LocationApplication) m_activity.getApplication();
-        //地图工具
-        m_mapUtil = MapUtil.getInstance();
-    }
-
     /**
      * 根据地理位置查找经纬度
      *
@@ -1256,7 +1205,65 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         m_mapView = inflater.inflate(R.layout.fragment_map_map, container, false);
-        InitView();
+        m_context = m_mapView.getContext();
+        URL = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/LocationInfo/FindByDeviceIdAndBetweenTime";
+        m_activity = getActivity();
+        m_textView = m_mapView.findViewById(R.id.textView_baidu);
+        m_baiduMapView = m_mapView.findViewById(R.id.mapView_baidu);
+        m_deviceInfoWindow = (LinearLayout) LayoutInflater.from(m_activity).inflate(R.layout.map_info_window, null);
+        m_deviceInfoWindow.setOnClickListener(this::onClick);
+        m_defenseInfoWindow = (LinearLayout) LayoutInflater.from(m_activity).inflate(R.layout.defense_info_window, null);
+        m_defenseInfoWindow.setOnClickListener(this::onClick);
+        m_areaInfoWindow = (LinearLayout) LayoutInflater.from(m_activity).inflate(R.layout.area_info_window, null);
+        m_areaInfoWindow.setOnClickListener(this::onClick);
+        m_addAreaInfoWindow = (LinearLayout) LayoutInflater.from(m_activity).inflate(R.layout.add_area_defense_window, null);
+        m_addAreaInfoWindow.setOnClickListener(this::onClick);
+        m_btnLocation = m_mapView.findViewById(R.id.btn_location_baidu);
+        m_btnLocation.setOnClickListener(this::onClick);
+        m_btnUpLocation = m_mapView.findViewById(R.id.btn_up_baidu);
+        m_btnUpLocation.setOnClickListener(this::onClick);
+        m_btnDownLocation = m_mapView.findViewById(R.id.btn_down_baidu);
+        m_btnDownLocation.setOnClickListener(this::onClick);
+        m_btnTraffic = m_mapView.findViewById(R.id.btn_trafficlight_baidu);
+        m_btnTraffic.setOnClickListener(this::onClick);
+        m_btnLocus = m_mapView.findViewById(R.id.btn_locus_baidu);
+        m_btnLocus.setOnClickListener(this::onClick);
+        m_btnTask = m_mapView.findViewById(R.id.btn_task_baidu);
+        m_btnTask.setOnClickListener(this::onClick);
+        m_btnDefense = m_mapView.findViewById(R.id.btn_defense_baidu);
+        m_btnDefense.setOnClickListener(this::onClick);
+        m_btn_up = m_mapView.findViewById(R.id.btn_up_baidu);
+        m_btn_up.setOnClickListener(this::onClick);
+        m_btn_up.setEnabled(false);
+        m_btn_down = m_mapView.findViewById(R.id.btn_down_baidu);
+        m_btn_down.setOnClickListener(this::onClick);
+        m_btn_down.setEnabled(false);
+        //动态获取权限
+        RequestPermission();
+        //注册SDK广播监听者
+        IntentFilter iFilter = new IntentFilter();
+        iFilter.addAction(SDKInitializer.SDK_BROADTCAST_ACTION_STRING_PERMISSION_CHECK_OK);
+        iFilter.addAction(SDKInitializer.SDK_BROADTCAST_ACTION_STRING_PERMISSION_CHECK_ERROR);
+        iFilter.addAction(SDKInitializer.SDK_BROADCAST_ACTION_STRING_NETWORK_ERROR);
+        //获取传感器管理服务
+        m_sensorManager = (SensorManager) m_context.getSystemService(SENSOR_SERVICE);
+        m_sdkReceiver = new SDKReceiver();
+        m_context.registerReceiver(m_sdkReceiver, iFilter);
+        //地图初始化
+        m_baiduMap = m_baiduMapView.getMap();
+        m_baiduMap.setOnMapClickListener(this);
+        m_baiduMap.setOnMarkerClickListener(this::onMarkerClick);
+        //地图加载完毕回调
+        m_baiduMap.setOnMapLoadedCallback(this::onMapLoaded);
+        m_btnMonitorTarget = m_mapView.findViewById(R.id.btn_monitor_target);
+        m_btnMonitorTarget.setOnClickListener(this::onClick);
+        if(null != m_deviceInfo)
+        {
+            m_btnMonitorTarget.setText("监控目标:" + m_deviceInfo.getM_name());
+        }
+        m_locationApplication = (LocationApplication) m_activity.getApplication();
+        //地图工具
+        m_mapUtil = MapUtil.getInstance();
         return m_mapView;
     }
 
@@ -1303,33 +1310,48 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
                 }
                 break;
             case R.id.btn_up_baidu:
-                if(m_nowMonthHistoryLocationIndex < historyLocationTotal)
+                if(m_deviceInfo != null && m_deviceInfo.getM_type().equals("铱星设备"))
                 {
-                    LocationInfo locationInfo = m_locationNowMonthEverDayList.get(m_nowMonthHistoryLocationIndex);
-                    LatLng latLng = new LatLng(locationInfo.getM_lat(), locationInfo.getM_lot());
-                    MapStatus mapStatus = new MapStatus.Builder().target(latLng).zoom(16).build();
-                    MapStatusUpdate mapStatusUpdate = MapStatusUpdateFactory.newMapStatus(mapStatus);
-                    m_baiduMap.setMapStatus(mapStatusUpdate);
-                    m_nowMonthHistoryLocationIndex++;
+                    if(m_nowMonthHistoryLocationIndex < historyLocationTotal)
+                    {
+                        LocationInfo locationInfo = m_locationNowMonthEverDayList.get(m_nowMonthHistoryLocationIndex);
+                        LatLng latLng = new LatLng(locationInfo.getM_lat(), locationInfo.getM_lot());
+                        MapStatus mapStatus = new MapStatus.Builder().target(latLng).zoom(16).build();
+                        MapStatusUpdate mapStatusUpdate = MapStatusUpdateFactory.newMapStatus(mapStatus);
+                        m_baiduMap.setMapStatus(mapStatusUpdate);
+                        m_nowMonthHistoryLocationIndex++;
+                    }
+                    else
+                    {
+                        Toast.makeText(m_context, "已到起始日", Toast.LENGTH_SHORT).show();
+                    }
                 }
                 else
                 {
-                    Toast.makeText(m_context, "已到起始日", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(m_context, "仅支持铱星设备", Toast.LENGTH_SHORT).show();
                 }
                 break;
             case R.id.btn_down_baidu:
-                if(m_nowMonthHistoryLocationIndex > 0 && m_nowMonthHistoryLocationIndex < historyLocationTotal)
+
+                if(m_deviceInfo != null && m_deviceInfo.getM_type().equals("铱星设备"))
                 {
-                    m_nowMonthHistoryLocationIndex--;
-                    LocationInfo locationInfo = m_locationNowMonthEverDayList.get(m_nowMonthHistoryLocationIndex);
-                    LatLng latLng = new LatLng(locationInfo.getM_lat(), locationInfo.getM_lot());
-                    MapStatus mapStatus = new MapStatus.Builder().target(latLng).zoom(16).build();
-                    MapStatusUpdate mapStatusUpdate = MapStatusUpdateFactory.newMapStatus(mapStatus);
-                    m_baiduMap.setMapStatus(mapStatusUpdate);
+                    if(m_nowMonthHistoryLocationIndex > 0 && m_nowMonthHistoryLocationIndex < historyLocationTotal)
+                    {
+                        m_nowMonthHistoryLocationIndex--;
+                        LocationInfo locationInfo = m_locationNowMonthEverDayList.get(m_nowMonthHistoryLocationIndex);
+                        LatLng latLng = new LatLng(locationInfo.getM_lat(), locationInfo.getM_lot());
+                        MapStatus mapStatus = new MapStatus.Builder().target(latLng).zoom(16).build();
+                        MapStatusUpdate mapStatusUpdate = MapStatusUpdateFactory.newMapStatus(mapStatus);
+                        m_baiduMap.setMapStatus(mapStatusUpdate);
+                    }
+                    else
+                    {
+                        Toast.makeText(m_context, "已到截止日", Toast.LENGTH_SHORT).show();
+                    }
                 }
                 else
                 {
-                    Toast.makeText(m_context, "已到截止日", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(m_context, "仅支持铱星设备", Toast.LENGTH_SHORT).show();
                 }
                 break;
             case R.id.btn_trafficlight_baidu:
