@@ -1,4 +1,4 @@
-package com.example.blowdown_app;
+package com.example.gprstest;
 
 import org.junit.Test;
 

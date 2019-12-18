@@ -167,7 +167,7 @@
         android:textSize="18sp" />
 
     <!--这个自定义的GroupRadio控件只能嵌套一个子Layout,所以其它的Layout都要嵌套这个子Layout里-->
-    <com.zistone.blowdown_app.control.MyRadioGroup
+    <com.zistone.gprstest.control.MyRadioGroup
         android:id="@+id/group_device_setting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -322,6 +322,6 @@
                     android:layout_marginRight="10dp" />
             </LinearLayout>
         </LinearLayout>
-    </com.zistone.blowdown_app.control.MyRadioGroup>
+    </com.zistone.gprstest.control.MyRadioGroup>
 
 </LinearLayout>
