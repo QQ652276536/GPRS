@@ -24,4 +24,10 @@
         <item name="android:minHeight">30dp</item>
     </style>
 
+    <style name="dialog_split_line_style">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:background">@color/dialog_divide_line</item>
+    </style>
+
 </resources>

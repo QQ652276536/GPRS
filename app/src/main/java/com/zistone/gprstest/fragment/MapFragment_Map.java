@@ -7,11 +7,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Point;
-import android.graphics.drawable.Drawable;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -22,9 +20,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.support.annotation.DrawableRes;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Log;
@@ -33,6 +29,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -63,8 +60,6 @@ import com.baidu.mapapi.map.MarkerOptions;
 import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.map.Overlay;
 import com.baidu.mapapi.map.OverlayOptions;
-import com.baidu.mapapi.map.PolygonOptions;
-import com.baidu.mapapi.map.PolylineOptions;
 import com.baidu.mapapi.map.Stroke;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.search.core.SearchResult;
@@ -79,26 +74,22 @@ import com.baidu.trace.api.fence.CreateFenceRequest;
 import com.baidu.trace.api.fence.CreateFenceResponse;
 import com.baidu.trace.api.fence.DeleteFenceResponse;
 import com.baidu.trace.api.fence.DeleteMonitoredPersonResponse;
-import com.baidu.trace.api.fence.FenceAlarmInfo;
 import com.baidu.trace.api.fence.FenceInfo;
 import com.baidu.trace.api.fence.FenceListResponse;
-import com.baidu.trace.api.fence.FenceShape;
 import com.baidu.trace.api.fence.FenceType;
 import com.baidu.trace.api.fence.HistoryAlarmResponse;
 import com.baidu.trace.api.fence.ListMonitoredPersonResponse;
 import com.baidu.trace.api.fence.MonitoredStatusByLocationResponse;
 import com.baidu.trace.api.fence.MonitoredStatusResponse;
 import com.baidu.trace.api.fence.OnFenceListener;
-import com.baidu.trace.api.fence.PolygonFence;
-import com.baidu.trace.api.fence.PolylineFence;
 import com.baidu.trace.api.fence.UpdateFenceResponse;
 import com.baidu.trace.model.CoordType;
 import com.baidu.trace.model.StatusCodes;
 import com.zistone.gprstest.LocationApplication;
 import com.zistone.gprstest.R;
+import com.zistone.gprstest.dialog.CreateFenceDialog;
 import com.zistone.gprstest.entity.AreaDefenseInfo;
 import com.zistone.gprstest.entity.DeviceInfo;
-import com.zistone.gprstest.entity.FenceItem;
 import com.zistone.gprstest.entity.LocationInfo;
 import com.zistone.gprstest.util.MapUtil;
 import com.zistone.gprstest.util.PropertiesUtil;
@@ -114,7 +105,6 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -209,10 +199,17 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
     //圆形围栏中心点坐标
     private LatLng m_circleCenter = null;
     public LocationApplication m_locationApplication = null;
-    //围栏监听器
-    private OnFenceListener m_fenceListener = null;
     private ImageButton m_btn_up;
     private ImageButton m_btn_down;
+
+    //围栏监听器
+    private OnFenceListener m_fenceListener = null;
+    //围栏创建对话框
+    private CreateFenceDialog m_createFenceDialog = null;
+    //围栏创建对话框回调接口
+    private CreateFenceDialog.Callback m_createCallback = null;
+    //围栏操作对话框（查询历史报警、删除、更新）
+    private CreateFenceDialog fenceOperateDialog = null;
 
     public static MapFragment_Map newInstance(DeviceInfo deviceInfo)
     {
@@ -351,57 +348,6 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
         }
     }
 
-    /**
-     * 添加区域设防,在点击地图添加完图标以后弹出
-     *
-     * @param latLng          窗体在地图上弹出的位置
-     * @param areaDefenseInfo
-     */
-    private boolean CreateAddAreaWindow(LatLng latLng, AreaDefenseInfo areaDefenseInfo)
-    {
-        TextView textName = m_addAreaInfoWindow.findViewById(R.id.editText_add_area_defense1);
-        TextView textAddress = m_addAreaInfoWindow.findViewById(R.id.editText_add_area_defense2);
-        textAddress.setText(areaDefenseInfo.getM_address());
-        TextView textRadius = m_addAreaInfoWindow.findViewById(R.id.editText_add_area_defense3);
-        m_baiduMap.showInfoWindow(new InfoWindow(m_addAreaInfoWindow, latLng, -100));
-        Button btnConirm = m_addAreaInfoWindow.findViewById(R.id.btn_add_defense1);
-        btnConirm.setOnClickListener(v ->
-        {
-            String radiusStr = textRadius.getText().toString();
-            try
-            {
-                String name = textName.getText().toString();
-                String address = textAddress.getText().toString();
-                if(null == name || "".equals(name))
-                {
-                    Toast.makeText(m_context, "名称不能为空", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                double radius = Double.valueOf(radiusStr);
-                m_fenceName = name;
-                m_radius = radius;
-                areaDefenseInfo.setM_name(name);
-                areaDefenseInfo.setM_address(address);
-                areaDefenseInfo.setM_radius(radius);
-                m_baiduMap.hideInfoWindow();
-                m_baiduMapView.postInvalidate();
-                CreateFence();
-            }
-            catch(Exception e)
-            {
-                e.printStackTrace();
-                Toast.makeText(m_context, "请输入正确的参数", Toast.LENGTH_SHORT).show();
-            }
-        });
-        Button btnCancel = m_addAreaInfoWindow.findViewById(R.id.btn_add_defense2);
-        btnCancel.setOnClickListener(v ->
-        {
-            m_baiduMap.hideInfoWindow();
-            m_baiduMapView.postInvalidate();
-        });
-        return true;
-    }
-
     private Handler handler = new Handler()
     {
         @Override
@@ -482,12 +428,16 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
                         }
                         return -1;
                     });
-                    for(LocationInfo tempLocationInfo : m_locationNowMonthEverDayList)
+                    //只有铱星设备才在地图上显示多个位置
+                    if(m_deviceInfo != null && m_deviceInfo.getM_type().equals("铱星设备"))
                     {
-                        LatLng latLng = new LatLng(tempLocationInfo.getM_lat(), tempLocationInfo.getM_lot());
-                        MarkerOptions markerOptions = new MarkerOptions().position(latLng).icon(ICON_MARKER1);
-                        //标记添加至地图中
-                        m_baiduMap.addOverlay(markerOptions);
+                        for(LocationInfo tempLocationInfo : m_locationNowMonthEverDayList)
+                        {
+                            LatLng latLng = new LatLng(tempLocationInfo.getM_lat(), tempLocationInfo.getM_lot());
+                            MarkerOptions markerOptions = new MarkerOptions().position(latLng).icon(ICON_MARKER1);
+                            //标记添加至地图中
+                            m_baiduMap.addOverlay(markerOptions);
+                        }
                     }
                     break;
                 }
@@ -514,8 +464,8 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
             //改变地图状态
             m_baiduMap.setMapStatus(mapStatusUpdate);
             //添加平移动画
-            m_marker.setAnimation(Transformation());
-            m_marker.startAnimation();
+            //m_marker.setAnimation(Transformation());
+            //m_marker.startAnimation();
         }
     };
 
@@ -672,17 +622,15 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
             String deviceId = m_deviceInfo.getM_deviceId();
             if(deviceId != null && !deviceId.equals(""))
             {
-                AreaDefenseInfo areaDefenseInfo = new AreaDefenseInfo();
-                double lat = latLng.latitude;
-                double lot = latLng.longitude;
-                areaDefenseInfo.setM_deviceId(deviceId);
-                areaDefenseInfo.setM_lat(lat);
-                areaDefenseInfo.setM_lot(lot);
                 MarkerOptions markerOptions = new MarkerOptions().position(latLng).icon(m_defenseMark);
                 m_baiduMap.addOverlay(markerOptions);
                 //设置点击地图的位置为围栏的坐标
                 m_circleCenter = markerOptions.getPosition();
-                CreateAddAreaWindow(latLng, areaDefenseInfo);
+                if(m_createFenceDialog == null)
+                {
+                    m_createFenceDialog = new CreateFenceDialog(getActivity(), m_createCallback);
+                }
+                m_createFenceDialog.show();
             }
             else
             {
@@ -1216,7 +1164,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
         m_defenseInfoWindow.setOnClickListener(this::onClick);
         m_areaInfoWindow = (LinearLayout) LayoutInflater.from(m_activity).inflate(R.layout.area_info_window, null);
         m_areaInfoWindow.setOnClickListener(this::onClick);
-        m_addAreaInfoWindow = (LinearLayout) LayoutInflater.from(m_activity).inflate(R.layout.add_area_defense_window, null);
+        m_addAreaInfoWindow = (LinearLayout) LayoutInflater.from(m_activity).inflate(R.layout.create_fence_dialog, null);
         m_addAreaInfoWindow.setOnClickListener(this::onClick);
         m_btnLocation = m_mapView.findViewById(R.id.btn_location_baidu);
         m_btnLocation.setOnClickListener(this::onClick);
@@ -1234,10 +1182,8 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
         m_btnDefense.setOnClickListener(this::onClick);
         m_btn_up = m_mapView.findViewById(R.id.btn_up_baidu);
         m_btn_up.setOnClickListener(this::onClick);
-        m_btn_up.setEnabled(false);
         m_btn_down = m_mapView.findViewById(R.id.btn_down_baidu);
         m_btn_down.setOnClickListener(this::onClick);
-        m_btn_down.setEnabled(false);
         //动态获取权限
         RequestPermission();
         //注册SDK广播监听者
