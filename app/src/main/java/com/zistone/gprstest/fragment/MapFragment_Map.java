@@ -200,7 +200,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
         m_createCallback = new CreateFenceDialog.Callback()
         {
             @Override
-            public void onSureCallback(double radius, int denoise, int offset)
+            public void onSureCallback(String name, String address, double radius)
             {
                 OverlayOptions overlayOptions = new CircleOptions().fillColor(0x000000FF).center(m_circleCenter).stroke(new Stroke(5, Color.rgb(0x23, 0x19, 0xDC))).radius((int) radius);
                 m_baiduMap.addOverlay(overlayOptions);
