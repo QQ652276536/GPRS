@@ -929,14 +929,15 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
                             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException
                             {
                                 String responseStr = response.body().string();
-                                Log.i(TAG, "添加围栏的响应内容:" + responseStr);
                                 if(response.isSuccessful())
                                 {
+                                    Log.i(TAG, "添加围栏的响应内容:" + responseStr);
                                     Message message = handler.obtainMessage(MESSAGE_FENCE_ADD_RESPONSE_SUCCESS, responseStr);
                                     handler.sendMessage(message);
                                 }
                                 else
                                 {
+                                    Log.e(TAG, "添加围栏的响应异常:" + responseStr);
                                     Message message = handler.obtainMessage(MESSAGE_FENCE_ADD_RESPONSE_FAIL, responseStr);
                                     handler.sendMessage(message);
                                 }
@@ -966,14 +967,15 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
                         public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException
                         {
                             String responseStr = response.body().string();
-                            Log.i(TAG, "删除围栏的响应内容:" + responseStr);
                             if(response.isSuccessful())
                             {
+                                Log.i(TAG, "删除围栏的响应内容:" + responseStr);
                                 Message message = handler.obtainMessage(MESSAGE_FENCE_DEL_RESPONSE_SUCCESS, responseStr);
                                 handler.sendMessage(message);
                             }
                             else
                             {
+                                Log.e(TAG, "删除围栏的响应异常:" + responseStr);
                                 Message message = handler.obtainMessage(MESSAGE_FENCE_DEL_RESPONSE_FAIL, responseStr);
                                 handler.sendMessage(message);
                             }
@@ -1006,14 +1008,15 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
                         public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException
                         {
                             String responseStr = response.body().string();
-                            Log.i(TAG, "查询围栏的响应内容:" + responseStr);
                             if(response.isSuccessful())
                             {
+                                Log.i(TAG, "查询围栏的响应内容:" + responseStr);
                                 Message message = handler.obtainMessage(MESSAGE_FENCE_QUERY_RESPONSE_SUCCESS, responseStr);
                                 handler.sendMessage(message);
                             }
                             else
                             {
+                                Log.e(TAG, "查询围栏的响应异常:" + responseStr);
                                 Message message = handler.obtainMessage(MESSAGE_FENCE_QUERY_RESPONSE_FAIL, responseStr);
                                 handler.sendMessage(message);
                             }
@@ -1036,7 +1039,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
     {
         if(null == geoCodeResult || SearchResult.ERRORNO.NO_ERROR != geoCodeResult.error)
         {
-            Toast.makeText(m_context, "经纬度查询失败", Toast.LENGTH_SHORT).show();
+            Toast.makeText(m_context, "经纬度查询异常", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -1050,7 +1053,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
     {
         if(null == reverseGeoCodeResult || SearchResult.ERRORNO.NO_ERROR != reverseGeoCodeResult.error)
         {
-            Toast.makeText(m_context, "地理位置查询失败", Toast.LENGTH_SHORT).show();
+            Toast.makeText(m_context, "地理位置查询异常", Toast.LENGTH_SHORT).show();
         }
         else
         {
