@@ -29,6 +29,8 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -68,6 +70,7 @@ import com.baidu.mapapi.search.geocode.ReverseGeoCodeOption;
 import com.baidu.mapapi.search.geocode.ReverseGeoCodeResult;
 import com.zistone.gprstest.R;
 import com.zistone.gprstest.dialog.CreateFenceDialog;
+import com.zistone.gprstest.dialog.InfoFenceDialog;
 import com.zistone.gprstest.entity.AreaDefenseInfo;
 import com.zistone.gprstest.entity.DeviceInfo;
 import com.zistone.gprstest.entity.LocationInfo;
@@ -146,7 +149,6 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
     private OnFragmentInteractionListener mListener;
     private LinearLayout m_deviceInfoWindow;
     private LinearLayout m_defenseInfoWindow;
-    private LinearLayout m_areaInfoWindow;
     private LinearLayout m_addAreaInfoWindow;
     private ImageButton m_btnLocation;
     private ImageButton m_btnUpLocation;
@@ -159,24 +161,19 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
     private boolean m_trafficEnabled = false;
     private List<AreaDefenseInfo> m_areaDefenseInfoList;
     private List<LocationInfo> m_locationNowMonthEverDayList = new ArrayList<>();
-    //当前点击的Marker
-    private String m_currentMarkerId;
     //本月历史位置所在集合的下标
     private int m_nowMonthHistoryLocationIndex = 0;
-    //圆形围栏默认半径
-    private double m_radius = 1000;
-    //围栏名称
-    private String m_fenceName = null;
-    //地图工具
-    private MapUtil m_mapUtil = null;
     //圆形围栏中心点坐标
-    private LatLng m_circleCenter = null;
+    private LatLng m_circleCenter;
     private ImageButton m_btn_up;
     private ImageButton m_btn_down;
-    //围栏创建对话框
-    private CreateFenceDialog m_createFenceDialog = null;
-    //围栏创建对话框回调接口
-    private CreateFenceDialog.Callback m_createCallback = null;
+    //围栏对话框
+    private CreateFenceDialog m_createFenceDialog;
+    private InfoFenceDialog m_infoFenceDialog;
+    //围栏对话框回调接口
+    private CreateFenceDialog.Callback m_createCallback;
+    private InfoFenceDialog.Callback m_delCallback;
+    private double m_radius;
 
     public static MapFragment_Map newInstance(DeviceInfo deviceInfo)
     {
@@ -202,11 +199,11 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
             @Override
             public void onSureCallback(String name, String address, double radius)
             {
-                OverlayOptions overlayOptions = new CircleOptions().fillColor(0x000000FF).center(m_circleCenter).stroke(new Stroke(5, Color.rgb(0x23, 0x19, 0xDC))).radius((int) radius);
-                m_baiduMap.addOverlay(overlayOptions);
+                m_radius = radius;
                 //取消地图的点击事件
                 m_baiduMap.setOnMapClickListener(null);
-
+                MarkerOptions markerOptions = new MarkerOptions().position(m_circleCenter).icon(ICON_MARKER3);
+                m_baiduMap.addOverlay(markerOptions);
             }
 
             @Override
@@ -214,6 +211,15 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
             {
                 //取消地图的点击事件
                 m_baiduMap.setOnMapClickListener(null);
+            }
+        };
+
+        m_delCallback = new InfoFenceDialog.Callback()
+        {
+            @Override
+            public void onDelCallback()
+            {
+
             }
         };
     }
@@ -320,22 +326,6 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
                 default:
                     break;
             }
-            //设置当前位置的图标
-            MarkerOptions markerOptions = new MarkerOptions().position(m_latLng).icon(ICON_MARKER2);
-            Bundle bundle = new Bundle();
-            bundle.putString(MARKERID_LOCATION, MARKERID_LOCATION);
-            //设置Marker覆盖物的额外信息
-            markerOptions.extraInfo(bundle);
-            //标记添加至地图中
-            m_marker = (Marker) (m_baiduMap.addOverlay(markerOptions));
-            //定义地图缩放级别3~16,值越大地图越精细
-            MapStatus mapStatus = new MapStatus.Builder().target(m_latLng).zoom(16).build();
-            MapStatusUpdate mapStatusUpdate = MapStatusUpdateFactory.newMapStatus(mapStatus);
-            //改变地图状态
-            m_baiduMap.setMapStatus(mapStatusUpdate);
-            //添加平移动画
-            //m_marker.setAnimation(Transformation());
-            //m_marker.startAnimation();
         }
     };
 
@@ -395,21 +385,6 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
         }).start();
     }
 
-    private void CreateAreaInfoWindow(LatLng latLng, AreaDefenseInfo areaDefenseInfo)
-    {
-        TextView textName = m_areaInfoWindow.findViewById(R.id.textView1_map_area_info);
-        textName.setText("");
-        TextView textDel = m_areaInfoWindow.findViewById(R.id.btn_close_map_area_info);
-        textDel.setOnClickListener(v -> DelAreaDefense(areaDefenseInfo));
-        TextView textAddress = m_areaInfoWindow.findViewById(R.id.textView2_map_area_info);
-        textAddress.setText("");
-        TextView textTime = m_areaInfoWindow.findViewById(R.id.textView3_map_area_info);
-        textTime.setText("");
-        TextView textRadius = m_areaInfoWindow.findViewById(R.id.textView4_map_area_info);
-        textRadius.setText("");
-        m_baiduMap.showInfoWindow(new InfoWindow(m_areaInfoWindow, latLng, -100));
-    }
-
     private void CreateDeviceInfoWindow()
     {
         ImageButton buttonClose = m_deviceInfoWindow.findViewById(R.id.btn_close_map_device_info);
@@ -443,39 +418,61 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
     @Override
     public void onMapLoaded()
     {
-        try
+        if(null == m_latLng)
         {
-            SetMapStateAndMarkOptions();
+            return;
         }
-        catch(ParseException e)
-        {
-            e.printStackTrace();
-        }
+        //设置标记的位置和图标
+        MarkerOptions markerOptions = new MarkerOptions().position(m_latLng).icon(ICON_MARKER2);
+        Bundle bundle = new Bundle();
+        bundle.putString(MARKERID_LOCATION, MARKERID_LOCATION);
+        //设置Marker覆盖物的额外信息
+        markerOptions.extraInfo(bundle);
+        //本月每天最后一次的上报位置
+        //标记添加至地图中
+        m_marker = (Marker) (m_baiduMap.addOverlay(markerOptions));
+        //定义地图缩放级别3~16,值越大地图越精细
+        MapStatus mapStatus = new MapStatus.Builder().target(m_latLng).zoom(16).build();
+        MapStatusUpdate mapStatusUpdate = MapStatusUpdateFactory.newMapStatus(mapStatus);
+        //改变地图状态
+        m_baiduMap.setMapStatus(mapStatusUpdate);
+        //添加平移动画
+        //        m_marker.setAnimation(Transformation());
+        //        m_marker.startAnimation();
+        //QueryHistoryTrack();
     }
 
     @Override
     public boolean onMarkerClick(Marker marker)
     {
+        marker.get
         Bundle bundle = marker.getExtraInfo();
-        if(bundle == null)
+        if(bundle != null)
         {
-            return false;
-        }
-        m_currentMarkerId = bundle.getString(MARKERID_LOCATION);
-        switch(m_currentMarkerId)
-        {
-            case MARKERID_LOCATION:
-                if(null != m_latLng && null != m_deviceInfo)
-                {
-                    CreateDeviceInfoWindow();
-                }
-                break;
-            default:
+            if(bundle.getString(MARKERID_LOCATION).equalsIgnoreCase("MARKERID_LOCATION"))
+            {
+                CreateDeviceInfoWindow();
+            }
+            else
+            {
+                OverlayOptions overlayOptions = new CircleOptions().fillColor(0x000000FF).center(m_circleCenter).stroke(new Stroke(5, Color.rgb(0x23, 0x19, 0xDC))).radius((int) m_radius);
+                m_baiduMap.addOverlay(overlayOptions);
                 AreaDefenseInfo areaDefenseInfo = null;
-                CreateAreaInfoWindow(marker.getPosition(), areaDefenseInfo);
-                break;
+                if(m_infoFenceDialog == null)
+                {
+                    m_infoFenceDialog = new InfoFenceDialog(getActivity(), m_delCallback, areaDefenseInfo);
+                }
+                Window window = m_infoFenceDialog.getWindow();
+                WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
+                Point point = m_baiduMap.getProjection().toScreenLocation(marker.getPosition());
+                layoutParams.x = point.x;
+                layoutParams.y = point.y;
+                window.setAttributes(layoutParams);
+                m_infoFenceDialog.setCanceledOnTouchOutside(true);
+                m_infoFenceDialog.show();
+            }
         }
-        return true;
+        return false;
     }
 
     @Override
@@ -493,6 +490,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
             {
                 m_createFenceDialog = new CreateFenceDialog(getActivity(), m_createCallback);
             }
+            m_createFenceDialog.setCanceledOnTouchOutside(true);
             m_createFenceDialog.show();
         }
         else
@@ -818,35 +816,6 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
     }
 
     /**
-     * 设置地图状态和标记的位置
-     */
-    private void SetMapStateAndMarkOptions() throws ParseException
-    {
-        if(null == m_latLng)
-        {
-            return;
-        }
-        //        //设置标记的位置和图标
-        //        MarkerOptions markerOptions = new MarkerOptions().position(m_latLng).icon(ICON_MARKER2);
-        //        Bundle bundle = new Bundle();
-        //        bundle.putString(MARKERID_LOCATION, MARKERID_LOCATION);
-        //        //设置Marker覆盖物的额外信息
-        //        markerOptions.extraInfo(bundle);
-        //        //本月每天最后一次的上报位置
-        //        //标记添加至地图中
-        //        m_marker = (Marker) (m_baiduMap.addOverlay(markerOptions));
-        //        //定义地图缩放级别3~16,值越大地图越精细
-        //        MapStatus mapStatus = new MapStatus.Builder().target(m_latLng).zoom(16).build();
-        //        MapStatusUpdate mapStatusUpdate = MapStatusUpdateFactory.newMapStatus(mapStatus);
-        //        //改变地图状态
-        //        m_baiduMap.setMapStatus(mapStatusUpdate);
-        //        //添加平移动画
-        //        m_marker.setAnimation(Transformation());
-        //        m_marker.startAnimation();
-        QueryHistoryTrack();
-    }
-
-    /**
      * 百度地图API提供的绘制文字有中心点偏差,导致效果很不理想,为了解决这个问题,可以采用TextView渲染Bitmap然后添加为图标覆盖物的方式,这样既可以实现换行,也可以控制中心点
      * ,实现正常的地图旋转等效果
      * <p>
@@ -1023,8 +992,6 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
         m_deviceInfoWindow.setOnClickListener(this::onClick);
         m_defenseInfoWindow = (LinearLayout) LayoutInflater.from(m_activity).inflate(R.layout.defense_info_window, null);
         m_defenseInfoWindow.setOnClickListener(this::onClick);
-        m_areaInfoWindow = (LinearLayout) LayoutInflater.from(m_activity).inflate(R.layout.area_info_window, null);
-        m_areaInfoWindow.setOnClickListener(this::onClick);
         m_addAreaInfoWindow = (LinearLayout) LayoutInflater.from(m_activity).inflate(R.layout.create_fence_dialog, null);
         m_addAreaInfoWindow.setOnClickListener(this::onClick);
         m_btnLocation = m_mapView.findViewById(R.id.btn_location_baidu);
@@ -1067,8 +1034,6 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
         {
             m_btnMonitorTarget.setText("监控目标:" + m_deviceInfo.getM_name());
         }
-        //地图工具
-        m_mapUtil = MapUtil.getInstance();
         return m_mapView;
     }
 
@@ -1232,10 +1197,6 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
                 getFragmentManager().beginTransaction().replace(R.id.fragment_current_map, mapFragment_setting, "mapFragment_setting").commitNow();
                 break;
             case R.id.btn_close_map_device_info:
-                m_baiduMap.hideInfoWindow();
-                m_baiduMapView.postInvalidate();
-                break;
-            case R.id.btn_close_map_area_info:
                 m_baiduMap.hideInfoWindow();
                 m_baiduMapView.postInvalidate();
                 break;

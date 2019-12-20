@@ -10,6 +10,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.baidu.mapapi.map.BaiduMap;
+import com.baidu.mapapi.map.BitmapDescriptor;
+import com.baidu.mapapi.map.BitmapDescriptorFactory;
+import com.baidu.mapapi.map.MarkerOptions;
+import com.baidu.mapapi.model.LatLng;
 import com.zistone.gprstest.R;
 
 /**
@@ -17,9 +22,6 @@ import com.zistone.gprstest.R;
  */
 public class CreateFenceDialog extends Dialog implements View.OnClickListener
 {
-    /**
-     * 回调接口
-     */
     private Callback callback;
     private Button m_btn1 = null;
     private Button m_btn2 = null;

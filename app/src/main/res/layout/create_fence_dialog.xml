@@ -85,7 +85,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:ems="10"
-                android:text="200"
+                android:text="1000"
                 android:inputType="textPersonName" />
         </TableRow>
 
