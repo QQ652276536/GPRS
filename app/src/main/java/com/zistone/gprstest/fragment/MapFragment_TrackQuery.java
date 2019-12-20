@@ -21,7 +21,6 @@ import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
 import com.baidu.mapapi.model.LatLng;
-import com.baidu.trace.model.SortType;
 import com.zistone.gprstest.R;
 import com.zistone.gprstest.entity.DeviceInfo;
 import com.zistone.gprstest.entity.LocationInfo;
@@ -182,7 +181,7 @@ public class MapFragment_TrackQuery extends Fragment implements View.OnClickList
                     if(null == result || "".equals(result) || "[]".equals(result))
                     {
                         //绘制历史轨迹
-                        m_mapUtil.drawHistoryTrack(null, SortType.asc);
+                        m_mapUtil.drawHistoryTrack(null);
                         return;
                     }
                     List<LocationInfo> locationList = JSON.parseArray(result, LocationInfo.class);
@@ -191,11 +190,11 @@ public class MapFragment_TrackQuery extends Fragment implements View.OnClickList
                     {
                         for(LocationInfo locationInfo : locationList)
                         {
-                            trackPointList.add(MapUtil.convertTrace2Map(new com.baidu.trace.model.LatLng(locationInfo.getM_lat(), locationInfo.getM_lot())));
+                            trackPointList.add(new LatLng(locationInfo.getM_lat(), locationInfo.getM_lot()));
                         }
                     }
                     //绘制历史轨迹
-                    m_mapUtil.drawHistoryTrack(trackPointList, SortType.asc);
+                    m_mapUtil.drawHistoryTrack(trackPointList);
                     break;
                 }
                 case MESSAGE_RESPONSE_FAIL:

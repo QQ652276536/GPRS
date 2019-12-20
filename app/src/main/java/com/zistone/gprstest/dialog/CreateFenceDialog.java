@@ -10,8 +10,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.baidu.trace.api.fence.FenceShape;
-import com.baidu.trace.api.fence.FenceType;
 import com.zistone.gprstest.R;
 
 /**

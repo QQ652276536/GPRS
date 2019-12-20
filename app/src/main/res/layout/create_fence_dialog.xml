@@ -27,8 +27,6 @@
             android:textColor="@color/dialog_title"
             android:textSize="20dp" />
 
-        <View style="@style/dialog_split_line_style" />
-
     </LinearLayout>
 
     <LinearLayout
@@ -53,7 +51,6 @@
             android:id="@+id/edtTxt_fenceCreate_denoise"
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:background="@drawable/all_border"
             android:hint="0"
             android:inputType="number"
             android:paddingLeft="5dp"
@@ -86,7 +83,6 @@
             android:id="@+id/edtTxt_fenceCreate_radius"
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:background="@drawable/all_border"
             android:hint="1000"
             android:inputType="numberDecimal"
             android:paddingLeft="5dp"
@@ -119,7 +115,6 @@
             android:id="@+id/edtTxt_fenceCreate_offset"
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:background="@drawable/all_border"
             android:hint="200"
             android:inputType="numberDecimal"
             android:paddingLeft="5dp"
@@ -134,7 +129,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:background="@drawable/dialog_border"
         android:gravity="center"
         android:orientation="horizontal">
 

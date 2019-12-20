@@ -22,9 +22,6 @@ import com.baidu.mapapi.map.PolylineOptions;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.model.LatLngBounds;
 import com.baidu.mapapi.utils.CoordinateConverter;
-import com.baidu.trace.model.CoordType;
-import com.baidu.trace.model.SortType;
-import com.baidu.trace.model.TraceLocation;
 import com.zistone.gprstest.R;
 
 import java.util.List;
@@ -104,58 +101,6 @@ public class MapUtil
             mapView.onDestroy();
             mapView = null;
         }
-    }
-
-    /**
-     * 将轨迹实时定位点转换为地图坐标
-     *
-     * @param location
-     * @return
-     */
-    public static LatLng convertTraceLocation2Map(TraceLocation location)
-    {
-        if(null == location)
-        {
-            return null;
-        }
-        double latitude = location.getLatitude();
-        double longitude = location.getLongitude();
-        if(Math.abs(latitude - 0.0) < 0.000001 && Math.abs(longitude - 0.0) < 0.000001)
-        {
-            return null;
-        }
-        LatLng currentLatLng = new LatLng(latitude, longitude);
-        if(CoordType.wgs84 == location.getCoordType())
-        {
-            LatLng sourceLatLng = currentLatLng;
-            CoordinateConverter converter = new CoordinateConverter();
-            converter.from(CoordinateConverter.CoordType.GPS);
-            converter.coord(sourceLatLng);
-            currentLatLng = converter.convert();
-        }
-        return currentLatLng;
-    }
-
-    /**
-     * 将地图坐标转换轨迹坐标
-     *
-     * @param latLng
-     * @return
-     */
-    public static com.baidu.trace.model.LatLng convertMap2Trace(LatLng latLng)
-    {
-        return new com.baidu.trace.model.LatLng(latLng.latitude, latLng.longitude);
-    }
-
-    /**
-     * 将轨迹坐标对象转换为地图坐标对象
-     *
-     * @param traceLatLng
-     * @return
-     */
-    public static LatLng convertTrace2Map(com.baidu.trace.model.LatLng traceLatLng)
-    {
-        return new LatLng(traceLatLng.latitude, traceLatLng.longitude);
     }
 
     /**
@@ -277,7 +222,7 @@ public class MapUtil
     /**
      * 绘制历史轨迹
      */
-    public void drawHistoryTrack(List<LatLng> points, SortType sortType)
+    public void drawHistoryTrack(List<LatLng> points)
     {
         // 绘制新覆盖物前，清空之前的覆盖物
         baiduMap.clear();
@@ -301,17 +246,8 @@ public class MapUtil
 
         LatLng startPoint;
         LatLng endPoint;
-        if(sortType == SortType.asc)
-        {
-            startPoint = points.get(0);
-            endPoint = points.get(points.size() - 1);
-        }
-        else
-        {
-            startPoint = points.get(points.size() - 1);
-            endPoint = points.get(0);
-        }
-
+        startPoint = points.get(0);
+        endPoint = points.get(points.size() - 1);
         // 添加起点图标
         OverlayOptions startOptions = new MarkerOptions().position(startPoint).icon(BitmapDescriptorFactory.fromResource(R.drawable.icon_start)).zIndex(9).draggable(true);
         // 添加终点图标
