@@ -106,14 +106,27 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
 {
     private static final SimpleDateFormat SIMPLEDATEFORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static final String TAG = "MapFragment_Map";
-    private static final String MARKERID_LOCATION = "MARKERID_LOCATION";
+    private static final String MARKERID = "MARKERID";
     private static final BitmapDescriptor ICON_MARKER1 = BitmapDescriptorFactory.fromResource(R.drawable.icon_mark1);
     private static final BitmapDescriptor ICON_MARKER2 = BitmapDescriptorFactory.fromResource(R.drawable.icon_mark2);
     private static final BitmapDescriptor ICON_MARKER3 = BitmapDescriptorFactory.fromResource(R.drawable.icon_mark3);
-    private static final int MESSAGE_RREQUEST_FAIL = 1;
-    private static final int MESSAGE_RESPONSE_FAIL = 2;
-    private static final int MESSAGE_RESPONSE_SUCCESS = 3;
-    private static String URL;
+    private static final int MESSAGE_QUERYLOCATION_RREQUEST_FAIL = 1;
+    private static final int MESSAGE_QUERYLOCATION_RESPONSE_FAIL = 2;
+    private static final int MESSAGE_QUERYLOCATION_RESPONSE_SUCCESS = 3;
+    private static final int MESSAGE_FENCE_ADD_RREQUEST_FAIL = 4;
+    private static final int MESSAGE_FENCE_ADD_RESPONSE_FAIL = 5;
+    private static final int MESSAGE_FENCE_ADD_RESPONSE_SUCCESS = 6;
+    private static final int MESSAGE_FENCE_DEL_RREQUEST_FAIL = 7;
+    private static final int MESSAGE_FENCE_DEL_RESPONSE_FAIL = 8;
+    private static final int MESSAGE_FENCE_DEL_RESPONSE_SUCCESS = 9;
+    private static final int MESSAGE_FENCE_QUERY_RREQUEST_FAIL = 13;
+    private static final int MESSAGE_FENCE_QUERY_RESPONSE_FAIL = 14;
+    private static final int MESSAGE_FENCE_QUERY_RESPONSE_SUCCESS = 15;
+    private static String URL_LOCATION;
+    private static String URL_FENCE_ADD;
+    private static String URL_FENCE_DEL;
+    private static String URL_FENCE_UPDATE;
+    private static String URL_FENCE_QUERY;
     private Context m_context;
     private MyLocationListener m_locationListener = new MyLocationListener();
     private LocationClient m_locationClient;
@@ -159,7 +172,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
     private ImageButton m_btnDefense;
     private Button m_btnMonitorTarget;
     private boolean m_trafficEnabled = false;
-    private List<AreaDefenseInfo> m_areaDefenseInfoList;
+    private List<AreaDefenseInfo> m_areaDefenseInfoList = new ArrayList<>();
     private List<LocationInfo> m_locationNowMonthEverDayList = new ArrayList<>();
     //本月历史位置所在集合的下标
     private int m_nowMonthHistoryLocationIndex = 0;
@@ -174,6 +187,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
     private CreateFenceDialog.Callback m_createCallback;
     private InfoFenceDialog.Callback m_delCallback;
     private double m_radius;
+    private Bundle m_bundle_marker = new Bundle();
 
     public static MapFragment_Map newInstance(DeviceInfo deviceInfo)
     {
@@ -202,8 +216,16 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
                 m_radius = radius;
                 //取消地图的点击事件
                 m_baiduMap.setOnMapClickListener(null);
-                MarkerOptions markerOptions = new MarkerOptions().position(m_circleCenter).icon(ICON_MARKER3);
-                m_baiduMap.addOverlay(markerOptions);
+                AreaDefenseInfo areaDefenseInfo = new AreaDefenseInfo();
+                areaDefenseInfo.setM_deviceId(m_deviceInfo.getM_deviceId());
+                areaDefenseInfo.setM_name(name);
+                areaDefenseInfo.setM_address(address);
+                areaDefenseInfo.setM_radius(radius);
+                areaDefenseInfo.setM_setTime(new Date());
+                areaDefenseInfo.setM_lat(m_circleCenter.latitude);
+                areaDefenseInfo.setM_lot(m_circleCenter.longitude);
+                //围栏在服务端添加成功才在地图上显示
+                AreaDefenseUtil("add", areaDefenseInfo);
             }
 
             @Override
@@ -229,21 +251,74 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
         @Override
         public void handleMessage(Message message)
         {
-            m_baiduMap.clear();
-            m_locationNowMonthEverDayList.clear();
             super.handleMessage(message);
+            String result = (String) message.obj;
+            boolean isNull = result == null || "".equals(result) || "[]".equals(result);
             switch(message.what)
             {
-                case MESSAGE_RREQUEST_FAIL:
+                case MESSAGE_QUERYLOCATION_RESPONSE_FAIL:
+                case MESSAGE_FENCE_ADD_RESPONSE_FAIL:
+                case MESSAGE_FENCE_DEL_RESPONSE_FAIL:
+                case MESSAGE_FENCE_QUERY_RESPONSE_FAIL:
                 {
-                    String result = (String) message.obj;
+                    Toast.makeText(m_context, "服务端数据异常,请与管理员联系", Toast.LENGTH_SHORT).show();
+                    break;
+                }
+                case MESSAGE_QUERYLOCATION_RREQUEST_FAIL:
+                case MESSAGE_FENCE_ADD_RREQUEST_FAIL:
+                case MESSAGE_FENCE_DEL_RREQUEST_FAIL:
+                case MESSAGE_FENCE_QUERY_RREQUEST_FAIL:
+                {
                     Toast.makeText(m_context, "网络连接超时,请检查网络环境", Toast.LENGTH_SHORT).show();
                     break;
                 }
-                case MESSAGE_RESPONSE_SUCCESS:
+                //围栏添加成功
+                case MESSAGE_FENCE_ADD_RESPONSE_SUCCESS:
                 {
-                    String result = (String) message.obj;
-                    if(null == result || "".equals(result) || "[]".equals(result))
+                    if(isNull)
+                    {
+                        return;
+                    }
+                    AreaDefenseInfo areaDefenseInfo = JSON.parseObject(result, AreaDefenseInfo.class);
+                    MarkerOptions markerOptions = new MarkerOptions().position(m_circleCenter).icon(ICON_MARKER3);
+                    m_baiduMap.addOverlay(markerOptions);
+                    m_bundle_marker.putString(MARKERID, areaDefenseInfo.getM_name());
+                    markerOptions.extraInfo(m_bundle_marker);
+                    m_areaDefenseInfoList.add(areaDefenseInfo);
+                    break;
+                }
+                //围栏删除成功
+                case MESSAGE_FENCE_DEL_RESPONSE_SUCCESS:
+                {
+                    if(isNull)
+                    {
+                        return;
+                    }
+                    break;
+                }
+                //查询围栏有返回
+                case MESSAGE_FENCE_QUERY_RESPONSE_SUCCESS:
+                {
+                    if(isNull)
+                    {
+                        return;
+                    }
+                    m_areaDefenseInfoList = JSON.parseArray(result, AreaDefenseInfo.class);
+                    for(AreaDefenseInfo temp : m_areaDefenseInfoList)
+                    {
+                        LatLng latLng = new LatLng(temp.getM_lat(), temp.getM_lot());
+                        MarkerOptions markerOptions = new MarkerOptions().position(latLng).icon(ICON_MARKER3);
+                        m_bundle_marker.putString(MARKERID, temp.getM_name());
+                        markerOptions.extraInfo(m_bundle_marker);
+                        //标记添加至地图中
+                        m_baiduMap.addOverlay(markerOptions);
+                    }
+                    break;
+                }
+                //查询历史位置有返回
+                case MESSAGE_QUERYLOCATION_RESPONSE_SUCCESS:
+                {
+                    if(isNull)
                     {
                         return;
                     }
@@ -317,14 +392,6 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
                     }
                     break;
                 }
-                case MESSAGE_RESPONSE_FAIL:
-                {
-                    String result = (String) message.obj;
-                    Toast.makeText(m_context, "获取本月定位数据失败,请与管理员联系", Toast.LENGTH_SHORT).show();
-                    break;
-                }
-                default:
-                    break;
             }
         }
     };
@@ -351,7 +418,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
             builder.add("endTime", endDate.getTime() + "");
             RequestBody requestBody = builder.build();
             //创建Post请求的方式
-            Request request = new Request.Builder().post(requestBody).url(URL).build();
+            Request request = new Request.Builder().post(requestBody).url(URL_LOCATION).build();
             Call call = okHttpClient.newCall(request);
             //Android中不允许任何网络的交互在主线程中进行
             call.enqueue(new Callback()
@@ -359,8 +426,8 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
                 @Override
                 public void onFailure(@NotNull Call call, @NotNull IOException e)
                 {
-                    Log.e(TAG, "请求失败:" + e.toString());
-                    Message message = handler.obtainMessage(MESSAGE_RREQUEST_FAIL, "请求失败:" + e.toString());
+                    Log.e(TAG, "查询设备历史位置的请求失败:" + e.toString());
+                    Message message = handler.obtainMessage(MESSAGE_QUERYLOCATION_RREQUEST_FAIL, "请求失败:" + e.toString());
                     handler.sendMessage(message);
                 }
 
@@ -368,15 +435,15 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
                 public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException
                 {
                     String responseStr = response.body().string();
-                    Log.i(TAG, "响应内容:" + responseStr);
+                    Log.i(TAG, "查询设备历史位置的响应内容:" + responseStr);
                     if(response.isSuccessful())
                     {
-                        Message message = handler.obtainMessage(MESSAGE_RESPONSE_SUCCESS, responseStr);
+                        Message message = handler.obtainMessage(MESSAGE_QUERYLOCATION_RESPONSE_SUCCESS, responseStr);
                         handler.sendMessage(message);
                     }
                     else
                     {
-                        Message message = handler.obtainMessage(MESSAGE_RESPONSE_FAIL, responseStr);
+                        Message message = handler.obtainMessage(MESSAGE_QUERYLOCATION_RESPONSE_FAIL, responseStr);
                         handler.sendMessage(message);
                     }
                 }
@@ -424,10 +491,9 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
         }
         //设置标记的位置和图标
         MarkerOptions markerOptions = new MarkerOptions().position(m_latLng).icon(ICON_MARKER2);
-        Bundle bundle = new Bundle();
-        bundle.putString(MARKERID_LOCATION, MARKERID_LOCATION);
         //设置Marker覆盖物的额外信息
-        markerOptions.extraInfo(bundle);
+        m_bundle_marker.putString(MARKERID, "MARKERICON");
+        markerOptions.extraInfo(m_bundle_marker);
         //本月每天最后一次的上报位置
         //标记添加至地图中
         m_marker = (Marker) (m_baiduMap.addOverlay(markerOptions));
@@ -445,31 +511,36 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
     @Override
     public boolean onMarkerClick(Marker marker)
     {
-        marker.get
         Bundle bundle = marker.getExtraInfo();
         if(bundle != null)
         {
-            if(bundle.getString(MARKERID_LOCATION).equalsIgnoreCase("MARKERID_LOCATION"))
+            String bundleStr = bundle.getString(MARKERID);
+            if(bundleStr.equals("MARKERICON"))
             {
                 CreateDeviceInfoWindow();
+                return true;
             }
-            else
+            for(AreaDefenseInfo temp : m_areaDefenseInfoList)
             {
-                OverlayOptions overlayOptions = new CircleOptions().fillColor(0x000000FF).center(m_circleCenter).stroke(new Stroke(5, Color.rgb(0x23, 0x19, 0xDC))).radius((int) m_radius);
-                m_baiduMap.addOverlay(overlayOptions);
-                AreaDefenseInfo areaDefenseInfo = null;
-                if(m_infoFenceDialog == null)
+                String areaName = temp.getM_name().trim();
+                if(areaName.equals(bundleStr))
                 {
-                    m_infoFenceDialog = new InfoFenceDialog(getActivity(), m_delCallback, areaDefenseInfo);
+                    OverlayOptions overlayOptions = new CircleOptions().fillColor(0x000000FF).center(m_circleCenter).stroke(new Stroke(5, Color.rgb(0x23, 0x19, 0xDC))).radius((int) m_radius);
+                    m_baiduMap.addOverlay(overlayOptions);
+                    AreaDefenseInfo areaDefenseInfo = null;
+                    if(m_infoFenceDialog == null)
+                    {
+                        m_infoFenceDialog = new InfoFenceDialog(getActivity(), m_delCallback, areaDefenseInfo);
+                    }
+                    Window window = m_infoFenceDialog.getWindow();
+                    WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
+                    Point point = m_baiduMap.getProjection().toScreenLocation(marker.getPosition());
+                    layoutParams.x = point.x;
+                    layoutParams.y = point.y;
+                    window.setAttributes(layoutParams);
+                    m_infoFenceDialog.setCanceledOnTouchOutside(true);
+                    m_infoFenceDialog.show();
                 }
-                Window window = m_infoFenceDialog.getWindow();
-                WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
-                Point point = m_baiduMap.getProjection().toScreenLocation(marker.getPosition());
-                layoutParams.x = point.x;
-                layoutParams.y = point.y;
-                window.setAttributes(layoutParams);
-                m_infoFenceDialog.setCanceledOnTouchOutside(true);
-                m_infoFenceDialog.show();
             }
         }
         return false;
@@ -816,52 +887,139 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
     }
 
     /**
-     * 百度地图API提供的绘制文字有中心点偏差,导致效果很不理想,为了解决这个问题,可以采用TextView渲染Bitmap然后添加为图标覆盖物的方式,这样既可以实现换行,也可以控制中心点
-     * ,实现正常的地图旋转等效果
-     * <p>
-     * 使用该方式绘制文字时不允许为"",否则会抛BDMapSDKException: marker's icon can not be null
-     *
-     * @param latLng
-     * @param str
-     * @param foreColor
-     * @param backColor
+     * 查询所有电子围栏
      */
-    private void DrawMarkerText(LatLng latLng, String str, int foreColor, int backColor)
+    private void AreaDefenseUtil(String param, AreaDefenseInfo areaDefenseInfo)
     {
-        if(null == latLng || "".equals(str) || null == m_activity)
+        FormBody.Builder builder = new FormBody.Builder();
+        OkHttpClient okHttpClient = new OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS).readTimeout(10, TimeUnit.SECONDS).build();
+        new Thread(() ->
         {
-            return;
-        }
-        TextView textView = new TextView(m_activity);
-        //内容距中
-        textView.setGravity(Gravity.LEFT);
-        textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
-        textView.setBackgroundColor(backColor);
-        textView.setTextColor(foreColor);
-        textView.setText(str);
-        //更新绘制缓存之前把旧的销毁
-        textView.destroyDrawingCache();
-        //通过测量实现TextView和文字的大小一致
-        textView.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
-        textView.layout(0, 0, textView.getMeasuredWidth(), textView.getMeasuredHeight());
-        //启用绘制缓存
-        textView.setDrawingCacheEnabled(true);
-        //将View的内容以图片的方式保存
-        Bitmap bitmapText = textView.getDrawingCache(true);
-        BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(bitmapText);
-        OverlayOptions textOverlayOptions = new MarkerOptions().icon(bitmapDescriptor).position(latLng);
-        m_baiduMap.addOverlay(textOverlayOptions);
-    }
+            Looper.prepare();
+            switch(param)
+            {
+                case "add":
+                {
+                    if(areaDefenseInfo != null)
+                    {
+                        builder.add("deviceId", m_deviceInfo.getM_deviceId());
+                        builder.add("name", areaDefenseInfo.getM_name());
+                        builder.add("address", areaDefenseInfo.getM_address());
+                        builder.add("lat", areaDefenseInfo.getM_lat() + "");
+                        builder.add("lot", areaDefenseInfo.getM_lot() + "");
+                        RequestBody requestBody = builder.build();
+                        Request request = new Request.Builder().post(requestBody).url(URL_FENCE_ADD).build();
+                        Call call = okHttpClient.newCall(request);
+                        //Android中不允许任何网络的交互在主线程中进行
+                        call.enqueue(new Callback()
+                        {
+                            @Override
+                            public void onFailure(@NotNull Call call, @NotNull IOException e)
+                            {
+                                Log.e(TAG, "添加围栏的请求失败:" + e.toString());
+                                Message message = handler.obtainMessage(MESSAGE_FENCE_ADD_RREQUEST_FAIL, "请求失败:" + e.toString());
+                                handler.sendMessage(message);
+                            }
 
-    private void GetAllAreaDefense()
-    {
-        m_areaDefenseInfoList = new ArrayList<>();
-    }
+                            @Override
+                            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException
+                            {
+                                String responseStr = response.body().string();
+                                Log.i(TAG, "添加围栏的响应内容:" + responseStr);
+                                if(response.isSuccessful())
+                                {
+                                    Message message = handler.obtainMessage(MESSAGE_FENCE_ADD_RESPONSE_SUCCESS, responseStr);
+                                    handler.sendMessage(message);
+                                }
+                                else
+                                {
+                                    Message message = handler.obtainMessage(MESSAGE_FENCE_ADD_RESPONSE_FAIL, responseStr);
+                                    handler.sendMessage(message);
+                                }
+                            }
+                        });
+                    }
+                    break;
+                }
+                case "del":
+                {
+                    builder.add("deviceId", m_deviceInfo.getM_deviceId());
+                    RequestBody requestBody = builder.build();
+                    Request request = new Request.Builder().post(requestBody).url(URL_FENCE_DEL).build();
+                    Call call = okHttpClient.newCall(request);
+                    //Android中不允许任何网络的交互在主线程中进行
+                    call.enqueue(new Callback()
+                    {
+                        @Override
+                        public void onFailure(@NotNull Call call, @NotNull IOException e)
+                        {
+                            Log.e(TAG, "删除围栏的请求失败:" + e.toString());
+                            Message message = handler.obtainMessage(MESSAGE_FENCE_DEL_RREQUEST_FAIL, "请求失败:" + e.toString());
+                            handler.sendMessage(message);
+                        }
 
-    private void DelAreaDefense(AreaDefenseInfo areaDefenseInfo)
-    {
-        Log.i(TAG, ">>>删除设备" + areaDefenseInfo.getM_deviceId() + "的区域设防");
-        Toast.makeText(m_context, "执行删除区域设防", Toast.LENGTH_SHORT).show();
+                        @Override
+                        public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException
+                        {
+                            String responseStr = response.body().string();
+                            Log.i(TAG, "删除围栏的响应内容:" + responseStr);
+                            if(response.isSuccessful())
+                            {
+                                Message message = handler.obtainMessage(MESSAGE_FENCE_DEL_RESPONSE_SUCCESS, responseStr);
+                                handler.sendMessage(message);
+                            }
+                            else
+                            {
+                                Message message = handler.obtainMessage(MESSAGE_FENCE_DEL_RESPONSE_FAIL, responseStr);
+                                handler.sendMessage(message);
+                            }
+                        }
+                    });
+                    break;
+                }
+                case "update":
+                {
+                    break;
+                }
+                case "query":
+                {
+                    builder.add("deviceId", m_deviceInfo.getM_deviceId());
+                    RequestBody requestBody = builder.build();
+                    Request request = new Request.Builder().post(requestBody).url(URL_FENCE_QUERY).build();
+                    Call call = okHttpClient.newCall(request);
+                    //Android中不允许任何网络的交互在主线程中进行
+                    call.enqueue(new Callback()
+                    {
+                        @Override
+                        public void onFailure(@NotNull Call call, @NotNull IOException e)
+                        {
+                            Log.e(TAG, "删除围栏的请求失败:" + e.toString());
+                            Message message = handler.obtainMessage(MESSAGE_FENCE_QUERY_RREQUEST_FAIL, "请求失败:" + e.toString());
+                            handler.sendMessage(message);
+                        }
+
+                        @Override
+                        public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException
+                        {
+                            String responseStr = response.body().string();
+                            Log.i(TAG, "删除围栏的响应内容:" + responseStr);
+                            if(response.isSuccessful())
+                            {
+                                Message message = handler.obtainMessage(MESSAGE_FENCE_QUERY_RESPONSE_SUCCESS, responseStr);
+                                handler.sendMessage(message);
+                            }
+                            else
+                            {
+                                Message message = handler.obtainMessage(MESSAGE_FENCE_QUERY_RESPONSE_FAIL, responseStr);
+                                handler.sendMessage(message);
+                            }
+                        }
+                    });
+                    break;
+                }
+            }
+            Looper.loop();
+        }).start();
     }
 
     /**
@@ -966,8 +1124,8 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
                 m_geoCoder.reverseGeoCode(new ReverseGeoCodeOption().location(m_latLng).newVersion(1).radius(500));
             }
         }
-        //获取该设备所有区域设防的位置
-        GetAllAreaDefense();
+        //获取该设备所有区域设防的位置(电子围栏)
+        AreaDefenseUtil("query", null);
         InitListener();
     }
 
@@ -984,7 +1142,11 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
     {
         m_mapView = inflater.inflate(R.layout.fragment_map_map, container, false);
         m_context = m_mapView.getContext();
-        URL = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/LocationInfo/FindByDeviceIdAndBetweenTime";
+        URL_LOCATION = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/LocationInfo/FindByDeviceIdAndBetweenTime";
+        URL_FENCE_ADD = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/AreaDefenseInfo/Add";
+        URL_FENCE_DEL = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/AreaDefenseInfo/DelById";
+        URL_FENCE_UPDATE = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/AreaDefenseInfo/UpdateById";
+        URL_FENCE_QUERY = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/AreaDefenseInfo/FindByDeviceId";
         m_activity = getActivity();
         m_textView = m_mapView.findViewById(R.id.textView_baidu);
         m_baiduMapView = m_mapView.findViewById(R.id.mapView_baidu);
