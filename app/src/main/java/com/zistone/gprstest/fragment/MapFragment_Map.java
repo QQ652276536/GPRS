@@ -997,7 +997,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
                         @Override
                         public void onFailure(@NotNull Call call, @NotNull IOException e)
                         {
-                            Log.e(TAG, "删除围栏的请求失败:" + e.toString());
+                            Log.e(TAG, "查询围栏的请求失败:" + e.toString());
                             Message message = handler.obtainMessage(MESSAGE_FENCE_QUERY_RREQUEST_FAIL, "请求失败:" + e.toString());
                             handler.sendMessage(message);
                         }
@@ -1006,7 +1006,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
                         public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException
                         {
                             String responseStr = response.body().string();
-                            Log.i(TAG, "删除围栏的响应内容:" + responseStr);
+                            Log.i(TAG, "查询围栏的响应内容:" + responseStr);
                             if(response.isSuccessful())
                             {
                                 Message message = handler.obtainMessage(MESSAGE_FENCE_QUERY_RESPONSE_SUCCESS, responseStr);
