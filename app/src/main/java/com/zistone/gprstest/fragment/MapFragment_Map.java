@@ -891,6 +891,10 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
      */
     private void AreaDefenseUtil(String param, AreaDefenseInfo areaDefenseInfo)
     {
+        if(m_deviceInfo == null)
+        {
+            return;
+        }
         FormBody.Builder builder = new FormBody.Builder();
         OkHttpClient okHttpClient = new OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS).readTimeout(10, TimeUnit.SECONDS).build();
         new Thread(() ->
