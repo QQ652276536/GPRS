@@ -16,7 +16,7 @@ import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.BitmapDescriptor;
 import com.baidu.mapapi.model.LatLng;
 import com.zistone.gprstest.R;
-import com.zistone.gprstest.entity.AreaDefenseInfo;
+import com.zistone.gprstest.entity.FenceInfo;
 
 import java.text.SimpleDateFormat;
 
@@ -33,16 +33,16 @@ public class InfoFenceDialog extends Dialog implements View.OnClickListener
     private TextView m_textView2;
     private TextView m_textView3;
     private TextView m_textView4;
-    private AreaDefenseInfo m_areaDefenseInfo;
+    private FenceInfo m_fenceInfo;
 
     /**
      * @param activity
      */
-    public InfoFenceDialog(Activity activity, Callback callback, AreaDefenseInfo areaDefenseInfo)
+    public InfoFenceDialog(Activity activity, Callback callback, FenceInfo fenceInfo)
     {
         super(activity, android.R.style.Theme_Holo_Light_Dialog);
         this.callback = callback;
-        m_areaDefenseInfo = areaDefenseInfo;
+        m_fenceInfo = fenceInfo;
     }
 
     @Override
@@ -59,12 +59,12 @@ public class InfoFenceDialog extends Dialog implements View.OnClickListener
         m_btn1.setOnClickListener(this::onClick);
         m_btn2 = findViewById(R.id.btn2_infoFence);
         m_btn2.setOnClickListener(this::onClick);
-        if(m_areaDefenseInfo != null)
+        if(m_fenceInfo != null)
         {
-            m_textView1.setText(m_areaDefenseInfo.getM_name());
-            m_textView2.setText(m_areaDefenseInfo.getM_address());
-            m_textView3.setText(SIMPLEDATEFORMAT.format(m_areaDefenseInfo.getM_setTime()));
-            m_textView4.setText(String.valueOf(m_areaDefenseInfo.getM_radius()));
+            m_textView1.setText(m_fenceInfo.getM_name());
+            m_textView2.setText(m_fenceInfo.getM_address());
+            m_textView3.setText(SIMPLEDATEFORMAT.format(m_fenceInfo.getM_setTime()));
+            m_textView4.setText(String.valueOf(m_fenceInfo.getM_radius()));
         }
     }
 

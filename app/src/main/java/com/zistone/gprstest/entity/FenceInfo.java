@@ -8,8 +8,15 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class AreaDefenseInfo
+public class FenceInfo
 {
+    private static final SimpleDateFormat SIMPLEDATEFORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+    @Override
+    public String toString()
+    {
+        return "FenceInfo{" + "m_id=" + m_id + ", m_deviceId='" + m_deviceId + '\'' + ", m_name" + "='" + m_name + '\'' + ", m_address='" + m_address + '\'' + ", m_setTime=" + SIMPLEDATEFORMAT.format(m_setTime) + ", m_radius=" + m_radius + ", m_lat=" + m_lat + ", m_lot=" + m_lot + '}';
+    }
 
     /**
      * 自增主键(由数据库生成)
@@ -50,12 +57,6 @@ public class AreaDefenseInfo
      * 经度
      */
     private double m_lot;
-
-    @Override
-    public String toString()
-    {
-        return "AreaDefenseInfo{" + "m_id=" + m_id + ", m_deviceId='" + m_deviceId + '\'' + ", m_name='" + m_name + '\'' + ", m_address='" + m_address + '\'' + ", m_setTime=" + m_setTime + ", m_radius=" + m_radius + ", m_lat=" + m_lat + ", m_lot=" + m_lot + '}';
-    }
 
     public int getM_id()
     {

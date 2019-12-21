@@ -71,7 +71,7 @@ import com.baidu.mapapi.search.geocode.ReverseGeoCodeResult;
 import com.zistone.gprstest.R;
 import com.zistone.gprstest.dialog.CreateFenceDialog;
 import com.zistone.gprstest.dialog.InfoFenceDialog;
-import com.zistone.gprstest.entity.AreaDefenseInfo;
+import com.zistone.gprstest.entity.FenceInfo;
 import com.zistone.gprstest.entity.DeviceInfo;
 import com.zistone.gprstest.entity.LocationInfo;
 import com.zistone.gprstest.util.MapUtil;
@@ -172,7 +172,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
     private ImageButton m_btnDefense;
     private Button m_btnMonitorTarget;
     private boolean m_trafficEnabled = false;
-    private List<AreaDefenseInfo> m_areaDefenseInfoList = new ArrayList<>();
+    private List<FenceInfo> m_fenceInfoList = new ArrayList<>();
     private List<LocationInfo> m_locationNowMonthEverDayList = new ArrayList<>();
     //本月历史位置所在集合的下标
     private int m_nowMonthHistoryLocationIndex = 0;
@@ -216,16 +216,16 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
                 m_radius = radius;
                 //取消地图的点击事件
                 m_baiduMap.setOnMapClickListener(null);
-                AreaDefenseInfo areaDefenseInfo = new AreaDefenseInfo();
-                areaDefenseInfo.setM_deviceId(m_deviceInfo.getM_deviceId());
-                areaDefenseInfo.setM_name(name);
-                areaDefenseInfo.setM_address(address);
-                areaDefenseInfo.setM_radius(radius);
-                areaDefenseInfo.setM_setTime(new Date());
-                areaDefenseInfo.setM_lat(m_circleCenter.latitude);
-                areaDefenseInfo.setM_lot(m_circleCenter.longitude);
+                FenceInfo fenceInfo = new FenceInfo();
+                fenceInfo.setM_deviceId(m_deviceInfo.getM_deviceId());
+                fenceInfo.setM_name(name);
+                fenceInfo.setM_address(address);
+                fenceInfo.setM_radius(radius);
+                fenceInfo.setM_setTime(new Date());
+                fenceInfo.setM_lat(m_circleCenter.latitude);
+                fenceInfo.setM_lot(m_circleCenter.longitude);
                 //围栏在服务端添加成功才在地图上显示
-                AreaDefenseUtil("add", areaDefenseInfo);
+                AreaDefenseUtil("add", fenceInfo);
             }
 
             @Override
@@ -279,12 +279,12 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
                     {
                         return;
                     }
-                    AreaDefenseInfo areaDefenseInfo = JSON.parseObject(result, AreaDefenseInfo.class);
+                    FenceInfo fenceInfo = JSON.parseObject(result, FenceInfo.class);
                     MarkerOptions markerOptions = new MarkerOptions().position(m_circleCenter).icon(ICON_MARKER3);
                     m_baiduMap.addOverlay(markerOptions);
-                    m_bundle_marker.putString(MARKERID, areaDefenseInfo.getM_name());
+                    m_bundle_marker.putString(MARKERID, fenceInfo.getM_name());
                     markerOptions.extraInfo(m_bundle_marker);
-                    m_areaDefenseInfoList.add(areaDefenseInfo);
+                    m_fenceInfoList.add(fenceInfo);
                     break;
                 }
                 //围栏删除成功
@@ -303,8 +303,8 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
                     {
                         return;
                     }
-                    m_areaDefenseInfoList = JSON.parseArray(result, AreaDefenseInfo.class);
-                    for(AreaDefenseInfo temp : m_areaDefenseInfoList)
+                    m_fenceInfoList = JSON.parseArray(result, FenceInfo.class);
+                    for(FenceInfo temp : m_fenceInfoList)
                     {
                         LatLng latLng = new LatLng(temp.getM_lat(), temp.getM_lot());
                         MarkerOptions markerOptions = new MarkerOptions().position(latLng).icon(ICON_MARKER3);
@@ -520,17 +520,17 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
                 CreateDeviceInfoWindow();
                 return true;
             }
-            for(AreaDefenseInfo temp : m_areaDefenseInfoList)
+            for(FenceInfo temp : m_fenceInfoList)
             {
                 String areaName = temp.getM_name().trim();
                 if(areaName.equals(bundleStr))
                 {
                     OverlayOptions overlayOptions = new CircleOptions().fillColor(0x000000FF).center(m_circleCenter).stroke(new Stroke(5, Color.rgb(0x23, 0x19, 0xDC))).radius((int) m_radius);
                     m_baiduMap.addOverlay(overlayOptions);
-                    AreaDefenseInfo areaDefenseInfo = null;
+                    FenceInfo fenceInfo = null;
                     if(m_infoFenceDialog == null)
                     {
-                        m_infoFenceDialog = new InfoFenceDialog(getActivity(), m_delCallback, areaDefenseInfo);
+                        m_infoFenceDialog = new InfoFenceDialog(getActivity(), m_delCallback, fenceInfo);
                     }
                     Window window = m_infoFenceDialog.getWindow();
                     WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
@@ -889,7 +889,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
     /**
      * 查询所有电子围栏
      */
-    private void AreaDefenseUtil(String param, AreaDefenseInfo areaDefenseInfo)
+    private void AreaDefenseUtil(String param, FenceInfo fenceInfo)
     {
         if(m_deviceInfo == null)
         {
@@ -904,13 +904,13 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
             {
                 case "add":
                 {
-                    if(areaDefenseInfo != null)
+                    if(fenceInfo != null)
                     {
                         builder.add("deviceId", m_deviceInfo.getM_deviceId());
-                        builder.add("name", areaDefenseInfo.getM_name());
-                        builder.add("address", areaDefenseInfo.getM_address());
-                        builder.add("lat", areaDefenseInfo.getM_lat() + "");
-                        builder.add("lot", areaDefenseInfo.getM_lot() + "");
+                        builder.add("name", fenceInfo.getM_name());
+                        builder.add("address", fenceInfo.getM_address());
+                        builder.add("lat", fenceInfo.getM_lat() + "");
+                        builder.add("lot", fenceInfo.getM_lot() + "");
                         RequestBody requestBody = builder.build();
                         Request request = new Request.Builder().post(requestBody).url(URL_FENCE_ADD).build();
                         Call call = okHttpClient.newCall(request);
@@ -1150,10 +1150,10 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
         m_mapView = inflater.inflate(R.layout.fragment_map_map, container, false);
         m_context = m_mapView.getContext();
         URL_LOCATION = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/LocationInfo/FindByDeviceIdAndBetweenTime";
-        URL_FENCE_ADD = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/AreaDefenseInfo/Add";
-        URL_FENCE_DEL = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/AreaDefenseInfo/DelById";
-        URL_FENCE_UPDATE = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/AreaDefenseInfo/UpdateById";
-        URL_FENCE_QUERY = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/AreaDefenseInfo/FindByDeviceId";
+        URL_FENCE_ADD = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/FenceInfo/InsertByDeviceId";
+        URL_FENCE_DEL = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/FenceInfo/DelById";
+        URL_FENCE_UPDATE = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/FenceInfo/UpdateById";
+        URL_FENCE_QUERY = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/FenceInfo/FindByDeviceId";
         m_activity = getActivity();
         m_textView = m_mapView.findViewById(R.id.textView_baidu);
         m_baiduMapView = m_mapView.findViewById(R.id.mapView_baidu);
