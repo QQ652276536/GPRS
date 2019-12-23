@@ -29,14 +29,16 @@ public class CreateFenceDialog extends Dialog implements View.OnClickListener
     private EditText m_editText1 = null;
     private EditText m_editText2 = null;
     private EditText m_editText3 = null;
+    private String m_address;
 
     /**
      * @param activity
      */
-    public CreateFenceDialog(Activity activity, Callback callback)
+    public CreateFenceDialog(Activity activity, Callback callback, String address)
     {
         super(activity, android.R.style.Theme_Holo_Light_Dialog);
         this.callback = callback;
+        m_address = address;
     }
 
     @Override
@@ -47,6 +49,7 @@ public class CreateFenceDialog extends Dialog implements View.OnClickListener
         setContentView(R.layout.create_fence_dialog);
         m_editText1 = findViewById(R.id.edt1_createFence);
         m_editText2 = findViewById(R.id.edt2_createFence);
+        m_editText2.setText(m_address);
         m_editText3 = findViewById(R.id.edt3_createFence);
         m_btn1 = findViewById(R.id.btn1_createFence);
         m_btn1.setOnClickListener(this::onClick);

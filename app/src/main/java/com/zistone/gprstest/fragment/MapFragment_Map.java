@@ -559,7 +559,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
         {
             if(m_createFenceDialog == null)
             {
-                m_createFenceDialog = new CreateFenceDialog(getActivity(), m_createCallback);
+                m_createFenceDialog = new CreateFenceDialog(getActivity(), m_createCallback, m_latLngStr);
             }
             m_createFenceDialog.setCanceledOnTouchOutside(true);
             m_createFenceDialog.show();
@@ -1063,17 +1063,32 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
     @Override
     public void onDestroy()
     {
-        //因为采用显示隐藏的方式来切换,资源暂时不能销毁
-        //        if(m_marker != null)
-        //        {
-        //            m_marker.cancelAnimation();
-        //            m_marker.remove();
-        //        }
-        //        //MapView的生命周期与Fragment同步,当Fragment销毁时需调用MapView.destroy()
-        //        m_baiduMapView.onDestroy();
         super.onDestroy();
-        //        //回收Bitmap资源
-        //        ICON_MARKER.recycle();
+        m_circleCenter = null;
+        //        if(null != ICON_MARKER1)
+        //        {
+        //            ICON_MARKER1.recycle();
+        //        }
+        //        if(null != ICON_MARKER2)
+        //        {
+        //            ICON_MARKER2.recycle();
+        //        }
+        //        if(null != ICON_MARKER3)
+        //        {
+        //            ICON_MARKER3.recycle();
+        //        }
+        //TODO:清空围栏覆盖物
+        if(null != m_baiduMap)
+        {
+            m_baiduMap.clear();
+            m_baiduMap = null;
+        }
+        //MapView的生命周期与Fragment同步,当Fragment销毁时需调用MapView.destroy()
+        if(null != m_baiduMapView)
+        {
+            m_baiduMapView.onDestroy();
+            m_baiduMapView = null;
+        }
     }
 
     @Override
