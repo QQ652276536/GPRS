@@ -23,7 +23,7 @@ import java.text.SimpleDateFormat;
 /**
  * 围栏创建对话框
  */
-public class InfoFenceDialog extends Dialog implements View.OnClickListener
+public class FenceInfoDialog extends Dialog implements View.OnClickListener
 {
     private static final SimpleDateFormat SIMPLEDATEFORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private Callback callback;
@@ -38,7 +38,7 @@ public class InfoFenceDialog extends Dialog implements View.OnClickListener
     /**
      * @param activity
      */
-    public InfoFenceDialog(Activity activity, Callback callback, FenceInfo fenceInfo)
+    public FenceInfoDialog(Activity activity, Callback callback, FenceInfo fenceInfo)
     {
         super(activity, android.R.style.Theme_Holo_Light_Dialog);
         this.callback = callback;

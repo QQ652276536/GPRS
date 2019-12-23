@@ -71,7 +71,8 @@ import com.baidu.mapapi.search.geocode.ReverseGeoCodeOption;
 import com.baidu.mapapi.search.geocode.ReverseGeoCodeResult;
 import com.zistone.gprstest.R;
 import com.zistone.gprstest.dialog.CreateFenceDialog;
-import com.zistone.gprstest.dialog.InfoFenceDialog;
+import com.zistone.gprstest.dialog.DeviceInfoDialog;
+import com.zistone.gprstest.dialog.FenceInfoDialog;
 import com.zistone.gprstest.entity.FenceInfo;
 import com.zistone.gprstest.entity.DeviceInfo;
 import com.zistone.gprstest.entity.LocationInfo;
@@ -162,9 +163,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
     private DeviceInfo m_deviceInfo;
     private Activity m_activity;
     private OnFragmentInteractionListener mListener;
-    private LinearLayout m_deviceInfoWindow;
     private LinearLayout m_defenseInfoWindow;
-    private LinearLayout m_addAreaInfoWindow;
     private ImageButton m_btnLocation;
     private ImageButton m_btnUpLocation;
     private ImageButton m_btnDownLocation;
@@ -179,12 +178,16 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
     private LatLng m_circleCenter;
     private ImageButton m_btn_up;
     private ImageButton m_btn_down;
-    //围栏对话框
+    //创建围栏对话框
     private CreateFenceDialog m_createFenceDialog;
-    private InfoFenceDialog m_infoFenceDialog;
+    //围栏信息对话框
+    private FenceInfoDialog m_fenceInfoDialog;
+    //设备信息对话框
+    private DeviceInfoDialog m_deviceInfoDialog;
     //围栏对话框回调接口
     private CreateFenceDialog.Callback m_createCallback;
-    private InfoFenceDialog.Callback m_delCallback;
+    //设备信息对话框回调接口
+    private DeviceInfoDialog.Callback m_setCallback;
     private Bundle m_bundle_marker = new Bundle();
     //该设备对应的围栏
     private List<FenceInfo> m_fenceInfoList = new ArrayList<>();
@@ -235,12 +238,13 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
             }
         };
 
-        m_delCallback = new InfoFenceDialog.Callback()
+        m_setCallback = new DeviceInfoDialog.Callback()
         {
             @Override
-            public void onDelCallback()
+            public void onSetCallback()
             {
-
+                MapFragment_Setting mapFragment_setting = MapFragment_Setting.newInstance(m_deviceInfo);
+                getFragmentManager().beginTransaction().replace(R.id.fragment_current_map, mapFragment_setting, "mapFragment_setting").commitNow();
             }
         };
     }
@@ -461,33 +465,6 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
         }).start();
     }
 
-    private void CreateDeviceInfoWindow()
-    {
-        ImageButton buttonClose = m_deviceInfoWindow.findViewById(R.id.btn_close_map_device_info);
-        buttonClose.setOnClickListener(this::onClick);
-        TextView textSetting = m_deviceInfoWindow.findViewById(R.id.textView2_map_device_info);
-        textSetting.setOnClickListener(this::onClick);
-        TextView textName = m_deviceInfoWindow.findViewById(R.id.textView4_map_device_info);
-        TextView textSIM = m_deviceInfoWindow.findViewById(R.id.textView5_map_device_info);
-        TextView textUpMode = m_deviceInfoWindow.findViewById(R.id.textView8_map_device_info);
-        TextView textUpInterval = m_deviceInfoWindow.findViewById(R.id.textView10_map_device_info);
-        TextView textReceiveTime = m_deviceInfoWindow.findViewById(R.id.textView12_map_device_info);
-        TextView textLat = m_deviceInfoWindow.findViewById(R.id.textView14_map_device_info);
-        TextView textLocation = m_deviceInfoWindow.findViewById(R.id.textView16_map_device_info);
-        TextView textTemperature = m_deviceInfoWindow.findViewById(R.id.textView18_map_device_info);
-        TextView textLastEct = m_deviceInfoWindow.findViewById(R.id.textView20_map_device_info);
-        textName.setText(m_deviceInfo.getM_name());
-        textSIM.setText(m_deviceInfo.getM_sim());
-        textUpMode.setText("正常模式");
-        textUpInterval.setText("180分钟/次");
-        textReceiveTime.setText(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(m_deviceInfo.getM_updateTime()));
-        textLat.setText(m_deviceInfo.getM_lot() + ", " + m_deviceInfo.getM_lat());
-        textLocation.setText(m_latLngStr);
-        textTemperature.setText(m_deviceInfo.getM_temperature() + "℃");
-        textLastEct.setText(m_deviceInfo.getM_electricity() + "%");
-        m_baiduMap.showInfoWindow(new InfoWindow(m_deviceInfoWindow, m_latLng, -100));
-    }
-
     /**
      * 地图加载成功后
      */
@@ -540,7 +517,16 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
         }
         if(!isClickFence)
         {
-            CreateDeviceInfoWindow();
+            if(m_deviceInfo != null && !m_deviceInfo.getM_deviceId().equals(""))
+            {
+                if(m_deviceInfoDialog == null)
+                {
+                    m_deviceInfoDialog = new DeviceInfoDialog(getActivity(), m_setCallback, m_deviceInfo, m_latLngStr);
+                }
+                m_deviceInfoDialog.setCanceledOnTouchOutside(true);
+                m_deviceInfoDialog.show();
+                m_isShowCreateFenceDialog = false;
+            }
         }
         return false;
     }
@@ -1177,12 +1163,8 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
         m_activity = getActivity();
         m_textView = m_mapView.findViewById(R.id.textView_baidu);
         m_baiduMapView = m_mapView.findViewById(R.id.mapView_baidu);
-        m_deviceInfoWindow = (LinearLayout) LayoutInflater.from(m_activity).inflate(R.layout.map_info_window, null);
-        m_deviceInfoWindow.setOnClickListener(this::onClick);
         m_defenseInfoWindow = (LinearLayout) LayoutInflater.from(m_activity).inflate(R.layout.defense_info_window, null);
         m_defenseInfoWindow.setOnClickListener(this::onClick);
-        m_addAreaInfoWindow = (LinearLayout) LayoutInflater.from(m_activity).inflate(R.layout.create_fence_dialog, null);
-        m_addAreaInfoWindow.setOnClickListener(this::onClick);
         m_btnLocation = m_mapView.findViewById(R.id.btn_location_baidu);
         m_btnLocation.setOnClickListener(this::onClick);
         m_btnUpLocation = m_mapView.findViewById(R.id.btn_up_baidu);
@@ -1381,14 +1363,6 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
                     builder.setMessage("请选择设备");
                     builder.show();
                 }
-                break;
-            case R.id.textView2_map_device_info:
-                MapFragment_Setting mapFragment_setting = MapFragment_Setting.newInstance(m_deviceInfo);
-                getFragmentManager().beginTransaction().replace(R.id.fragment_current_map, mapFragment_setting, "mapFragment_setting").commitNow();
-                break;
-            case R.id.btn_close_map_device_info:
-                m_baiduMap.hideInfoWindow();
-                m_baiduMapView.postInvalidate();
                 break;
         }
     }
