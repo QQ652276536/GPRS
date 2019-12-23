@@ -64,7 +64,7 @@ public class InfoFenceDialog extends Dialog implements View.OnClickListener
             m_textView1.setText(m_fenceInfo.getM_name());
             m_textView2.setText(m_fenceInfo.getM_address());
             m_textView3.setText(SIMPLEDATEFORMAT.format(m_fenceInfo.getM_setTime()));
-            m_textView4.setText(String.valueOf(m_fenceInfo.getM_radius()));
+            m_textView4.setText(m_fenceInfo.getM_radius() + "");
         }
     }
 
