@@ -233,7 +233,6 @@ public class MapFragment_TrackQuery extends Fragment implements View.OnClickList
             builder.add("startTime", startDate.getTime() + "");
             builder.add("endTime", endDate.getTime() + "");
             RequestBody requestBody = builder.build();
-            //创建Post请求的方式
             Request request = new Request.Builder().post(requestBody).url(URL).build();
             Call call = okHttpClient.newCall(request);
             //Android中不允许任何网络的交互在主线程中进行

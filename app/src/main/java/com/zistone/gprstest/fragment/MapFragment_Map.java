@@ -95,6 +95,7 @@ import java.util.concurrent.TimeUnit;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -225,7 +226,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
                 fenceInfo.setM_lat(m_circleCenter.latitude);
                 fenceInfo.setM_lot(m_circleCenter.longitude);
                 //围栏在服务端添加成功才在地图上显示
-                AreaDefenseUtil("add", fenceInfo);
+                FenceUtil("add", fenceInfo);
             }
 
             @Override
@@ -417,7 +418,6 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
             builder.add("startTime", startDate.getTime() + "");
             builder.add("endTime", endDate.getTime() + "");
             RequestBody requestBody = builder.build();
-            //创建Post请求的方式
             Request request = new Request.Builder().post(requestBody).url(URL_LOCATION).build();
             Call call = okHttpClient.newCall(request);
             //Android中不允许任何网络的交互在主线程中进行
@@ -889,13 +889,12 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
     /**
      * 查询所有电子围栏
      */
-    private void AreaDefenseUtil(String param, FenceInfo fenceInfo)
+    private void FenceUtil(String param, FenceInfo fenceInfo)
     {
         if(m_deviceInfo == null)
         {
             return;
         }
-        FormBody.Builder builder = new FormBody.Builder();
         OkHttpClient okHttpClient = new OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS).readTimeout(10, TimeUnit.SECONDS).build();
         new Thread(() ->
         {
@@ -906,12 +905,9 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
                 {
                     if(fenceInfo != null)
                     {
-                        builder.add("deviceId", m_deviceInfo.getM_deviceId());
-                        builder.add("name", fenceInfo.getM_name());
-                        builder.add("address", fenceInfo.getM_address());
-                        builder.add("lat", fenceInfo.getM_lat() + "");
-                        builder.add("lot", fenceInfo.getM_lot() + "");
-                        RequestBody requestBody = builder.build();
+                        fenceInfo.setM_deviceId(m_deviceInfo.getM_deviceId());
+                        String jsonData = JSON.toJSONString(fenceInfo);
+                        RequestBody requestBody = FormBody.create(jsonData, MediaType.parse("application/json; charset=utf-8"));
                         Request request = new Request.Builder().post(requestBody).url(URL_FENCE_ADD).build();
                         Call call = okHttpClient.newCall(request);
                         //Android中不允许任何网络的交互在主线程中进行
@@ -948,6 +944,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
                 }
                 case "del":
                 {
+                    FormBody.Builder builder = new FormBody.Builder();
                     builder.add("deviceId", m_deviceInfo.getM_deviceId());
                     RequestBody requestBody = builder.build();
                     Request request = new Request.Builder().post(requestBody).url(URL_FENCE_DEL).build();
@@ -989,6 +986,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
                 }
                 case "query":
                 {
+                    FormBody.Builder builder = new FormBody.Builder();
                     builder.add("deviceId", m_deviceInfo.getM_deviceId());
                     RequestBody requestBody = builder.build();
                     Request request = new Request.Builder().post(requestBody).url(URL_FENCE_QUERY).build();
@@ -1132,7 +1130,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
             }
         }
         //获取该设备所有区域设防的位置(电子围栏)
-        AreaDefenseUtil("query", null);
+        FenceUtil("query", null);
         InitListener();
     }
 

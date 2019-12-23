@@ -304,7 +304,6 @@ public class DeviceFragment_List extends Fragment implements View.OnClickListene
             //实例化并设置连接超时时间、读取超时时间
             OkHttpClient okHttpClient = new OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS).readTimeout(10, TimeUnit.SECONDS).build();
             RequestBody requestBody = FormBody.create("", MediaType.parse("application/json; charset=utf-8"));
-            //创建Post请求的方式
             Request request = new Request.Builder().post(requestBody).url(URL).build();
             Call call = okHttpClient.newCall(request);
             //Android中不允许任何网络的交互在主线程中进行

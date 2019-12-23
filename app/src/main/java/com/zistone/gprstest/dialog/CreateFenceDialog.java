@@ -9,6 +9,7 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.BitmapDescriptor;
@@ -78,6 +79,7 @@ public class CreateFenceDialog extends Dialog implements View.OnClickListener
                 }
                 else
                 {
+                    Toast.makeText(getContext(), "请输入围栏名称", Toast.LENGTH_SHORT).show();
                 }
                 dismiss();
                 break;
