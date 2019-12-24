@@ -56,7 +56,7 @@ public class DefenseDialog extends Dialog implements View.OnClickListener
     {
         switch(view.getId())
         {
-            case R.id.btn1_infoFence:
+            case R.id.btn_area_defense:
             {
                 dismiss();
                 if(null != callback)
@@ -65,7 +65,7 @@ public class DefenseDialog extends Dialog implements View.OnClickListener
                 }
                 break;
             }
-            case R.id.btn2_infoFence:
+            case R.id.btn_warning_defense:
             {
                 dismiss();
                 if(null != callback)
