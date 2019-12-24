@@ -154,7 +154,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
     private SDKReceiver m_sdkReceiver;
     //设备标记
     private Marker m_marker;
-    //经纬度对应的详细信息
+    //经纬度对应的地址信息
     private String m_latLngStr = "";
     //地理编码搜索
     private GeoCoder m_geoCoder;
@@ -509,6 +509,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
     public boolean onMarkerClick(Marker marker)
     {
         LatLng latLng = marker.getPosition();
+        m_geoCoder.reverseGeoCode(new ReverseGeoCodeOption().location(latLng).newVersion(1).radius(500));
         boolean isClickFence = false;
         for(FenceInfo temp : m_fenceInfoList)
         {
@@ -530,10 +531,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
         {
             if(m_deviceInfo != null && !m_deviceInfo.getM_deviceId().equals(""))
             {
-                if(m_deviceInfoDialog == null)
-                {
-                    m_deviceInfoDialog = new DeviceInfoDialog(m_activity, m_setCallback, m_deviceInfo, m_latLngStr);
-                }
+                m_deviceInfoDialog = new DeviceInfoDialog(m_activity, m_setCallback, m_deviceInfo, m_latLngStr);
                 m_deviceInfoDialog.setCanceledOnTouchOutside(true);
                 m_deviceInfoDialog.show();
                 m_isShowCreateFenceDialog = false;
@@ -545,6 +543,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
     @Override
     public void onMapClick(LatLng latLng)
     {
+        m_geoCoder.reverseGeoCode(new ReverseGeoCodeOption().location(latLng).newVersion(1).radius(500));
         //隐藏围栏
         Iterator<Map.Entry<String, Overlay>> iterator = m_overlayMap.entrySet().iterator();
         while(iterator.hasNext())
@@ -558,10 +557,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
         {
             if(m_deviceInfo != null && !m_deviceInfo.getM_deviceId().equals(""))
             {
-                if(m_createFenceDialog == null)
-                {
-                    m_createFenceDialog = new CreateFenceDialog(m_activity, m_createCallback, m_latLngStr);
-                }
+                m_createFenceDialog = new CreateFenceDialog(m_activity, m_createCallback, m_latLngStr);
                 m_createFenceDialog.setCanceledOnTouchOutside(true);
                 m_createFenceDialog.show();
                 m_isShowCreateFenceDialog = false;
@@ -1059,6 +1055,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
         else
         {
             m_latLngStr = reverseGeoCodeResult.getAddress();
+            fff=true;
             //DrawMarkerText(m_latLng, m_latLngStr, Color.RED, 0xAAFFFF80);
         }
     }
@@ -1142,7 +1139,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
             if(null != m_deviceInfo)
             {
                 m_latLng = new LatLng(m_deviceInfo.getM_lat(), m_deviceInfo.getM_lot());
-                //设置反地理编码坐标
+                //反地理编码坐标
                 m_geoCoder.reverseGeoCode(new ReverseGeoCodeOption().location(m_latLng).newVersion(1).radius(500));
             }
         }
