@@ -40,7 +40,7 @@ public class FenceInfoDialog extends Dialog implements View.OnClickListener
      */
     public FenceInfoDialog(Activity activity, Callback callback, FenceInfo fenceInfo)
     {
-        super(activity, android.R.style.Theme_Holo_Light_Dialog);
+        super(activity);
         this.callback = callback;
         m_fenceInfo = fenceInfo;
     }

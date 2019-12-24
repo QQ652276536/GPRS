@@ -36,7 +36,7 @@ public class CreateFenceDialog extends Dialog implements View.OnClickListener
      */
     public CreateFenceDialog(Activity activity, Callback callback, String address)
     {
-        super(activity, android.R.style.Theme_Holo_Light_Dialog);
+        super(activity);
         this.callback = callback;
         m_address = address;
     }

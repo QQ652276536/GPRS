@@ -13,26 +13,14 @@
         android:layout_height="match_parent"
         android:layout_marginLeft="10dp"
         android:layout_marginTop="10dp"
-        android:layout_marginRight="10dp">
-        android:layout_marginBottom="10dp">
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="10dp"
+        android:stretchColumns="1">
 
         <TableRow
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="5dp"
-            android:gravity="right">
-
-            <ImageButton
-                android:id="@+id/btn1_deviceInfo_dialog"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@color/transparent"
-                app:srcCompat="@drawable/close2" />
-        </TableRow>
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_span="2"
             android:gravity="center">
 
             <TextView
@@ -43,21 +31,12 @@
                 android:gravity="center"
                 android:text="车辆跟踪GPRS-1"
                 android:textSize="18sp" />
-
-            <Button
-                android:id="@+id/btn2_deviceInfo_dialog"
-                style="@style/ButtonStyleB"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:gravity="center"
-                android:text="终端设置" />
-
         </TableRow>
 
         <TableRow
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:layout_marginTop="5dp">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -73,6 +52,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:textSize="16sp" />
+
         </TableRow>
 
         <TableRow
@@ -250,7 +230,31 @@
                 android:textSize="16sp" />
 
         </TableRow>
-
     </TableLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="5dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btn2_deviceInfo_dialog"
+            style="@style/ButtonStyleA"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="终端设置" />
+
+        <Button
+            android:id="@+id/btn1_deviceInfo_dialog"
+            style="@style/ButtonStyleB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:text="取消"
+            android:textColor="@color/gray" />
+    </LinearLayout>
 
 </LinearLayout>

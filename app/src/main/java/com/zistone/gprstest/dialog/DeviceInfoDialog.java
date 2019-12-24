@@ -25,7 +25,7 @@ public class DeviceInfoDialog extends Dialog implements View.OnClickListener
 {
     private static final SimpleDateFormat SIMPLEDATEFORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private DeviceInfoDialog.Callback callback;
-    private ImageButton m_btn1;
+    private Button m_btn1;
     private Button m_btn2;
     private TextView m_textView1;
     private TextView m_textView3;
@@ -45,7 +45,7 @@ public class DeviceInfoDialog extends Dialog implements View.OnClickListener
      */
     public DeviceInfoDialog(Activity activity, Callback callback, DeviceInfo deviceInfo, String deviceAddress)
     {
-        super(activity, android.R.style.Theme_Holo_Light_Dialog);
+        super(activity);
         this.callback = callback;
         m_deviceInfo = deviceInfo;
         m_deviceAddress = deviceAddress;
