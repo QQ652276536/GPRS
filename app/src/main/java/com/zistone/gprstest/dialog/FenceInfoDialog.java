@@ -3,18 +3,12 @@ package com.zistone.gprstest.dialog;
 import android.app.Activity;
 import android.app.Dialog;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.baidu.mapapi.map.BaiduMap;
-import com.baidu.mapapi.map.BitmapDescriptor;
-import com.baidu.mapapi.model.LatLng;
 import com.zistone.gprstest.R;
 import com.zistone.gprstest.entity.FenceInfo;
 
@@ -27,7 +21,7 @@ public class FenceInfoDialog extends Dialog implements View.OnClickListener
 {
     private static final SimpleDateFormat SIMPLEDATEFORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private Callback callback;
-    private ImageButton m_btn1;
+    private Button m_btn1;
     private Button m_btn2;
     private TextView m_textView1;
     private TextView m_textView2;
@@ -50,7 +44,7 @@ public class FenceInfoDialog extends Dialog implements View.OnClickListener
     {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.info_fence_dialog);
+        setContentView(R.layout.fence_info_dialog);
         m_textView1 = findViewById(R.id.text1_infoFence);
         m_textView2 = findViewById(R.id.text2_infoFence);
         m_textView3 = findViewById(R.id.text3_infoFence);
@@ -82,15 +76,15 @@ public class FenceInfoDialog extends Dialog implements View.OnClickListener
             case R.id.btn1_infoFence:
             {
                 dismiss();
+                if(null != callback)
+                {
+                    callback.onDelCallback();
+                }
                 break;
             }
             case R.id.btn2_infoFence:
             {
                 dismiss();
-                if(null != callback)
-                {
-                    callback.onDelCallback();
-                }
                 break;
             }
         }
