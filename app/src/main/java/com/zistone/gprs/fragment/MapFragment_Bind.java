@@ -1,4 +1,4 @@
-package com.zistone.gprstest.fragment;
+package com.zistone.gprs.fragment;
 
 import android.content.Context;
 import android.net.Uri;
@@ -15,9 +15,9 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.zistone.gprstest.R;
-import com.zistone.gprstest.entity.DeviceInfo;
-import com.zistone.gprstest.util.PropertiesUtil;
+import com.zistone.gprs.R;
+import com.zistone.gprs.entity.DeviceInfo;
+import com.zistone.gprs.util.PropertiesUtil;
 
 import org.jetbrains.annotations.NotNull;
 

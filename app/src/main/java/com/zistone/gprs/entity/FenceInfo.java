@@ -1,4 +1,4 @@
-package com.zistone.gprstest.entity;
+package com.zistone.gprs.entity;
 
 import android.os.Bundle;
 import android.os.Parcel;

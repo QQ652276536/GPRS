@@ -1,4 +1,4 @@
-package com.zistone.gprstest.fragment;
+package com.zistone.gprs.fragment;
 
 import android.Manifest;
 import android.app.Activity;
@@ -29,11 +29,11 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
-import com.zistone.gprstest.util.ImageUtil;
-import com.zistone.gprstest.util.PropertiesUtil;
-import com.zistone.gprstest.R;
-import com.zistone.gprstest.util.UserSharedPreference;
-import com.zistone.gprstest.entity.UserInfo;
+import com.zistone.gprs.util.ImageUtil;
+import com.zistone.gprs.util.PropertiesUtil;
+import com.zistone.gprs.R;
+import com.zistone.gprs.util.UserSharedPreference;
+import com.zistone.gprs.entity.UserInfo;
 
 import org.jetbrains.annotations.NotNull;
 

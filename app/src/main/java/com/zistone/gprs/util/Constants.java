@@ -1,4 +1,4 @@
-package com.zistone.gprstest.util;
+package com.zistone.gprs.util;
 
 /**
  * Created by baidu on 17/1/12.

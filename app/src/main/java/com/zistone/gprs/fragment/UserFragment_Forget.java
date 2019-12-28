@@ -1,4 +1,4 @@
-package com.zistone.gprstest.fragment;
+package com.zistone.gprs.fragment;
 
 import android.content.Context;
 import android.net.Uri;
@@ -10,8 +10,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 
-import com.zistone.gprstest.util.PropertiesUtil;
-import com.zistone.gprstest.R;
+import com.zistone.gprs.util.PropertiesUtil;
+import com.zistone.gprs.R;
 
 public class UserFragment_Forget extends Fragment implements View.OnClickListener
 {

@@ -1,4 +1,4 @@
-package com.zistone.gprstest.fragment;
+package com.zistone.gprs.fragment;
 
 import android.content.Context;
 import android.net.Uri;
@@ -19,10 +19,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
-import com.zistone.gprstest.util.PropertiesUtil;
-import com.zistone.gprstest.R;
-import com.zistone.gprstest.control.DeviceInfoRecyclerAdapter;
-import com.zistone.gprstest.entity.DeviceInfo;
+import com.zistone.gprs.util.PropertiesUtil;
+import com.zistone.gprs.R;
+import com.zistone.gprs.control.DeviceInfoRecyclerAdapter;
+import com.zistone.gprs.entity.DeviceInfo;
 import com.zistone.material_refresh_layout.MaterialRefreshLayout;
 import com.zistone.material_refresh_layout.MaterialRefreshListener;
 

@@ -1,9 +1,9 @@
-package com.zistone.gprstest.util;
+package com.zistone.gprs.util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.zistone.gprstest.entity.UserInfo;
+import com.zistone.gprs.entity.UserInfo;
 
 public class UserSharedPreference
 {

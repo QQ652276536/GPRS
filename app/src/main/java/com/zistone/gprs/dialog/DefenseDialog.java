@@ -1,4 +1,4 @@
-package com.zistone.gprstest.dialog;
+package com.zistone.gprs.dialog;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -9,8 +9,8 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.zistone.gprstest.R;
-import com.zistone.gprstest.entity.FenceInfo;
+import com.zistone.gprs.R;
+import com.zistone.gprs.entity.FenceInfo;
 
 import java.text.SimpleDateFormat;
 

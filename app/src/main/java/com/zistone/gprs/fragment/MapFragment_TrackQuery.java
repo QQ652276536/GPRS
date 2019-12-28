@@ -1,4 +1,4 @@
-package com.zistone.gprstest.fragment;
+package com.zistone.gprs.fragment;
 
 import android.app.DatePickerDialog;
 import android.content.Context;
@@ -21,11 +21,11 @@ import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
 import com.baidu.mapapi.model.LatLng;
-import com.zistone.gprstest.R;
-import com.zistone.gprstest.entity.DeviceInfo;
-import com.zistone.gprstest.entity.LocationInfo;
-import com.zistone.gprstest.util.MapUtil;
-import com.zistone.gprstest.util.PropertiesUtil;
+import com.zistone.gprs.R;
+import com.zistone.gprs.entity.DeviceInfo;
+import com.zistone.gprs.entity.LocationInfo;
+import com.zistone.gprs.util.MapUtil;
+import com.zistone.gprs.util.PropertiesUtil;
 
 import org.jetbrains.annotations.NotNull;
 

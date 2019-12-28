@@ -1,4 +1,4 @@
-package com.zistone.gprstest.util;
+package com.zistone.gprs.util;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -22,7 +22,7 @@ import com.baidu.mapapi.map.PolylineOptions;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.model.LatLngBounds;
 import com.baidu.mapapi.utils.CoordinateConverter;
-import com.zistone.gprstest.R;
+import com.zistone.gprs.R;
 
 import java.util.List;
 

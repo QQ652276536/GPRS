@@ -1,4 +1,4 @@
-package com.zistone.gprstest.fragment;
+package com.zistone.gprs.fragment;
 
 import android.Manifest;
 import android.app.Activity;
@@ -69,16 +69,16 @@ import com.baidu.mapapi.search.geocode.GeoCoder;
 import com.baidu.mapapi.search.geocode.OnGetGeoCoderResultListener;
 import com.baidu.mapapi.search.geocode.ReverseGeoCodeOption;
 import com.baidu.mapapi.search.geocode.ReverseGeoCodeResult;
-import com.zistone.gprstest.R;
-import com.zistone.gprstest.dialog.CreateFenceDialog;
-import com.zistone.gprstest.dialog.DefenseDialog;
-import com.zistone.gprstest.dialog.DeviceInfoDialog;
-import com.zistone.gprstest.dialog.FenceInfoDialog;
-import com.zistone.gprstest.entity.FenceInfo;
-import com.zistone.gprstest.entity.DeviceInfo;
-import com.zistone.gprstest.entity.LocationInfo;
-import com.zistone.gprstest.util.MapUtil;
-import com.zistone.gprstest.util.PropertiesUtil;
+import com.zistone.gprs.R;
+import com.zistone.gprs.dialog.CreateFenceDialog;
+import com.zistone.gprs.dialog.DefenseDialog;
+import com.zistone.gprs.dialog.DeviceInfoDialog;
+import com.zistone.gprs.dialog.FenceInfoDialog;
+import com.zistone.gprs.entity.FenceInfo;
+import com.zistone.gprs.entity.DeviceInfo;
+import com.zistone.gprs.entity.LocationInfo;
+import com.zistone.gprs.util.MapUtil;
+import com.zistone.gprs.util.PropertiesUtil;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -127,7 +127,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
     private static final int MESSAGE_FENCE_QUERY_RREQUEST_FAIL = 13;
     private static final int MESSAGE_FENCE_QUERY_RESPONSE_FAIL = 14;
     private static final int MESSAGE_FENCE_QUERY_RESPONSE_SUCCESS = 15;
-    private static String URL_LOCATION;
+    private static String URL_LOCATION_LASTDAYS;
     private static String URL_FENCE_ADD;
     private static String URL_FENCE_DEL;
     private static String URL_FENCE_UPDATE;
@@ -362,73 +362,13 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
                     {
                         return;
                     }
-                    List<LocationInfo> list = JSON.parseArray(result, LocationInfo.class);
-                    List<String> keyList = new ArrayList<>();
-                    for(LocationInfo locationInfo : list)
+                    m_locationNowMonthEverDayList = JSON.parseArray(result, LocationInfo.class);
+                    for(LocationInfo tempLocationInfo : m_locationNowMonthEverDayList)
                     {
-                        String timeStr = SIMPLEDATEFORMAT.format(locationInfo.getM_createTime());
-                        timeStr = timeStr.split(" ")[0];
-                        keyList.add(timeStr);
-                    }
-                    //当天日期为键,当天所有位置为值
-                    Map<String, List<LocationInfo>> map_locationsForDay = new HashMap<>();
-                    for(String tempStr : keyList)
-                    {
-                        List<LocationInfo> tempList = new ArrayList<>();
-                        for(LocationInfo locationInfo : list)
-                        {
-                            String timeStr = SIMPLEDATEFORMAT.format(locationInfo.getM_createTime());
-                            timeStr = timeStr.split(" ")[0];
-                            if(tempStr.equals(timeStr))
-                            {
-                                tempList.add(locationInfo);
-                            }
-                        }
-                        map_locationsForDay.put(tempStr, tempList);
-                    }
-                    for(Map.Entry<String, List<LocationInfo>> entry : map_locationsForDay.entrySet())
-                    {
-                        List<LocationInfo> locationInfos = entry.getValue();
-                        List<Date> dates = new ArrayList<>();
-                        //当天所有位置的新增时间
-                        for(LocationInfo tempLocationInfo : locationInfos)
-                        {
-                            dates.add(tempLocationInfo.getM_createTime());
-                        }
-                        //当天最后一条记录的新增时间
-                        Date lastTime = Collections.max(dates);
-                        for(LocationInfo tempLocationInfo : locationInfos)
-                        {
-                            if(lastTime == tempLocationInfo.getM_createTime())
-                            {
-                                m_locationNowMonthEverDayList.add(tempLocationInfo);
-                                break;
-                            }
-                        }
-                    }
-                    Collections.sort(m_locationNowMonthEverDayList, (o1, o2) ->
-                    {
-                        //降序排列
-                        if(o1.getM_createTime().before(o2.getM_createTime()))
-                        {
-                            return 1;
-                        }
-                        if(o1.getM_createTime() == o2.getM_createTime())
-                        {
-                            return 0;
-                        }
-                        return -1;
-                    });
-                    //只有铱星设备才在地图上显示多个位置
-                    if(m_deviceInfo != null && m_deviceInfo.getM_type().equals("铱星设备"))
-                    {
-                        for(LocationInfo tempLocationInfo : m_locationNowMonthEverDayList)
-                        {
-                            LatLng latLng = new LatLng(tempLocationInfo.getM_lat(), tempLocationInfo.getM_lot());
-                            MarkerOptions markerOptions = new MarkerOptions().position(latLng).icon(ICON_MARKER1);
-                            //标记添加至地图中
-                            m_baiduMap.addOverlay(markerOptions);
-                        }
+                        LatLng latLng = new LatLng(tempLocationInfo.getM_lat(), tempLocationInfo.getM_lot());
+                        MarkerOptions markerOptions = new MarkerOptions().position(latLng).icon(ICON_MARKER1);
+                        //标记添加至地图中
+                        m_baiduMap.addOverlay(markerOptions);
                     }
                     break;
                 }
@@ -436,16 +376,8 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
         }
     };
 
-    private void QueryHistoryTrack() throws ParseException
+    private void QueryLastDays(int days) throws ParseException
     {
-        Calendar calendar = Calendar.getInstance();
-        String yearStr = calendar.get(Calendar.YEAR) + "";
-        String monthStr = calendar.get(Calendar.MONTH) + 1 + "";
-        String dayStr = calendar.get(Calendar.DAY_OF_MONTH) + "";
-        String startStr = yearStr + "-" + monthStr + "-" + "01" + " 00:00:00";
-        String endStr = yearStr + "-" + monthStr + "-" + dayStr + " 23:59:59";
-        Date startDate = SIMPLEDATEFORMAT.parse(startStr);
-        Date endDate = SIMPLEDATEFORMAT.parse(endStr);
         new Thread(() ->
         {
             Looper.prepare();
@@ -454,10 +386,9 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
             //RequestBody requestBody = FormBody.create("", MediaType.parse("application/json; charset=utf-8"));
             FormBody.Builder builder = new FormBody.Builder();
             builder.add("deviceId", m_deviceInfo.getM_deviceId());
-            builder.add("startTime", startDate.getTime() + "");
-            builder.add("endTime", endDate.getTime() + "");
+            builder.add("days", days + "");
             RequestBody requestBody = builder.build();
-            Request request = new Request.Builder().post(requestBody).url(URL_LOCATION).build();
+            Request request = new Request.Builder().post(requestBody).url(URL_LOCATION_LASTDAYS).build();
             Call call = okHttpClient.newCall(request);
             //Android中不允许任何网络的交互在主线程中进行
             call.enqueue(new Callback()
@@ -465,7 +396,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
                 @Override
                 public void onFailure(@NotNull Call call, @NotNull IOException e)
                 {
-                    Log.e(TAG, "查询设备历史位置的请求失败:" + e.toString());
+                    Log.e(TAG, "查询设备" + m_deviceInfo.getM_deviceId() + "历史位置的请求失败:" + e.toString());
                     Message message = handler.obtainMessage(MESSAGE_QUERYLOCATION_RREQUEST_FAIL, "请求失败:" + e.toString());
                     handler.sendMessage(message);
                 }
@@ -474,7 +405,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
                 public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException
                 {
                     String responseStr = response.body().string();
-                    Log.i(TAG, "查询设备历史位置的响应内容:" + responseStr);
+                    Log.i(TAG, "查询设备" + m_deviceInfo.getM_deviceId() + "最后" + days + "天最后位置的响应内容:" + responseStr);
                     if(response.isSuccessful())
                     {
                         Message message = handler.obtainMessage(MESSAGE_QUERYLOCATION_RESPONSE_SUCCESS, responseStr);
@@ -513,7 +444,14 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
         //添加平移动画
         //        m_marker.setAnimation(Transformation());
         //        m_marker.startAnimation();
-        //QueryHistoryTrack();
+        try
+        {
+            QueryLastDays(7);
+        }
+        catch(ParseException e)
+        {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -1185,7 +1123,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
     {
         m_mapView = inflater.inflate(R.layout.fragment_map_map, container, false);
         m_context = m_mapView.getContext();
-        URL_LOCATION = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/LocationInfo/FindByDeviceIdAndBetweenTime";
+        URL_LOCATION_LASTDAYS = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/LocationInfo/FindDescDaysLastDataByDeviceId";
         URL_FENCE_ADD = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/FenceInfo/InsertByDeviceId";
         URL_FENCE_DEL = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/FenceInfo/DelById";
         URL_FENCE_UPDATE = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/FenceInfo/UpdateById";
@@ -1280,48 +1218,39 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
                 }
                 break;
             case R.id.btn_up_baidu:
-                if(m_deviceInfo != null && m_deviceInfo.getM_type().equals("铱星设备"))
+                if(m_nowMonthHistoryLocationIndex < historyLocationTotal)
                 {
-                    if(m_nowMonthHistoryLocationIndex < historyLocationTotal)
-                    {
-                        LocationInfo locationInfo = m_locationNowMonthEverDayList.get(m_nowMonthHistoryLocationIndex);
-                        LatLng latLng = new LatLng(locationInfo.getM_lat(), locationInfo.getM_lot());
-                        MapStatus mapStatus = new MapStatus.Builder().target(latLng).zoom(16).build();
-                        MapStatusUpdate mapStatusUpdate = MapStatusUpdateFactory.newMapStatus(mapStatus);
-                        m_baiduMap.setMapStatus(mapStatusUpdate);
-                        m_nowMonthHistoryLocationIndex++;
-                    }
-                    else
-                    {
-                        Toast.makeText(m_context, "已到起始日", Toast.LENGTH_SHORT).show();
-                    }
+                    LocationInfo locationInfo = m_locationNowMonthEverDayList.get(m_nowMonthHistoryLocationIndex);
+                    LatLng latLng = new LatLng(locationInfo.getM_lat(), locationInfo.getM_lot());
+                    MapStatus mapStatus = new MapStatus.Builder().target(latLng).zoom(16).build();
+                    MapStatusUpdate mapStatusUpdate = MapStatusUpdateFactory.newMapStatus(mapStatus);
+                    m_baiduMap.setMapStatus(mapStatusUpdate);
+                    m_nowMonthHistoryLocationIndex++;
                 }
                 else
                 {
-                    Toast.makeText(m_context, "仅支持铱星设备", Toast.LENGTH_SHORT).show();
+                    AlertDialog.Builder builder = new AlertDialog.Builder(m_activity);
+                    builder.setPositiveButton("知道了", (dialog, which) -> dialog.dismiss());
+                    builder.setMessage("已到起始日");
+                    builder.show();
                 }
                 break;
             case R.id.btn_down_baidu:
-
-                if(m_deviceInfo != null && m_deviceInfo.getM_type().equals("铱星设备"))
+                if(m_nowMonthHistoryLocationIndex > 0)
                 {
-                    if(m_nowMonthHistoryLocationIndex > 0 && m_nowMonthHistoryLocationIndex < historyLocationTotal)
-                    {
-                        m_nowMonthHistoryLocationIndex--;
-                        LocationInfo locationInfo = m_locationNowMonthEverDayList.get(m_nowMonthHistoryLocationIndex);
-                        LatLng latLng = new LatLng(locationInfo.getM_lat(), locationInfo.getM_lot());
-                        MapStatus mapStatus = new MapStatus.Builder().target(latLng).zoom(16).build();
-                        MapStatusUpdate mapStatusUpdate = MapStatusUpdateFactory.newMapStatus(mapStatus);
-                        m_baiduMap.setMapStatus(mapStatusUpdate);
-                    }
-                    else
-                    {
-                        Toast.makeText(m_context, "已到截止日", Toast.LENGTH_SHORT).show();
-                    }
+                    m_nowMonthHistoryLocationIndex--;
+                    LocationInfo locationInfo = m_locationNowMonthEverDayList.get(m_nowMonthHistoryLocationIndex);
+                    LatLng latLng = new LatLng(locationInfo.getM_lat(), locationInfo.getM_lot());
+                    MapStatus mapStatus = new MapStatus.Builder().target(latLng).zoom(16).build();
+                    MapStatusUpdate mapStatusUpdate = MapStatusUpdateFactory.newMapStatus(mapStatus);
+                    m_baiduMap.setMapStatus(mapStatusUpdate);
                 }
                 else
                 {
-                    Toast.makeText(m_context, "仅支持铱星设备", Toast.LENGTH_SHORT).show();
+                    AlertDialog.Builder builder = new AlertDialog.Builder(m_activity);
+                    builder.setPositiveButton("知道了", (dialog, which) -> dialog.dismiss());
+                    builder.setMessage("已到截止日");
+                    builder.show();
                 }
                 break;
             case R.id.btn_trafficlight_baidu:

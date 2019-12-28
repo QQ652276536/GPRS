@@ -1,4 +1,4 @@
-package com.zistone.gprstest.dialog;
+package com.zistone.gprs.dialog;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -16,7 +16,7 @@ import com.baidu.mapapi.map.BitmapDescriptor;
 import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.MarkerOptions;
 import com.baidu.mapapi.model.LatLng;
-import com.zistone.gprstest.R;
+import com.zistone.gprs.R;
 
 /**
  * 围栏创建对话框

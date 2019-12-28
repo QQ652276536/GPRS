@@ -1,4 +1,4 @@
-package com.zistone.gprstest.fragment;
+package com.zistone.gprs.fragment;
 
 import android.content.Context;
 import android.net.Uri;
@@ -8,8 +8,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.zistone.gprstest.R;
-import com.zistone.gprstest.util.UserSharedPreference;
+import com.zistone.gprs.R;
+import com.zistone.gprs.util.UserSharedPreference;
 
 public class UserFragment extends Fragment
 {

@@ -1,4 +1,4 @@
-package com.example.gprstest;
+package com.example.gprs;
 
 import org.junit.Test;
 

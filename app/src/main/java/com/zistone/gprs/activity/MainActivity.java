@@ -1,4 +1,4 @@
-package com.zistone.gprstest.activity;
+package com.zistone.gprs.activity;
 
 import android.net.Uri;
 import android.os.Bundle;
@@ -12,29 +12,29 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.baidu.mapapi.map.MapFragment;
-import com.zistone.gprstest.R;
-import com.zistone.gprstest.fragment.MapFragment_Bind;
-import com.zistone.gprstest.fragment.MapFragment_Choose;
-import com.zistone.gprstest.fragment.DeviceFragment_Info;
-import com.zistone.gprstest.fragment.MapFragment_Map;
-import com.zistone.gprstest.fragment.MapFragment_Setting;
-import com.zistone.gprstest.fragment.MapFragment_TrackQuery;
-import com.zistone.gprstest.fragment.UserFragment_Forget;
-import com.zistone.gprstest.fragment.UserFragment_Info;
-import com.zistone.gprstest.fragment.UserFragment_Login;
-import com.zistone.gprstest.fragment.UserFragment_Register;
-import com.zistone.gprstest.util.UserSharedPreference;
-import com.zistone.gprstest.fragment.DeviceFragment_Add;
-import com.zistone.gprstest.fragment.DeviceFragment;
-import com.zistone.gprstest.fragment.DeviceFragment_List;
-import com.zistone.gprstest.fragment.DeviceFragment_Manage;
-import com.zistone.gprstest.fragment.UserFragment;
+import com.zistone.gprs.R;
+import com.zistone.gprs.fragment.MapFragment_Bind;
+import com.zistone.gprs.fragment.MapFragment_Choose;
+import com.zistone.gprs.fragment.DeviceFragment_Info;
+import com.zistone.gprs.fragment.MapFragment_Map;
+import com.zistone.gprs.fragment.MapFragment_Setting;
+import com.zistone.gprs.fragment.MapFragment_TrackQuery;
+import com.zistone.gprs.fragment.UserFragment_Forget;
+import com.zistone.gprs.fragment.UserFragment_Info;
+import com.zistone.gprs.fragment.UserFragment_Login;
+import com.zistone.gprs.fragment.UserFragment_Register;
+import com.zistone.gprs.util.UserSharedPreference;
+import com.zistone.gprs.fragment.DeviceFragment_Add;
+import com.zistone.gprs.fragment.DeviceFragment;
+import com.zistone.gprs.fragment.DeviceFragment_List;
+import com.zistone.gprs.fragment.DeviceFragment_Manage;
+import com.zistone.gprs.fragment.UserFragment;
 
 import java.io.Serializable;
 
 public class MainActivity extends AppCompatActivity implements
         //位置
-        com.zistone.gprstest.fragment.MapFragment.OnFragmentInteractionListener,
+        com.zistone.gprs.fragment.MapFragment.OnFragmentInteractionListener,
         MapFragment_Map.OnFragmentInteractionListener,
         MapFragment_Bind.OnFragmentInteractionListener,
         MapFragment_Choose.OnFragmentInteractionListener,
@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity implements
     //当前页,用来切换
     public Fragment m_currentFragment;
     //地图页
-    public com.zistone.gprstest.fragment.MapFragment m_mapFragment;
+    public com.zistone.gprs.fragment.MapFragment m_mapFragment;
     //设备页
     public DeviceFragment m_deviceFragment;
     //用户页
@@ -153,10 +153,10 @@ public class MainActivity extends AppCompatActivity implements
 
     private void ClickMapItem()
     {
-        m_mapFragment = (com.zistone.gprstest.fragment.MapFragment) getSupportFragmentManager().findFragmentByTag("mapFragment");
+        m_mapFragment = (com.zistone.gprs.fragment.MapFragment) getSupportFragmentManager().findFragmentByTag("mapFragment");
         if (m_mapFragment == null)
         {
-            m_mapFragment = com.zistone.gprstest.fragment.MapFragment.newInstance("", "");
+            m_mapFragment = com.zistone.gprs.fragment.MapFragment.newInstance("", "");
         }
         AddOrShowFragment(getSupportFragmentManager().beginTransaction(), m_mapFragment, "mapFragment");
     }

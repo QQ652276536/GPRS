@@ -1,4 +1,4 @@
-package com.zistone.gprstest.control;
+package com.zistone.gprs.control;
 
 import android.annotation.SuppressLint;
 import android.content.Context;

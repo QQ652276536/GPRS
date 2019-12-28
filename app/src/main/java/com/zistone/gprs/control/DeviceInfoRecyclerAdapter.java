@@ -1,4 +1,4 @@
-package com.zistone.gprstest.control;
+package com.zistone.gprs.control;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -13,8 +13,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.zistone.gprstest.R;
-import com.zistone.gprstest.entity.DeviceInfo;
+import com.zistone.gprs.R;
+import com.zistone.gprs.entity.DeviceInfo;
 
 import java.util.List;
 

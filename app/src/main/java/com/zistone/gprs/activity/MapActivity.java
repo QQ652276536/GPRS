@@ -1,4 +1,4 @@
-package com.zistone.gprstest.activity;
+package com.zistone.gprs.activity;
 
 import android.Manifest;
 import android.content.BroadcastReceiver;
@@ -32,7 +32,7 @@ import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.MyLocationConfiguration;
 import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.model.LatLng;
-import com.zistone.gprstest.R;
+import com.zistone.gprs.R;
 
 import java.util.ArrayList;
 import java.util.List;

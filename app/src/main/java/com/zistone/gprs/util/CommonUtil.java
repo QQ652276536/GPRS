@@ -1,4 +1,4 @@
-package com.zistone.gprstest.util;
+package com.zistone.gprs.util;
 
 import android.app.ActivityManager;
 import android.content.Context;

@@ -1,4 +1,4 @@
-package com.zistone.gprstest.entity;
+package com.zistone.gprs.entity;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

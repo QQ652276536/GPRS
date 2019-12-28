@@ -1,4 +1,4 @@
-package com.zistone.gprstest.util;
+package com.zistone.gprs.util;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;

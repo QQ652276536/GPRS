@@ -1,4 +1,4 @@
-package com.zistone.gprstest.fragment;
+package com.zistone.gprs.fragment;
 
 import android.content.Context;
 import android.net.Uri;
@@ -9,7 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-import com.zistone.gprstest.R;
+import com.zistone.gprs.R;
 
 public class DeviceFragment extends Fragment
 {
