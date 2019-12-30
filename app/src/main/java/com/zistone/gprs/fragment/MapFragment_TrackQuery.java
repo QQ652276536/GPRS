@@ -59,7 +59,6 @@ public class MapFragment_TrackQuery extends Fragment implements View.OnClickList
     private View m_trackQueryView;
     private ImageButton m_btnReturn;
     private OnFragmentInteractionListener mListener;
-    private Button m_btnQuery;
     private DeviceInfo m_deviceInfo;
     private EditText m_editBegin;
     private EditText m_editend;
@@ -152,8 +151,6 @@ public class MapFragment_TrackQuery extends Fragment implements View.OnClickList
         m_editend = m_trackQueryView.findViewById(R.id.editText_endTime_trackQuery);
         m_editend.setOnClickListener(this::onClick);
         m_editend.setInputType(InputType.TYPE_NULL);
-        m_btnQuery = m_trackQueryView.findViewById(R.id.btn_query_trackQuery);
-        m_btnQuery.setOnClickListener(this::onClick);
         m_mapUtil = MapUtil.getInstance();
         m_mapUtil.init(m_trackQueryView.findViewById(R.id.mapView_trackQuery));
         //设置地图中心
@@ -211,17 +208,32 @@ public class MapFragment_TrackQuery extends Fragment implements View.OnClickList
 
     private void QueryHistoryTrack() throws ParseException
     {
-
-        if(m_startStr == null || m_startStr.equals(""))
-            m_startStr = "2019-01-01 00:00:00";
-        else
+        Date startDate;
+        Date endDate;
+        try
+        {
             m_startStr = m_editBegin.getText() + " 00:00:00";
-        if(m_endStr == null || m_endStr.equals(""))
-            m_endStr = SIMPLEDATEFORMAT_YMD.format(new Date()) + " 23:59:59";
-        else
+            startDate = SIMPLEDATEFORMAT.parse(m_startStr);
+        }
+        catch(Exception e)
+        {
+            m_startStr = "2019-01-01 00:00:00";
+            startDate = SIMPLEDATEFORMAT.parse(m_startStr);
+            e.printStackTrace();
+        }
+        try
+        {
             m_endStr = m_editend.getText() + " 23:59:59";
-        Date startDate = SIMPLEDATEFORMAT.parse(m_startStr);
-        Date endDate = SIMPLEDATEFORMAT.parse(m_endStr);
+            endDate = SIMPLEDATEFORMAT.parse(m_endStr);
+        }
+        catch(Exception e)
+        {
+            m_endStr = SIMPLEDATEFORMAT_YMD.format(new Date()) + " 23:59:59";
+            endDate = SIMPLEDATEFORMAT.parse(m_endStr);
+            e.printStackTrace();
+        }
+        Date finalStartDate = startDate;
+        Date finalEndDate = endDate;
         new Thread(() ->
         {
             Looper.prepare();
@@ -230,8 +242,8 @@ public class MapFragment_TrackQuery extends Fragment implements View.OnClickList
             //RequestBody requestBody = FormBody.create("", MediaType.parse("application/json; charset=utf-8"));
             FormBody.Builder builder = new FormBody.Builder();
             builder.add("deviceId", m_deviceInfo.getM_deviceId());
-            builder.add("startTime", startDate.getTime() + "");
-            builder.add("endTime", endDate.getTime() + "");
+            builder.add("startTime", finalStartDate.getTime() + "");
+            builder.add("endTime", finalEndDate.getTime() + "");
             RequestBody requestBody = builder.build();
             Request request = new Request.Builder().post(requestBody).url(URL).build();
             Call call = okHttpClient.newCall(request);
@@ -241,7 +253,7 @@ public class MapFragment_TrackQuery extends Fragment implements View.OnClickList
                 @Override
                 public void onFailure(@NotNull Call call, @NotNull IOException e)
                 {
-                    Log.e(TAG, "请求失败:" + e.toString());
+                    Log.e(TAG, "查询历史轨迹失败:" + e.toString());
                     Message message = handler.obtainMessage(MESSAGE_RREQUEST_FAIL, "请求失败:" + e.toString());
                     handler.sendMessage(message);
                 }
@@ -250,14 +262,15 @@ public class MapFragment_TrackQuery extends Fragment implements View.OnClickList
                 public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException
                 {
                     String responseStr = response.body().string();
-                    Log.i(TAG, "响应内容:" + responseStr);
                     if(response.isSuccessful())
                     {
+                        Log.i(TAG, "查询历史轨迹成功:" + responseStr);
                         Message message = handler.obtainMessage(MESSAGE_RESPONSE_SUCCESS, responseStr);
                         handler.sendMessage(message);
                     }
                     else
                     {
+                        Log.e(TAG, "查询历史轨迹失败:" + responseStr);
                         Message message = handler.obtainMessage(MESSAGE_RESPONSE_FAIL, responseStr);
                         handler.sendMessage(message);
                     }

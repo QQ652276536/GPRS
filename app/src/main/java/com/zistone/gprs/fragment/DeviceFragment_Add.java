@@ -128,7 +128,7 @@ public class DeviceFragment_Add extends Fragment implements View.OnClickListener
                 case MESSAGE_RESPONSE_FAIL:
                 {
                     String result = (String) message.obj;
-                    Toast.makeText(m_context, "添加设备失败,请与管理员联系", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(m_context, "添加设备失败", Toast.LENGTH_SHORT).show();
                     break;
                 }
                 default:
@@ -183,7 +183,7 @@ public class DeviceFragment_Add extends Fragment implements View.OnClickListener
                         @Override
                         public void onFailure(@NotNull Call call, @NotNull IOException e)
                         {
-                            Log.e(TAG, "请求失败:" + e.toString());
+                            Log.e(TAG, "添加设备失败:" + e.toString());
                             Message message = handler.obtainMessage(MESSAGE_RREQUEST_FAIL, "请求失败:" + e.toString());
                             handler.sendMessage(message);
                         }
@@ -192,14 +192,15 @@ public class DeviceFragment_Add extends Fragment implements View.OnClickListener
                         public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException
                         {
                             String responseStr = response.body().string();
-                            Log.i(TAG, "响应内容:" + responseStr);
                             if (response.isSuccessful())
                             {
+                                Log.i(TAG, "添加设备成功:" + responseStr);
                                 Message message = handler.obtainMessage(MESSAGE_RESPONSE_SUCCESS, responseStr);
                                 handler.sendMessage(message);
                             }
                             else
                             {
+                                Log.e(TAG, "添加设备失败:" + responseStr);
                                 Message message = handler.obtainMessage(MESSAGE_RESPONSE_FAIL, responseStr);
                                 handler.sendMessage(message);
                             }

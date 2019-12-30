@@ -161,7 +161,7 @@ public class MapFragment_Bind extends Fragment implements View.OnClickListener
                 @Override
                 public void onFailure(@NotNull Call call, @NotNull IOException e)
                 {
-                    Log.e(TAG, "请求失败:" + e.toString());
+                    Log.e(TAG, "绑定设备失败:" + e.toString());
                     Message message = handler.obtainMessage(MESSAGE_RREQUEST_FAIL, "请求失败:" + e.toString());
                     handler.sendMessage(message);
                 }
@@ -173,14 +173,15 @@ public class MapFragment_Bind extends Fragment implements View.OnClickListener
                 public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException
                 {
                     String result = response.body().string();
-                    Log.i(TAG, "响应内容:" + result);
                     if(response.isSuccessful())
                     {
+                        Log.i(TAG, "绑定设备成功:" + result);
                         Message message = handler.obtainMessage(MESSAGE_RESPONSE_SUCCESS, result);
                         handler.sendMessage(message);
                     }
                     else
                     {
+                        Log.e(TAG, "绑定设备失败:" + result);
                         Message message = handler.obtainMessage(MESSAGE_RESPONSE_FAIL, result);
                         handler.sendMessage(message);
                     }

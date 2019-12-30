@@ -114,7 +114,7 @@ public class DeviceFragment_Info extends Fragment implements View.OnClickListene
                             @Override
                             public void onFailure(@NotNull Call call, @NotNull IOException e)
                             {
-                                Log.e(TAG, "请求失败:" + e.toString());
+                                Log.e(TAG, "查询设备信息失败:" + e.toString());
                                 Message message = handler.obtainMessage(MESSAGE_RREQUEST_FAIL, "请求失败:" + e.toString());
                                 handler.sendMessage(message);
                             }
@@ -123,14 +123,15 @@ public class DeviceFragment_Info extends Fragment implements View.OnClickListene
                             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException
                             {
                                 String responseStr = response.body().string();
-                                Log.i(TAG, "响应内容:" + responseStr);
                                 if(response.isSuccessful())
                                 {
+                                    Log.i(TAG, "查询设备信息成功:" + responseStr);
                                     Message message = handler.obtainMessage(MESSAGE_RESPONSE_SUCCESS, responseStr);
                                     handler.sendMessage(message);
                                 }
                                 else
                                 {
+                                    Log.e(TAG, "查询设备信息失败:" + responseStr);
                                     Message message = handler.obtainMessage(MESSAGE_RESPONSE_FAIL, responseStr);
                                     handler.sendMessage(message);
                                 }
@@ -243,51 +244,6 @@ public class DeviceFragment_Info extends Fragment implements View.OnClickListene
             }
         }
     };
-
-    private void SendWithOkHttp()
-    {
-        new Thread(() ->
-        {
-            Looper.prepare();
-            //实例化并设置连接超时时间、读取超时时间
-            OkHttpClient okHttpClient = new OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS).readTimeout(10, TimeUnit.SECONDS).build();
-            RequestBody requestBody = FormBody.create("", MediaType.parse("application/json; charset=utf-8"));
-            Request request = new Request.Builder().post(requestBody).url(URL).build();
-            Call call = okHttpClient.newCall(request);
-            //Android中不允许任何网络的交互在主线程中进行
-            call.enqueue(new Callback()
-            {
-                @Override
-                public void onFailure(@NotNull Call call, @NotNull IOException e)
-                {
-                    Log.e(TAG, "请求失败:" + e.toString());
-                    Message message = handler.obtainMessage(MESSAGE_RREQUEST_FAIL, "请求失败:" + e.toString());
-                    handler.sendMessage(message);
-                }
-
-                //获得请求响应的字符串:response.body().string()该方法只能被调用一次!另:toString()返回的是对象地址
-                //获得请求响应的二进制字节数组:response.body().bytes()
-                //获得请求响应的inputStream:response.body().byteStream()
-                @Override
-                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException
-                {
-                    String result = response.body().string();
-                    Log.i(TAG, "响应内容:" + result);
-                    if(response.isSuccessful())
-                    {
-                        Message message = handler.obtainMessage(MESSAGE_RESPONSE_SUCCESS, result);
-                        handler.sendMessage(message);
-                    }
-                    else
-                    {
-                        Message message = handler.obtainMessage(MESSAGE_RESPONSE_FAIL, result);
-                        handler.sendMessage(message);
-                    }
-                }
-            });
-            Looper.loop();
-        }).start();
-    }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState)

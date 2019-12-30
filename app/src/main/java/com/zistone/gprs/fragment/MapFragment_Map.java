@@ -396,7 +396,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
                 @Override
                 public void onFailure(@NotNull Call call, @NotNull IOException e)
                 {
-                    Log.e(TAG, "查询设备" + m_deviceInfo.getM_deviceId() + "历史位置的请求失败:" + e.toString());
+                    Log.e(TAG, String.format("查询设备%s最后%s天最后位置失败:%s", m_deviceInfo.getM_deviceId(), days, e.toString()));
                     Message message = handler.obtainMessage(MESSAGE_QUERYLOCATION_RREQUEST_FAIL, "请求失败:" + e.toString());
                     handler.sendMessage(message);
                 }
@@ -405,7 +405,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
                 public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException
                 {
                     String responseStr = response.body().string();
-                    Log.i(TAG, "查询设备" + m_deviceInfo.getM_deviceId() + "最后" + days + "天最后位置的响应内容:" + responseStr);
+                    Log.i(TAG, String.format("查询设备%s最后%s天最后位置的响应内容:%s", m_deviceInfo.getM_deviceId(), days, responseStr));
                     if(response.isSuccessful())
                     {
                         Message message = handler.obtainMessage(MESSAGE_QUERYLOCATION_RESPONSE_SUCCESS, responseStr);
@@ -628,7 +628,8 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
             {
                 for(Poi poi : poiList)
                 {
-                    Log.i(TAG, ">>>" + poi.getId() + "\t" + poi.getName() + "\t" + poi.getRank());
+                    Log.i(TAG, String.format(">>>%s\t%s\t%s", poi.getId(), poi.getName(),
+                            poi.getRank()));
                 }
             }
             Log.i(TAG, ">>>" + sb.toString());
@@ -847,7 +848,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
                             @Override
                             public void onFailure(@NotNull Call call, @NotNull IOException e)
                             {
-                                Log.e(TAG, "添加围栏的请求失败:" + e.toString());
+                                Log.e(TAG, "添加围栏失败:" + e.toString());
                                 Message message = handler.obtainMessage(MESSAGE_FENCE_ADD_RREQUEST_FAIL, "请求失败:" + e.toString());
                                 handler.sendMessage(message);
                             }
@@ -858,13 +859,13 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
                                 String responseStr = response.body().string();
                                 if(response.isSuccessful())
                                 {
-                                    Log.i(TAG, "添加围栏的响应内容:" + responseStr);
+                                    Log.i(TAG, "添加围栏成功:" + responseStr);
                                     Message message = handler.obtainMessage(MESSAGE_FENCE_ADD_RESPONSE_SUCCESS, responseStr);
                                     handler.sendMessage(message);
                                 }
                                 else
                                 {
-                                    Log.e(TAG, "添加围栏的响应异常:" + responseStr);
+                                    Log.e(TAG, "添加围栏失败:" + responseStr);
                                     Message message = handler.obtainMessage(MESSAGE_FENCE_ADD_RESPONSE_FAIL, responseStr);
                                     handler.sendMessage(message);
                                 }
@@ -886,7 +887,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
                         @Override
                         public void onFailure(@NotNull Call call, @NotNull IOException e)
                         {
-                            Log.e(TAG, "删除围栏的请求失败:" + e.toString());
+                            Log.e(TAG, "删除围栏失败:" + e.toString());
                             Message message = handler.obtainMessage(MESSAGE_FENCE_DEL_RREQUEST_FAIL, "请求失败:" + e.toString());
                             handler.sendMessage(message);
                         }
@@ -897,13 +898,13 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
                             String responseStr = response.body().string();
                             if(response.isSuccessful())
                             {
-                                Log.i(TAG, "删除围栏的响应内容:" + responseStr);
+                                Log.i(TAG, "删除围栏成功:" + responseStr);
                                 Message message = handler.obtainMessage(MESSAGE_FENCE_DEL_RESPONSE_SUCCESS, responseStr);
                                 handler.sendMessage(message);
                             }
                             else
                             {
-                                Log.e(TAG, "删除围栏的响应异常:" + responseStr);
+                                Log.e(TAG, "删除围栏失败:" + responseStr);
                                 Message message = handler.obtainMessage(MESSAGE_FENCE_DEL_RESPONSE_FAIL, responseStr);
                                 handler.sendMessage(message);
                             }
@@ -928,7 +929,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
                         @Override
                         public void onFailure(@NotNull Call call, @NotNull IOException e)
                         {
-                            Log.e(TAG, "查询围栏的请求失败:" + e.toString());
+                            Log.e(TAG, "查询围栏失败:" + e.toString());
                             Message message = handler.obtainMessage(MESSAGE_FENCE_QUERY_RREQUEST_FAIL, "请求失败:" + e.toString());
                             handler.sendMessage(message);
                         }
@@ -939,13 +940,13 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
                             String responseStr = response.body().string();
                             if(response.isSuccessful())
                             {
-                                Log.i(TAG, "查询围栏的响应内容:" + responseStr);
+                                Log.i(TAG, "查询围栏成功:" + responseStr);
                                 Message message = handler.obtainMessage(MESSAGE_FENCE_QUERY_RESPONSE_SUCCESS, responseStr);
                                 handler.sendMessage(message);
                             }
                             else
                             {
-                                Log.e(TAG, "查询围栏的响应异常:" + responseStr);
+                                Log.e(TAG, "查询围栏失败:" + responseStr);
                                 Message message = handler.obtainMessage(MESSAGE_FENCE_QUERY_RESPONSE_FAIL, responseStr);
                                 handler.sendMessage(message);
                             }
