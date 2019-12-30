@@ -134,20 +134,17 @@ public class MapFragment_Setting extends Fragment implements View.OnClickListene
                     hexStrSecond = "0000002904" + stringBuffer.toString();
                     if(m_deviceInfo.getM_type().contains("铱星"))
                     {
-                        data =
-                                "YX," + m_deviceInfo.getM_deviceId() + ",02" + hexStartTime + hexStrSecond;
+                        data = "YX," + m_deviceInfo.getM_deviceId() + ",02" + hexStartTime + hexStrSecond;
                     }
                     else
                     {
-                        data =
-                                "GPRS," + m_deviceInfo.getM_deviceId() + ",02" + hexStartTime + hexStrSecond;
+                        data = "GPRS," + m_deviceInfo.getM_deviceId() + ",02" + hexStartTime + hexStrSecond;
                     }
                 }
                 //追踪模式
                 else if(m_radio3.isChecked())
                 {
-                    data = "GPRS," + m_deviceInfo.getM_deviceId() +
-                            ",020000000A040000000A0000000B0400000E10";
+                    data = "GPRS," + m_deviceInfo.getM_deviceId() + ",020000000A040000000A0000000B0400000E10";
                 }
                 if(!data.equals(""))
                 {
@@ -186,43 +183,6 @@ public class MapFragment_Setting extends Fragment implements View.OnClickListene
             mListener.onFragmentInteraction(uri);
         }
     }
-
-    public void InitView()
-    {
-        m_context = m_deviceSettingView.getContext();
-        URL = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/DeviceInfo/Update";
-        m_btnReturn = m_deviceSettingView.findViewById(R.id.btn_return_device_device_setting);
-        m_btnReturn.setOnClickListener(this::onClick);
-        m_btnSave = m_deviceSettingView.findViewById(R.id.btn_confirm_device_device_setting);
-        m_btnSave.setOnClickListener(this::onClick);
-        m_textView1 = m_deviceSettingView.findViewById(R.id.textView1_device_setting);
-        m_textView2 = m_deviceSettingView.findViewById(R.id.textView2_device_setting);
-        m_textView3 = m_deviceSettingView.findViewById(R.id.textView3_device_setting);
-        m_textView4 = m_deviceSettingView.findViewById(R.id.textView4_device_setting);
-        m_radio1 = m_deviceSettingView.findViewById(R.id.radio1_setting);
-        m_radio2 = m_deviceSettingView.findViewById(R.id.radio2_setting);
-        m_radio3 = m_deviceSettingView.findViewById(R.id.radio3_setting);
-        m_editText1 = m_deviceSettingView.findViewById(R.id.editText_upStart_device_setting);
-        m_editText1.setOnClickListener(this::onClick);
-        m_editText2 = m_deviceSettingView.findViewById(R.id.editText_upForMinute_device_setting);
-        m_editText3 = m_deviceSettingView.findViewById(R.id.editText_upForHour_device_setting);
-        if(null != m_deviceInfo)
-        {
-            m_textView1.setText(m_deviceInfo.getM_name());
-            m_textView2.setText(m_deviceInfo.getM_deviceId());
-            m_textView3.setText(m_deviceInfo.getM_sim());
-            m_textView4.setText("");
-            if(m_deviceInfo.getM_type().contains("铱星"))
-            {
-                m_radio3.setEnabled(false);
-            }
-            else
-            {
-                m_radio3.setEnabled(true);
-            }
-        }
-    }
-
 
     private Handler handler = new Handler()
     {
@@ -311,7 +271,38 @@ public class MapFragment_Setting extends Fragment implements View.OnClickListene
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         m_deviceSettingView = inflater.inflate(R.layout.fragment_map_device_setting, container, false);
-        InitView();
+        m_context = m_deviceSettingView.getContext();
+        URL = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/DeviceInfo/Update";
+        m_btnReturn = m_deviceSettingView.findViewById(R.id.btn_return_device_device_setting);
+        m_btnReturn.setOnClickListener(this::onClick);
+        m_btnSave = m_deviceSettingView.findViewById(R.id.btn_confirm_device_device_setting);
+        m_btnSave.setOnClickListener(this::onClick);
+        m_textView1 = m_deviceSettingView.findViewById(R.id.textView1_device_setting);
+        m_textView2 = m_deviceSettingView.findViewById(R.id.textView2_device_setting);
+        m_textView3 = m_deviceSettingView.findViewById(R.id.textView3_device_setting);
+        m_textView4 = m_deviceSettingView.findViewById(R.id.textView4_device_setting);
+        m_radio1 = m_deviceSettingView.findViewById(R.id.radio1_setting);
+        m_radio2 = m_deviceSettingView.findViewById(R.id.radio2_setting);
+        m_radio3 = m_deviceSettingView.findViewById(R.id.radio3_setting);
+        m_editText1 = m_deviceSettingView.findViewById(R.id.editText_upStart_device_setting);
+        m_editText1.setOnClickListener(this::onClick);
+        m_editText2 = m_deviceSettingView.findViewById(R.id.editText_upForMinute_device_setting);
+        m_editText3 = m_deviceSettingView.findViewById(R.id.editText_upForHour_device_setting);
+        if(null != m_deviceInfo)
+        {
+            m_textView1.setText(m_deviceInfo.getM_name());
+            m_textView2.setText(m_deviceInfo.getM_deviceId());
+            m_textView3.setText(m_deviceInfo.getM_sim());
+            m_textView4.setText("");
+            if(m_deviceInfo.getM_type().contains("铱星"))
+            {
+                m_radio3.setEnabled(false);
+            }
+            else
+            {
+                m_radio3.setEnabled(true);
+            }
+        }
         return m_deviceSettingView;
     }
 

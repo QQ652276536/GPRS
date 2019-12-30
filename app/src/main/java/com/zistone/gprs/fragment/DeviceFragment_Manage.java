@@ -75,17 +75,6 @@ public class DeviceFragment_Manage extends Fragment implements View.OnClickListe
         }
     }
 
-    public void InitView()
-    {
-        m_context = m_deviceView.getContext();
-        m_btn_canUse = m_deviceView.findViewById(R.id.btn_canuse_manager);
-        m_btn_canUse.setOnClickListener(this);
-        m_btn_notUse = m_deviceView.findViewById(R.id.btn_not_use_manager);
-        m_btn_notUse.setOnClickListener(this);
-        m_btn_add = m_deviceView.findViewById(R.id.btn_add_manager);
-        m_btn_add.setOnClickListener(this);
-    }
-
     @Override
     public void onActivityCreated(Bundle savedInstanceState)
     {
@@ -105,7 +94,14 @@ public class DeviceFragment_Manage extends Fragment implements View.OnClickListe
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         m_deviceView = inflater.inflate(R.layout.fragment_device_manage, container, false);
-        InitView();
+
+        m_context = m_deviceView.getContext();
+        m_btn_canUse = m_deviceView.findViewById(R.id.btn_canuse_manager);
+        m_btn_canUse.setOnClickListener(this);
+        m_btn_notUse = m_deviceView.findViewById(R.id.btn_not_use_manager);
+        m_btn_notUse.setOnClickListener(this);
+        m_btn_add = m_deviceView.findViewById(R.id.btn_add_manager);
+        m_btn_add.setOnClickListener(this);
         return m_deviceView;
     }
 

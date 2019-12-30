@@ -46,14 +46,6 @@ public class DeviceFragment extends Fragment
         }
     }
 
-    public void InitView()
-    {
-        m_context = getContext();
-        //注意:一个FragmentTransaction只能Commit一次,不要用全局或共享一个FragmentTransaction对象,多个Fragment则多次get
-        DeviceFragment_Manage deviceFragment_manage = DeviceFragment_Manage.newInstance("", "");
-        getChildFragmentManager().beginTransaction().add(R.id.fragment_current_device, deviceFragment_manage, "deviceFragment_manage").show(deviceFragment_manage).commitNow();
-    }
-
     @Override
     public void onActivityCreated(Bundle savedInstanceState)
     {
@@ -73,7 +65,11 @@ public class DeviceFragment extends Fragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         m_deviceView = inflater.inflate(R.layout.fragment_device, container, false);
-        InitView();
+
+        m_context = getContext();
+        //注意:一个FragmentTransaction只能Commit一次,不要用全局或共享一个FragmentTransaction对象,多个Fragment则多次get
+        DeviceFragment_Manage deviceFragment_manage = DeviceFragment_Manage.newInstance("", "");
+        getChildFragmentManager().beginTransaction().add(R.id.fragment_current_device, deviceFragment_manage, "deviceFragment_manage").show(deviceFragment_manage).commitNow();
         return m_deviceView;
     }
 

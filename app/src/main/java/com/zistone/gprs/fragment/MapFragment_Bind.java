@@ -91,25 +91,6 @@ public class MapFragment_Bind extends Fragment implements View.OnClickListener
         }
     }
 
-    public void InitView()
-    {
-        m_context = m_deviceBindView.getContext();
-        URL = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/DeviceInfo/Update";
-        m_btnReturn = m_deviceBindView.findViewById(R.id.btn_return_device_bind);
-        m_btnReturn.setOnClickListener(this::onClick);
-        m_textView1 = m_deviceBindView.findViewById(R.id.textView1_bind);
-        m_textView2 = m_deviceBindView.findViewById(R.id.textView2_bind);
-        m_textView3 = m_deviceBindView.findViewById(R.id.textView3_bind);
-        m_textView4 = m_deviceBindView.findViewById(R.id.textView4_bind);
-        if(null != m_deviceInfo)
-        {
-            m_textView1.setText(m_deviceInfo.getM_name());
-            m_textView2.setText("");
-            m_textView3.setText(m_deviceInfo.getM_deviceId());
-            m_textView4.setText(m_deviceInfo.getM_sim());
-        }
-    }
-
     private Handler handler = new Handler()
     {
         @Override
@@ -212,7 +193,21 @@ public class MapFragment_Bind extends Fragment implements View.OnClickListener
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         m_deviceBindView = inflater.inflate(R.layout.fragment_map_device_bind, container, false);
-        InitView();
+        m_context = m_deviceBindView.getContext();
+        URL = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/DeviceInfo/Update";
+        m_btnReturn = m_deviceBindView.findViewById(R.id.btn_return_device_bind);
+        m_btnReturn.setOnClickListener(this::onClick);
+        m_textView1 = m_deviceBindView.findViewById(R.id.textView1_bind);
+        m_textView2 = m_deviceBindView.findViewById(R.id.textView2_bind);
+        m_textView3 = m_deviceBindView.findViewById(R.id.textView3_bind);
+        m_textView4 = m_deviceBindView.findViewById(R.id.textView4_bind);
+        if(null != m_deviceInfo)
+        {
+            m_textView1.setText(m_deviceInfo.getM_name());
+            m_textView2.setText("");
+            m_textView3.setText(m_deviceInfo.getM_deviceId());
+            m_textView4.setText(m_deviceInfo.getM_sim());
+        }
         return m_deviceBindView;
     }
 

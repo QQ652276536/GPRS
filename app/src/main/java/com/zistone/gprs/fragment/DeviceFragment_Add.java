@@ -228,23 +228,6 @@ public class DeviceFragment_Add extends Fragment implements View.OnClickListener
         }
     }
 
-    public void InitView()
-    {
-        m_context = getContext();
-        URL = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/DeviceInfo/InsertByDeviceId";
-        m_btnReturn = m_addDeviceView.findViewById(R.id.btn_return_device_add);
-        m_btnReturn.setOnClickListener(this);
-        m_editText_deviceName = m_addDeviceView.findViewById(R.id.editText_deviceName_add);
-        m_editText_deviceType = m_addDeviceView.findViewById(R.id.editText_deviceType_add);
-        m_editText_deviceId = m_addDeviceView.findViewById(R.id.editText_deviceID_add);
-        m_editText_simNumber = m_addDeviceView.findViewById(R.id.editText_sim_number_add);
-        m_editText_comment = m_addDeviceView.findViewById(R.id.editText_comment_add);
-        m_switch_state = m_addDeviceView.findViewById(R.id.switch_state_add);
-        m_progressBar = m_addDeviceView.findViewById(R.id.progressBar_add);
-        m_btnSave = m_addDeviceView.findViewById(R.id.btn_save_add);
-        m_btnSave.setOnClickListener(this);
-    }
-
     @Override
     public void onActivityCreated(Bundle savedInstanceState)
     {
@@ -264,7 +247,20 @@ public class DeviceFragment_Add extends Fragment implements View.OnClickListener
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         m_addDeviceView = inflater.inflate(R.layout.fragment_device_add, container, false);
-        InitView();
+
+        m_context = getContext();
+        URL = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/DeviceInfo/InsertByDeviceId";
+        m_btnReturn = m_addDeviceView.findViewById(R.id.btn_return_device_add);
+        m_btnReturn.setOnClickListener(this);
+        m_editText_deviceName = m_addDeviceView.findViewById(R.id.editText_deviceName_add);
+        m_editText_deviceType = m_addDeviceView.findViewById(R.id.editText_deviceType_add);
+        m_editText_deviceId = m_addDeviceView.findViewById(R.id.editText_deviceID_add);
+        m_editText_simNumber = m_addDeviceView.findViewById(R.id.editText_sim_number_add);
+        m_editText_comment = m_addDeviceView.findViewById(R.id.editText_comment_add);
+        m_switch_state = m_addDeviceView.findViewById(R.id.switch_state_add);
+        m_progressBar = m_addDeviceView.findViewById(R.id.progressBar_add);
+        m_btnSave = m_addDeviceView.findViewById(R.id.btn_save_add);
+        m_btnSave.setOnClickListener(this);
         return m_addDeviceView;
     }
 

@@ -46,14 +46,6 @@ public class MapFragment extends Fragment
         }
     }
 
-    public void InitView()
-    {
-        m_context = getContext();
-        //注意:一个FragmentTransaction只能Commit一次,不要用全局或共享一个FragmentTransaction对象,多个Fragment则多次get
-        MapFragment_Map mapFragment_map = MapFragment_Map.newInstance(null);
-        getChildFragmentManager().beginTransaction().add(R.id.fragment_current_map, mapFragment_map, "mapFragment_map").show(mapFragment_map).commitNow();
-    }
-
     @Override
     public void onActivityCreated(Bundle savedInstanceState)
     {
@@ -73,7 +65,10 @@ public class MapFragment extends Fragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         m_mapView = inflater.inflate(R.layout.fragment_map, container, false);
-        InitView();
+        m_context = getContext();
+        //注意:一个FragmentTransaction只能Commit一次,不要用全局或共享一个FragmentTransaction对象,多个Fragment则多次get
+        MapFragment_Map mapFragment_map = MapFragment_Map.newInstance(null);
+        getChildFragmentManager().beginTransaction().add(R.id.fragment_current_map, mapFragment_map, "mapFragment_map").show(mapFragment_map).commitNow();
         return m_mapView;
     }
 

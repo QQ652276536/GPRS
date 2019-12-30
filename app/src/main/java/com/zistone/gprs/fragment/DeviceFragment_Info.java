@@ -172,43 +172,6 @@ public class DeviceFragment_Info extends Fragment implements View.OnClickListene
         }
     }
 
-    public void InitView()
-    {
-        m_context = m_deviceInfoView.getContext();
-        URL = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/DeviceInfo/Update";
-        m_btnReturn = m_deviceInfoView.findViewById(R.id.btn_return_device_info);
-        m_btnReturn.setOnClickListener(this::onClick);
-        m_toolbartextView = m_deviceInfoView.findViewById(R.id.textView_toolbar_device_info);
-        m_btnConfirm = m_deviceInfoView.findViewById(R.id.btn_confirm_device_info);
-        m_btnConfirm.setOnClickListener(this::onClick);
-        m_editText1 = m_deviceInfoView.findViewById(R.id.editText1_device_info);
-        m_editText2 = m_deviceInfoView.findViewById(R.id.editText2_device_info);
-        m_editText3 = m_deviceInfoView.findViewById(R.id.editText3_device_info);
-        m_editText4 = m_deviceInfoView.findViewById(R.id.editText4_device_info);
-        m_editText5 = m_deviceInfoView.findViewById(R.id.editText5_device_info);
-        m_switch = m_deviceInfoView.findViewById(R.id.switch_device_info);
-        if(null != m_deviceInfo)
-        {
-            m_editText1.setText(m_deviceInfo.getM_name());
-            m_editText2.setText(m_deviceInfo.getM_type());
-            m_editText3.setText(m_deviceInfo.getM_deviceId());
-            m_editText4.setText(m_deviceInfo.getM_sim());
-            m_editText5.setText(m_deviceInfo.getM_comment());
-            switch(m_deviceInfo.getM_state())
-            {
-                case 0:
-                    m_switch.setChecked(false);
-                    break;
-                case 1:
-                    m_switch.setChecked(true);
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
-
-
     private Handler handler = new Handler()
     {
         @Override
@@ -266,7 +229,38 @@ public class DeviceFragment_Info extends Fragment implements View.OnClickListene
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         m_deviceInfoView = inflater.inflate(R.layout.fragment_device_info, container, false);
-        InitView();
+        m_context = m_deviceInfoView.getContext();
+        URL = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/DeviceInfo/Update";
+        m_btnReturn = m_deviceInfoView.findViewById(R.id.btn_return_device_info);
+        m_btnReturn.setOnClickListener(this::onClick);
+        m_toolbartextView = m_deviceInfoView.findViewById(R.id.textView_toolbar_device_info);
+        m_btnConfirm = m_deviceInfoView.findViewById(R.id.btn_confirm_device_info);
+        m_btnConfirm.setOnClickListener(this::onClick);
+        m_editText1 = m_deviceInfoView.findViewById(R.id.editText1_device_info);
+        m_editText2 = m_deviceInfoView.findViewById(R.id.editText2_device_info);
+        m_editText3 = m_deviceInfoView.findViewById(R.id.editText3_device_info);
+        m_editText4 = m_deviceInfoView.findViewById(R.id.editText4_device_info);
+        m_editText5 = m_deviceInfoView.findViewById(R.id.editText5_device_info);
+        m_switch = m_deviceInfoView.findViewById(R.id.switch_device_info);
+        if(null != m_deviceInfo)
+        {
+            m_editText1.setText(m_deviceInfo.getM_name());
+            m_editText2.setText(m_deviceInfo.getM_type());
+            m_editText3.setText(m_deviceInfo.getM_deviceId());
+            m_editText4.setText(m_deviceInfo.getM_sim());
+            m_editText5.setText(m_deviceInfo.getM_comment());
+            switch(m_deviceInfo.getM_state())
+            {
+                case 0:
+                    m_switch.setChecked(false);
+                    break;
+                case 1:
+                    m_switch.setChecked(true);
+                    break;
+                default:
+                    break;
+            }
+        }
         return m_deviceInfoView;
     }
 

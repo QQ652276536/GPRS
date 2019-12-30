@@ -58,6 +58,7 @@ public class MapFragment_TrackQuery extends Fragment implements View.OnClickList
     private Context m_context;
     private View m_trackQueryView;
     private ImageButton m_btnReturn;
+    private Button m_btnQuery;
     private OnFragmentInteractionListener mListener;
     private DeviceInfo m_deviceInfo;
     private EditText m_editBegin;
@@ -111,14 +112,7 @@ public class MapFragment_TrackQuery extends Fragment implements View.OnClickList
                 getFragmentManager().beginTransaction().replace(R.id.fragment_current_map, mapFragment_map, "mapFragment_map").commitNow();
                 break;
             case R.id.btn_query_trackQuery:
-                try
-                {
-                    QueryHistoryTrack();
-                }
-                catch(ParseException e)
-                {
-                    e.printStackTrace();
-                }
+                QueryHistoryTrack();
                 break;
         }
     }
@@ -137,25 +131,6 @@ public class MapFragment_TrackQuery extends Fragment implements View.OnClickList
         {
             mListener.onFragmentInteraction(uri);
         }
-    }
-
-    public void InitView()
-    {
-        m_context = getContext();
-        URL = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/LocationInfo/FindByDeviceIdAndBetweenTime";
-        m_btnReturn = m_trackQueryView.findViewById(R.id.btn_return_trackQuery);
-        m_btnReturn.setOnClickListener(this::onClick);
-        m_editBegin = m_trackQueryView.findViewById(R.id.editText_beginTime_trackQuery);
-        m_editBegin.setOnClickListener(this::onClick);
-        m_editBegin.setInputType(InputType.TYPE_NULL);
-        m_editend = m_trackQueryView.findViewById(R.id.editText_endTime_trackQuery);
-        m_editend.setOnClickListener(this::onClick);
-        m_editend.setInputType(InputType.TYPE_NULL);
-        m_mapUtil = MapUtil.getInstance();
-        m_mapUtil.init(m_trackQueryView.findViewById(R.id.mapView_trackQuery));
-        //设置地图中心
-        LatLng latLng = new LatLng(m_deviceInfo.getM_lat(), m_deviceInfo.getM_lot());
-        m_mapUtil.UpdateStatus(latLng, false, m_context);
     }
 
     private Handler handler = new Handler()
@@ -206,20 +181,26 @@ public class MapFragment_TrackQuery extends Fragment implements View.OnClickList
         }
     };
 
-    private void QueryHistoryTrack() throws ParseException
+    private void QueryHistoryTrack()
     {
-        Date startDate;
-        Date endDate;
+        Date startDate = null;
+        Date endDate = null;
         try
         {
             m_startStr = m_editBegin.getText() + " 00:00:00";
             startDate = SIMPLEDATEFORMAT.parse(m_startStr);
         }
-        catch(Exception e)
+        catch(ParseException e)
         {
-            m_startStr = "2019-01-01 00:00:00";
-            startDate = SIMPLEDATEFORMAT.parse(m_startStr);
-            e.printStackTrace();
+            try
+            {
+                m_startStr = "2019-01-01 00:00:00";
+                startDate = SIMPLEDATEFORMAT.parse(m_startStr);
+            }
+            catch(ParseException e1)
+            {
+                e1.printStackTrace();
+            }
         }
         try
         {
@@ -228,9 +209,15 @@ public class MapFragment_TrackQuery extends Fragment implements View.OnClickList
         }
         catch(Exception e)
         {
-            m_endStr = SIMPLEDATEFORMAT_YMD.format(new Date()) + " 23:59:59";
-            endDate = SIMPLEDATEFORMAT.parse(m_endStr);
-            e.printStackTrace();
+            try
+            {
+                m_endStr = SIMPLEDATEFORMAT_YMD.format(new Date()) + " 23:59:59";
+                endDate = SIMPLEDATEFORMAT.parse(m_endStr);
+            }
+            catch(ParseException e1)
+            {
+                e1.printStackTrace();
+            }
         }
         Date finalStartDate = startDate;
         Date finalEndDate = endDate;
@@ -300,7 +287,24 @@ public class MapFragment_TrackQuery extends Fragment implements View.OnClickList
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         m_trackQueryView = inflater.inflate(R.layout.fragment_map_track_query, container, false);
-        InitView();
+
+        m_context = getContext();
+        URL = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/LocationInfo/FindByDeviceIdAndBetweenTime";
+        m_btnReturn = m_trackQueryView.findViewById(R.id.btn_return_trackQuery);
+        m_btnReturn.setOnClickListener(this::onClick);
+        m_btnQuery = m_trackQueryView.findViewById(R.id.btn_query_trackQuery);
+        m_btnQuery.setOnClickListener(this::onClick);
+        m_editBegin = m_trackQueryView.findViewById(R.id.editText_beginTime_trackQuery);
+        m_editBegin.setOnClickListener(this::onClick);
+        m_editBegin.setInputType(InputType.TYPE_NULL);
+        m_editend = m_trackQueryView.findViewById(R.id.editText_endTime_trackQuery);
+        m_editend.setOnClickListener(this::onClick);
+        m_editend.setInputType(InputType.TYPE_NULL);
+        m_mapUtil = MapUtil.getInstance();
+        m_mapUtil.init(m_trackQueryView.findViewById(R.id.mapView_trackQuery));
+        //设置地图中心
+        LatLng latLng = new LatLng(m_deviceInfo.getM_lat(), m_deviceInfo.getM_lot());
+        m_mapUtil.UpdateStatus(latLng, false, m_context);
         return m_trackQueryView;
     }
 

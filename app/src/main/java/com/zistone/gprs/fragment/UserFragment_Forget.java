@@ -38,15 +38,6 @@ public class UserFragment_Forget extends Fragment implements View.OnClickListene
         return fragment;
     }
 
-    private void InitView()
-    {
-        m_context = getContext();
-        URL = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/UserInfo/Forget";
-        m_toolbar = m_forgetView.findViewById(R.id.toolbar_forget);
-        m_btnReturn = m_forgetView.findViewById(R.id.btn_return_forget);
-        m_btnReturn.setOnClickListener(this);
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
@@ -62,7 +53,12 @@ public class UserFragment_Forget extends Fragment implements View.OnClickListene
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         m_forgetView = inflater.inflate(R.layout.fragment_user_forget, container, false);
-        InitView();
+
+        m_context = getContext();
+        URL = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/UserInfo/Forget";
+        m_toolbar = m_forgetView.findViewById(R.id.toolbar_forget);
+        m_btnReturn = m_forgetView.findViewById(R.id.btn_return_forget);
+        m_btnReturn.setOnClickListener(this);
         return m_forgetView;
     }
 

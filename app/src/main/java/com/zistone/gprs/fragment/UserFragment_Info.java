@@ -353,41 +353,6 @@ public class UserFragment_Info extends Fragment implements View.OnClickListener,
         }).start();
     }
 
-    private void InitView()
-    {
-        m_context = m_userInfoView.getContext();
-        URL = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/UserInfo/Update";
-        m_editText_userName = m_userInfoView.findViewById(R.id.editText_userName_userInfo);
-        m_editText_userRealName = m_userInfoView.findViewById(R.id.editText_userRealName_userInfo);
-        m_editText_userRealName.setOnFocusChangeListener(this);
-        m_editText_userPhone = m_userInfoView.findViewById(R.id.editText_userPhone_userInfo);
-        m_editText_userPhone.setOnFocusChangeListener(this);
-        m_editText_password = m_userInfoView.findViewById(R.id.editText_password_userInfo);
-        m_editText_password.setOnFocusChangeListener(this);
-        m_editText_rePassword = m_userInfoView.findViewById(R.id.editText_rePassword_userInfo);
-        m_editText_rePassword.setOnFocusChangeListener(this);
-        m_btnUpdate = m_userInfoView.findViewById(R.id.btnUpdate_userInfo);
-        m_btnUpdate.setOnClickListener(this);
-        m_btnLogout = m_userInfoView.findViewById(R.id.btnLogout_userInfo);
-        m_btnLogout.setOnClickListener(this);
-        m_imageView = m_userInfoView.findViewById(R.id.imageView);
-        m_imageView.setOnClickListener(this);
-        m_progressBar = m_userInfoView.findViewById(R.id.progressBar_updateUserInfo);
-        //动态获取权限
-        RequestPermission();
-        //显示用户基本信息
-        String imageStr = UserSharedPreference.GetUserImage(m_context);
-        if(null != imageStr && !"".equals(imageStr))
-        {
-            byte[] bytes = Base64.decode(imageStr, Base64.DEFAULT);
-            Bitmap bitmap = ImageUtil.ByteArrayToBitmap(bytes);
-            m_imageView.setImageBitmap(bitmap);
-        }
-        m_editText_userName.setText(UserSharedPreference.GetUserName(m_context));
-        m_editText_userRealName.setText(UserSharedPreference.GetRealName(m_context));
-        m_editText_userPhone.setText(UserSharedPreference.GetPhone(m_context));
-    }
-
     public interface OnFragmentInteractionListener
     {
         void onFragmentInteraction(Uri uri);
@@ -462,7 +427,37 @@ public class UserFragment_Info extends Fragment implements View.OnClickListener,
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         m_userInfoView = inflater.inflate(R.layout.fragment_user_info, container, false);
-        InitView();
+        m_context = m_userInfoView.getContext();
+        URL = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/UserInfo/Update";
+        m_editText_userName = m_userInfoView.findViewById(R.id.editText_userName_userInfo);
+        m_editText_userRealName = m_userInfoView.findViewById(R.id.editText_userRealName_userInfo);
+        m_editText_userRealName.setOnFocusChangeListener(this);
+        m_editText_userPhone = m_userInfoView.findViewById(R.id.editText_userPhone_userInfo);
+        m_editText_userPhone.setOnFocusChangeListener(this);
+        m_editText_password = m_userInfoView.findViewById(R.id.editText_password_userInfo);
+        m_editText_password.setOnFocusChangeListener(this);
+        m_editText_rePassword = m_userInfoView.findViewById(R.id.editText_rePassword_userInfo);
+        m_editText_rePassword.setOnFocusChangeListener(this);
+        m_btnUpdate = m_userInfoView.findViewById(R.id.btnUpdate_userInfo);
+        m_btnUpdate.setOnClickListener(this);
+        m_btnLogout = m_userInfoView.findViewById(R.id.btnLogout_userInfo);
+        m_btnLogout.setOnClickListener(this);
+        m_imageView = m_userInfoView.findViewById(R.id.imageView);
+        m_imageView.setOnClickListener(this);
+        m_progressBar = m_userInfoView.findViewById(R.id.progressBar_updateUserInfo);
+        //动态获取权限
+        RequestPermission();
+        //显示用户基本信息
+        String imageStr = UserSharedPreference.GetUserImage(m_context);
+        if(null != imageStr && !"".equals(imageStr))
+        {
+            byte[] bytes = Base64.decode(imageStr, Base64.DEFAULT);
+            Bitmap bitmap = ImageUtil.ByteArrayToBitmap(bytes);
+            m_imageView.setImageBitmap(bitmap);
+        }
+        m_editText_userName.setText(UserSharedPreference.GetUserName(m_context));
+        m_editText_userRealName.setText(UserSharedPreference.GetRealName(m_context));
+        m_editText_userPhone.setText(UserSharedPreference.GetPhone(m_context));
         return m_userInfoView;
     }
 

@@ -36,25 +36,6 @@ public class UserFragment extends Fragment
         return fragment;
     }
 
-    private void InitView()
-    {
-        m_context = getContext();
-        //注意:一个FragmentTransaction只能Commit一次,不要用全局或共享一个FragmentTransaction对象,多个Fragment则多次get
-        //已经登录过则显示用户信息页面,否则显示登录页面
-        int id = UserSharedPreference.GetUserId(m_context);
-        int state = UserSharedPreference.GetState(m_context);
-        if (id != 0 && 1 == state)
-        {
-            UserFragment_Info userFragment_info = UserFragment_Info.newInstance("", "");
-            getChildFragmentManager().beginTransaction().add(R.id.fragment_current_user, userFragment_info, "userFragment_info").show(userFragment_info).commitNow();
-        }
-        else
-        {
-            UserFragment_Login userFragment_login = UserFragment_Login.newInstance("", "");
-            getChildFragmentManager().beginTransaction().add(R.id.fragment_current_user, userFragment_login, "userFragment_login").show(userFragment_login).commitNow();
-        }
-    }
-
     public interface OnFragmentInteractionListener
     {
         void onFragmentInteraction(Uri uri);
@@ -97,7 +78,21 @@ public class UserFragment extends Fragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         m_userView = inflater.inflate(R.layout.fragment_user, container, false);
-        InitView();
+        m_context = getContext();
+        //注意:一个FragmentTransaction只能Commit一次,不要用全局或共享一个FragmentTransaction对象,多个Fragment则多次get
+        //已经登录过则显示用户信息页面,否则显示登录页面
+        int id = UserSharedPreference.GetUserId(m_context);
+        int state = UserSharedPreference.GetState(m_context);
+        if (id != 0 && 1 == state)
+        {
+            UserFragment_Info userFragment_info = UserFragment_Info.newInstance("", "");
+            getChildFragmentManager().beginTransaction().add(R.id.fragment_current_user, userFragment_info, "userFragment_info").show(userFragment_info).commitNow();
+        }
+        else
+        {
+            UserFragment_Login userFragment_login = UserFragment_Login.newInstance("", "");
+            getChildFragmentManager().beginTransaction().add(R.id.fragment_current_user, userFragment_login, "userFragment_login").show(userFragment_login).commitNow();
+        }
         return m_userView;
     }
 

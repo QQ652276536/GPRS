@@ -81,47 +81,6 @@ public class UserFragment_Register extends Fragment implements View.OnClickListe
         return fragment;
     }
 
-    /**
-     * 停止Fragment时被回调
-     */
-    @Override
-    public void onStop()
-    {
-        super.onStop();
-    }
-
-    /**
-     * 创建Fragment时回调,只会被调用一次
-     *
-     * @param savedInstanceState
-     */
-    @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
-        super.onCreate(savedInstanceState);
-        if(getArguments() != null)
-        {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
-
-    /**
-     * 绘制Fragment组件时回调
-     *
-     * @param inflater
-     * @param container
-     * @param savedInstanceState
-     * @return
-     */
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
-    {
-        m_registerView = inflater.inflate(R.layout.fragment_user_register, container, false);
-        InitView();
-        return m_registerView;
-    }
-
     public void onButtonPressed(Uri uri)
     {
         if(mListener != null)
@@ -130,28 +89,158 @@ public class UserFragment_Register extends Fragment implements View.OnClickListe
         }
     }
 
-    @Override
-    public void onAttach(Context context)
+    public interface OnFragmentInteractionListener
     {
-        super.onAttach(context);
-        if(context instanceof OnFragmentInteractionListener)
+        void onFragmentInteraction(Uri uri);
+    }
+
+    private Handler handler = new Handler()
+    {
+        @Override
+        public void handleMessage(Message message)
         {
-            mListener = (OnFragmentInteractionListener) context;
+            super.handleMessage(message);
+            IsRegisterEd();
+            switch(message.what)
+            {
+                case MESSAGE_RREQUEST_FAIL:
+                {
+                    String result = (String) message.obj;
+                    Toast.makeText(m_context, "注册超时,请检查网络环境", Toast.LENGTH_SHORT).show();
+                    break;
+                }
+                case MESSAGE_RESPONSE_SUCCESS:
+                {
+                    String result = (String) message.obj;
+                    UserInfo userInfo = JSON.parseObject(result, UserInfo.class);
+                    RegisterResult(userInfo);
+                    break;
+                }
+                case MESSAGE_RESPONSE_FAIL:
+                {
+                    String result = (String) message.obj;
+                    Toast.makeText(m_context, "注册失败,请与管理员联系", Toast.LENGTH_SHORT).show();
+                    break;
+                }
+                default:
+                    break;
+            }
+        }
+    };
+
+    private void SendWithOkHttp()
+    {
+        new Thread(() ->
+        {
+            Looper.prepare();
+            UserInfo userInfo = new UserInfo();
+            userInfo.setM_realName(m_editText_userRealName.getText().toString());
+            userInfo.setM_userName(m_editText_userName.getText().toString());
+            userInfo.setM_phoneNumber(m_editText_userPhone.getText().toString());
+            userInfo.setM_password(m_editText_rePassword.getText().toString());
+            userInfo.setM_state(1);
+            userInfo.setM_level(1);
+            String jsonData = JSON.toJSONString(userInfo);
+            //实例化并设置连接超时时间、读取超时时间
+            OkHttpClient okHttpClient = new OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS).readTimeout(10, TimeUnit.SECONDS).build();
+            RequestBody requestBody = FormBody.create(jsonData, MediaType.parse("application/json; charset=utf-8"));
+            Request request = new Request.Builder().post(requestBody).url(URL).build();
+            Call call = okHttpClient.newCall(request);
+            //Android中不允许任何网络的交互在主线程中进行
+            call.enqueue(new Callback()
+            {
+                @Override
+                public void onFailure(@NotNull Call call, @NotNull IOException e)
+                {
+                    Log.e(TAG, "注册失败:" + e.toString());
+                    Message message = handler.obtainMessage(MESSAGE_RREQUEST_FAIL, "请求失败:" + e.toString());
+                    handler.sendMessage(message);
+                }
+
+                //获得请求响应的字符串:response.body().string()该方法只能被调用一次!另:toString()返回的是对象地址
+                //获得请求响应的二进制字节数组:response.body().bytes()
+                //获得请求响应的inputStream:response.body().byteStream()
+                @Override
+                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException
+                {
+                    String result = response.body().string();
+                    if(response.isSuccessful())
+                    {
+                        Log.i(TAG, "注册成功:" + result);
+                        Message message = handler.obtainMessage(MESSAGE_RESPONSE_SUCCESS, result);
+                        handler.sendMessage(message);
+                    }
+                    else
+                    {
+                        Log.e(TAG, "注册失败:" + result);
+                        Message message = handler.obtainMessage(MESSAGE_RESPONSE_FAIL, result);
+                        handler.sendMessage(message);
+                    }
+                }
+            });
+            Looper.loop();
+        }).start();
+    }
+
+    /**
+     * 注册成功与否
+     */
+    private void RegisterResult(UserInfo userInfo)
+    {
+        if(userInfo != null)
+        {
+            Log.i(TAG, "注册成功:用户ID是" + userInfo.getM_id());
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setPositiveButton("确定", (dialog, which) ->
+            {
+                dialog.dismiss();
+                UserFragment_Login userFragment_login = UserFragment_Login.newInstance("", "");
+                getFragmentManager().beginTransaction().replace(R.id.fragment_current_user, userFragment_login, "userFragment_login").commitNow();
+            });
+            builder.setMessage("注册成功,请牢记你的用户名" + userInfo.getM_userName() + "和密码!");
+            builder.show();
         }
         else
         {
-            throw new RuntimeException(context.toString() + " must implement OnFragmentInteractionListener");
+            Log.i(TAG, "注册失败:用户名已被注册");
+            Toast.makeText(m_context, "注册失败:用户名已被注册", Toast.LENGTH_SHORT).show();
         }
     }
 
     /**
-     * 该Fragment从Activity删除/替换时回调该方法,onDestroy()执行后一定会执行该方法,且只调用一次
+     * 注册完成,用于释放控件
      */
-    @Override
-    public void onDetach()
+    private void IsRegisterEd()
     {
-        super.onDetach();
-        mListener = null;
+        m_progressBar.setVisibility(View.INVISIBLE);
+        m_editText_userName.setEnabled(true);
+        m_editText_userRealName.setEnabled(true);
+        m_editText_userPhone.setEnabled(true);
+        m_editText_password.setEnabled(true);
+        m_editText_rePassword.setEnabled(true);
+        m_btnReturn.setEnabled(true);
+        m_btnRegister.setEnabled(true);
+    }
+
+    /**
+     * 正在注册,用于禁止控件
+     */
+    private void IsRegistering()
+    {
+        m_progressBar.setVisibility(View.VISIBLE);
+        m_editText_userName.setEnabled(false);
+        m_editText_userRealName.setEnabled(false);
+        m_editText_userPhone.setEnabled(false);
+        m_editText_password.setEnabled(false);
+        m_editText_rePassword.setEnabled(false);
+        //m_btnReturn.setEnabled(false);
+        m_btnRegister.setEnabled(false);
+    }
+
+    private void Register()
+    {
+        IsRegistering();
+        SendWithOkHttp();
     }
 
     @Override
@@ -322,162 +411,18 @@ public class UserFragment_Register extends Fragment implements View.OnClickListe
         }
     }
 
-    public interface OnFragmentInteractionListener
-    {
-        void onFragmentInteraction(Uri uri);
-    }
-
-    private Handler handler = new Handler()
-    {
-        @Override
-        public void handleMessage(Message message)
-        {
-            super.handleMessage(message);
-            IsRegisterEd();
-            switch(message.what)
-            {
-                case MESSAGE_RREQUEST_FAIL:
-                {
-                    String result = (String) message.obj;
-                    Toast.makeText(m_context, "注册超时,请检查网络环境", Toast.LENGTH_SHORT).show();
-                    break;
-                }
-                case MESSAGE_RESPONSE_SUCCESS:
-                {
-                    String result = (String) message.obj;
-                    UserInfo userInfo = JSON.parseObject(result, UserInfo.class);
-                    RegisterResult(userInfo);
-                    break;
-                }
-                case MESSAGE_RESPONSE_FAIL:
-                {
-                    String result = (String) message.obj;
-                    Toast.makeText(m_context, "注册失败,请与管理员联系", Toast.LENGTH_SHORT).show();
-                    break;
-                }
-                default:
-                    break;
-            }
-        }
-    };
-
-    private void SendWithOkHttp()
-    {
-        new Thread(() ->
-        {
-            Looper.prepare();
-            UserInfo userInfo = new UserInfo();
-            userInfo.setM_realName(m_editText_userRealName.getText().toString());
-            userInfo.setM_userName(m_editText_userName.getText().toString());
-            userInfo.setM_phoneNumber(m_editText_userPhone.getText().toString());
-            userInfo.setM_password(m_editText_rePassword.getText().toString());
-            userInfo.setM_state(1);
-            userInfo.setM_level(1);
-            String jsonData = JSON.toJSONString(userInfo);
-            //实例化并设置连接超时时间、读取超时时间
-            OkHttpClient okHttpClient = new OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS).readTimeout(10, TimeUnit.SECONDS).build();
-            RequestBody requestBody = FormBody.create(jsonData, MediaType.parse("application/json; charset=utf-8"));
-            Request request = new Request.Builder().post(requestBody).url(URL).build();
-            Call call = okHttpClient.newCall(request);
-            //Android中不允许任何网络的交互在主线程中进行
-            call.enqueue(new Callback()
-            {
-                @Override
-                public void onFailure(@NotNull Call call, @NotNull IOException e)
-                {
-                    Log.e(TAG, "注册失败:" + e.toString());
-                    Message message = handler.obtainMessage(MESSAGE_RREQUEST_FAIL, "请求失败:" + e.toString());
-                    handler.sendMessage(message);
-                }
-
-                //获得请求响应的字符串:response.body().string()该方法只能被调用一次!另:toString()返回的是对象地址
-                //获得请求响应的二进制字节数组:response.body().bytes()
-                //获得请求响应的inputStream:response.body().byteStream()
-                @Override
-                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException
-                {
-                    String result = response.body().string();
-                    if(response.isSuccessful())
-                    {
-                        Log.i(TAG, "注册成功:" + result);
-                        Message message = handler.obtainMessage(MESSAGE_RESPONSE_SUCCESS, result);
-                        handler.sendMessage(message);
-                    }
-                    else
-                    {
-                        Log.e(TAG, "注册失败:" + result);
-                        Message message = handler.obtainMessage(MESSAGE_RESPONSE_FAIL, result);
-                        handler.sendMessage(message);
-                    }
-                }
-            });
-            Looper.loop();
-        }).start();
-    }
-
     /**
-     * 注册成功与否
+     * 绘制Fragment组件时回调
+     *
+     * @param inflater
+     * @param container
+     * @param savedInstanceState
+     * @return
      */
-    private void RegisterResult(UserInfo userInfo)
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        if(userInfo != null)
-        {
-            Log.i(TAG, "注册成功:用户ID是" + userInfo.getM_id());
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setPositiveButton("确定", (dialog, which) ->
-            {
-                dialog.dismiss();
-                UserFragment_Login userFragment_login = UserFragment_Login.newInstance("", "");
-                getFragmentManager().beginTransaction().replace(R.id.fragment_current_user, userFragment_login, "userFragment_login").commitNow();
-            });
-            builder.setMessage("注册成功,请牢记你的用户名" + userInfo.getM_userName() + "和密码!");
-            builder.show();
-        }
-        else
-        {
-            Log.i(TAG, "注册失败:用户名已被注册");
-            Toast.makeText(m_context, "注册失败:用户名已被注册", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    /**
-     * 注册完成,用于释放控件
-     */
-    private void IsRegisterEd()
-    {
-        m_progressBar.setVisibility(View.INVISIBLE);
-        m_editText_userName.setEnabled(true);
-        m_editText_userRealName.setEnabled(true);
-        m_editText_userPhone.setEnabled(true);
-        m_editText_password.setEnabled(true);
-        m_editText_rePassword.setEnabled(true);
-        m_btnReturn.setEnabled(true);
-        m_btnRegister.setEnabled(true);
-    }
-
-    /**
-     * 正在注册,用于禁止控件
-     */
-    private void IsRegistering()
-    {
-        m_progressBar.setVisibility(View.VISIBLE);
-        m_editText_userName.setEnabled(false);
-        m_editText_userRealName.setEnabled(false);
-        m_editText_userPhone.setEnabled(false);
-        m_editText_password.setEnabled(false);
-        m_editText_rePassword.setEnabled(false);
-        //m_btnReturn.setEnabled(false);
-        m_btnRegister.setEnabled(false);
-    }
-
-    private void Register()
-    {
-        IsRegistering();
-        SendWithOkHttp();
-    }
-
-    private void InitView()
-    {
+        m_registerView = inflater.inflate(R.layout.fragment_user_register, container, false);
         m_context = m_registerView.getContext();
         URL = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/UserInfo/Register";
         m_editText_userName = m_registerView.findViewById(R.id.editTextUserName_register);
@@ -495,5 +440,56 @@ public class UserFragment_Register extends Fragment implements View.OnClickListe
         m_btnRegister = m_registerView.findViewById(R.id.btn_register_register);
         m_btnRegister.setOnClickListener(this);
         m_progressBar = m_registerView.findViewById(R.id.progressBar_register);
+        return m_registerView;
     }
+
+    /**
+     * 停止Fragment时被回调
+     */
+    @Override
+    public void onStop()
+    {
+        super.onStop();
+    }
+
+    /**
+     * 创建Fragment时回调,只会被调用一次
+     *
+     * @param savedInstanceState
+     */
+    @Override
+    public void onCreate(Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+        if(getArguments() != null)
+        {
+            mParam1 = getArguments().getString(ARG_PARAM1);
+            mParam2 = getArguments().getString(ARG_PARAM2);
+        }
+    }
+
+    @Override
+    public void onAttach(Context context)
+    {
+        super.onAttach(context);
+        if(context instanceof OnFragmentInteractionListener)
+        {
+            mListener = (OnFragmentInteractionListener) context;
+        }
+        else
+        {
+            throw new RuntimeException(context.toString() + " must implement OnFragmentInteractionListener");
+        }
+    }
+
+    /**
+     * 该Fragment从Activity删除/替换时回调该方法,onDestroy()执行后一定会执行该方法,且只调用一次
+     */
+    @Override
+    public void onDetach()
+    {
+        super.onDetach();
+        mListener = null;
+    }
+
 }

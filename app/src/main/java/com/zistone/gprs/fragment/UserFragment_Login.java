@@ -243,23 +243,6 @@ public class UserFragment_Login extends Fragment implements View.OnClickListener
         //m_loginTimer.schedule(loginTask, TIMEINTERVAL);
     }
 
-    private void InitView()
-    {
-        m_context = m_userView.getContext();
-        URL = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/UserInfo/Login";
-        m_editText_userName = m_userView.findViewById(R.id.editTextUserName_login);
-        m_editText_userName.setOnFocusChangeListener(this);
-        m_editText_password = m_userView.findViewById(R.id.editTextPassword_login);
-        m_editText_password.setOnFocusChangeListener(this);
-        m_btn_login = m_userView.findViewById(R.id.btn_login_login);
-        m_btn_login.setOnClickListener(this);
-        m_btn_register = m_userView.findViewById(R.id.btn_register_login);
-        m_btn_register.setOnClickListener(this);
-        m_btn_forget = m_userView.findViewById(R.id.btn_forget_login);
-        m_btn_forget.setOnClickListener(this);
-        m_progressBar = m_userView.findViewById(R.id.progressBar_login);
-    }
-
     @Override
     public void onActivityCreated(Bundle savedInstanceState)
     {
@@ -305,7 +288,19 @@ public class UserFragment_Login extends Fragment implements View.OnClickListener
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         m_userView = inflater.inflate(R.layout.fragment_user_login, container, false);
-        InitView();
+        m_context = m_userView.getContext();
+        URL = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/UserInfo/Login";
+        m_editText_userName = m_userView.findViewById(R.id.editTextUserName_login);
+        m_editText_userName.setOnFocusChangeListener(this);
+        m_editText_password = m_userView.findViewById(R.id.editTextPassword_login);
+        m_editText_password.setOnFocusChangeListener(this);
+        m_btn_login = m_userView.findViewById(R.id.btn_login_login);
+        m_btn_login.setOnClickListener(this);
+        m_btn_register = m_userView.findViewById(R.id.btn_register_login);
+        m_btn_register.setOnClickListener(this);
+        m_btn_forget = m_userView.findViewById(R.id.btn_forget_login);
+        m_btn_forget.setOnClickListener(this);
+        m_progressBar = m_userView.findViewById(R.id.progressBar_login);
         return m_userView;
     }
 
