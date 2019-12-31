@@ -31,28 +31,46 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="50dp"
+        android:background="@color/colorPrimary"
         android:orientation="horizontal">
 
-        <EditText
-            android:id="@+id/editText_beginTime_trackQuery"
+        <TextView
+            android:id="@+id/text_beginTime_trackQuery"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_weight="0.4"
-            android:hint="开始时间"
-            android:inputType="date" />
+            android:layout_weight="1"
+            android:gravity="center"
+            android:inputType="none"
+            android:text="开始时间"
+            android:textColor="@color/white"
+            android:textSize="16dp" />
 
-        <EditText
-            android:id="@+id/editText_endTime_trackQuery"
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_weight="0.4"
-            android:hint="结束时间"
-            android:inputType="date" />
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="至"
+            android:textColor="@color/white"
+            android:textSize="16dp" />
+
+        <TextView
+            android:id="@+id/text_endTime_trackQuery"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:inputType="none"
+            android:text="结束时间"
+            android:textColor="@color/white"
+            android:textSize="16dp" />
 
         <Button
             android:id="@+id/btn_query_trackQuery"
+            style="@style/ButtonStyleA"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"

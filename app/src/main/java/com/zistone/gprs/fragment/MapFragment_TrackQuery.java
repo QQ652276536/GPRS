@@ -17,6 +17,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
@@ -61,8 +62,8 @@ public class MapFragment_TrackQuery extends Fragment implements View.OnClickList
     private Button m_btnQuery;
     private OnFragmentInteractionListener mListener;
     private DeviceInfo m_deviceInfo;
-    private EditText m_editBegin;
-    private EditText m_editend;
+    private TextView m_textBegin;
+    private TextView m_textEnd;
     //地图工具
     private MapUtil m_mapUtil = null;
     //查询轨迹的开始时间
@@ -91,18 +92,18 @@ public class MapFragment_TrackQuery extends Fragment implements View.OnClickList
         imm.hideSoftInputFromWindow(v.getApplicationWindowToken(), 0);
         switch(v.getId())
         {
-            case R.id.editText_beginTime_trackQuery:
+            case R.id.text_beginTime_trackQuery:
             {
-                m_editend.clearFocus();
-                DatePickerDialog.OnDateSetListener onDateSetListener = (view, y, m, d) -> m_editBegin.setText(y + "-" + ++m + "-" + d);
+                DatePickerDialog.OnDateSetListener onDateSetListener =
+                        (view, y, m, d) -> m_textBegin.setText(y + "-" + ++m + "-" + d);
                 DatePickerDialog datePickerDialog = new DatePickerDialog(m_context, onDateSetListener, year, month, day);
                 datePickerDialog.show();
                 break;
             }
-            case R.id.editText_endTime_trackQuery:
+            case R.id.text_endTime_trackQuery:
             {
-                m_editBegin.clearFocus();
-                DatePickerDialog.OnDateSetListener onDateSetListener = (view, y, m, d) -> m_editend.setText(y + "-" + ++m + "-" + d);
+                DatePickerDialog.OnDateSetListener onDateSetListener =
+                        (view, y, m, d) -> m_textEnd.setText(y + "-" + ++m + "-" + d);
                 DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(), onDateSetListener, year, month, day);
                 datePickerDialog.show();
                 break;
@@ -187,7 +188,7 @@ public class MapFragment_TrackQuery extends Fragment implements View.OnClickList
         Date endDate = null;
         try
         {
-            m_startStr = m_editBegin.getText() + " 00:00:00";
+            m_startStr = m_textBegin.getText() + " 00:00:00";
             startDate = SIMPLEDATEFORMAT.parse(m_startStr);
         }
         catch(ParseException e)
@@ -204,7 +205,7 @@ public class MapFragment_TrackQuery extends Fragment implements View.OnClickList
         }
         try
         {
-            m_endStr = m_editend.getText() + " 23:59:59";
+            m_endStr = m_textEnd.getText() + " 23:59:59";
             endDate = SIMPLEDATEFORMAT.parse(m_endStr);
         }
         catch(Exception e)
@@ -294,12 +295,10 @@ public class MapFragment_TrackQuery extends Fragment implements View.OnClickList
         m_btnReturn.setOnClickListener(this::onClick);
         m_btnQuery = m_trackQueryView.findViewById(R.id.btn_query_trackQuery);
         m_btnQuery.setOnClickListener(this::onClick);
-        m_editBegin = m_trackQueryView.findViewById(R.id.editText_beginTime_trackQuery);
-        m_editBegin.setOnClickListener(this::onClick);
-        m_editBegin.setInputType(InputType.TYPE_NULL);
-        m_editend = m_trackQueryView.findViewById(R.id.editText_endTime_trackQuery);
-        m_editend.setOnClickListener(this::onClick);
-        m_editend.setInputType(InputType.TYPE_NULL);
+        m_textBegin = m_trackQueryView.findViewById(R.id.text_beginTime_trackQuery);
+        m_textBegin.setOnClickListener(this::onClick);
+        m_textEnd = m_trackQueryView.findViewById(R.id.text_endTime_trackQuery);
+        m_textEnd.setOnClickListener(this::onClick);
         m_mapUtil = MapUtil.getInstance();
         m_mapUtil.init(m_trackQueryView.findViewById(R.id.mapView_trackQuery));
         //设置地图中心
