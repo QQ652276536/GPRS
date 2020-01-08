@@ -153,7 +153,7 @@ public class DeviceFragment_Add extends Fragment implements View.OnClickListener
                 String sim = m_editText_simNumber.getText().toString();
                 String comment = m_editText_comment.getText().toString();
                 boolean state = m_switch_state.isChecked();
-                if (null == name || "".equals(name) || null == type || "".equals(type) || null == deviceId || "".equals(deviceId) || null == sim || "".equals(sim) || null == comment || "".equals(comment))
+                if (null == name || "".equals(name) || null == type || "".equals(type) || null == deviceId || "".equals(deviceId))
                 {
                     Toast.makeText(m_context, "请填写正确的设备信息", Toast.LENGTH_SHORT).show();
                     return;

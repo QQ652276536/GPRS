@@ -180,7 +180,10 @@ public class UserFragment_Info extends Fragment implements View.OnClickListener,
     {
         AlertDialog.Builder builder = new AlertDialog.Builder(m_context);
         builder.setTitle("设置头像");
-        String[] items = {"选择本地照片", "拍照"};
+        String[] items = {
+                "选择本地照片",
+                "拍照"
+        };
         builder.setNegativeButton("取消", null);
         builder.setItems(items, (dialog, which) ->
         {
@@ -222,7 +225,9 @@ public class UserFragment_Info extends Fragment implements View.OnClickListener,
             StrictMode.setVmPolicy(builder.build());
             ArrayList<String> permissionsList = new ArrayList<>();
             String[] permissions = {
-                    Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE
+                    Manifest.permission.CAMERA,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    Manifest.permission.READ_EXTERNAL_STORAGE
             };
             for(String perm : permissions)
             {

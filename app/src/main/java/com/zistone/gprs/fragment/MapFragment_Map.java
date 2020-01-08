@@ -628,8 +628,7 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
             {
                 for(Poi poi : poiList)
                 {
-                    Log.i(TAG, String.format(">>>%s\t%s\t%s", poi.getId(), poi.getName(),
-                            poi.getRank()));
+                    Log.i(TAG, String.format(">>>%s\t%s\t%s", poi.getId(), poi.getName(), poi.getRank()));
                 }
             }
             Log.i(TAG, ">>>" + sb.toString());
@@ -801,8 +800,15 @@ public class MapFragment_Map extends Fragment implements BaiduMap.OnMapClickList
             m_isPermissionRequested = true;
             ArrayList<String> permissionsList = new ArrayList<>();
             String[] permissions = {
-                    Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.INTERNET, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.WRITE_SETTINGS, Manifest.permission.ACCESS_WIFI_STATE,
-            };
+                    Manifest.permission.ACCESS_NETWORK_STATE,
+                    Manifest.permission.INTERNET,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.WRITE_SETTINGS,
+                    Manifest.permission.ACCESS_WIFI_STATE,
+                    };
             for(String perm : permissions)
             {
                 if(PackageManager.PERMISSION_GRANTED != m_context.checkSelfPermission(perm))
