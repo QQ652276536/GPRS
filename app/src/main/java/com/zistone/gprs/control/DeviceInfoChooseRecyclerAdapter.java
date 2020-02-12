@@ -6,27 +6,22 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
-import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.zistone.gprs.R;
-import com.zistone.gprs.entity.DeviceInfo;
+import com.zistone.gprs.pojo.DeviceInfo;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class DeviceInfoChooseRecyclerAdapter extends RecyclerView.Adapter<DeviceInfoChooseRecyclerAdapter.DeviceInfoChooseViewHolder>
 {
     private static final String TAG = "DeviceInfoRecyclerAdapt";
-    private Context m_context;
-    private List<DeviceInfo> m_list;
-    private View m_inflater;
-    private OnItemClickListener m_onItemClickListener;
-    private OnClickListener m_onClickListener;
+    private Context _context;
+    private List<DeviceInfo> _list;
+    private View _inflater;
+    private OnItemClickListener _onItemClickListener;
+    private OnClickListener _onClickListener;
 
     public interface OnItemClickListener
     {
@@ -42,18 +37,18 @@ public class DeviceInfoChooseRecyclerAdapter extends RecyclerView.Adapter<Device
 
     public DeviceInfoChooseRecyclerAdapter(Context context, List<DeviceInfo> list)
     {
-        m_context = context;
-        m_list = list;
+        _context = context;
+        _list = list;
     }
 
     public void SetOnClickListener(OnClickListener onClickListener)
     {
-        this.m_onClickListener = onClickListener;
+        this._onClickListener = onClickListener;
     }
 
     public void SetOnItemClickListener(OnItemClickListener onItemClickListener)
     {
-        this.m_onItemClickListener = onItemClickListener;
+        this._onItemClickListener = onItemClickListener;
     }
 
     /**
@@ -67,8 +62,8 @@ public class DeviceInfoChooseRecyclerAdapter extends RecyclerView.Adapter<Device
     @Override
     public DeviceInfoChooseViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i)
     {
-        m_inflater = LayoutInflater.from(m_context).inflate(R.layout.device_item_choose, viewGroup, false);
-        DeviceInfoChooseViewHolder deviceInfoChooseViewHolder = new DeviceInfoChooseViewHolder(m_inflater);
+        _inflater = LayoutInflater.from(_context).inflate(R.layout.device_item_choose, viewGroup, false);
+        DeviceInfoChooseViewHolder deviceInfoChooseViewHolder = new DeviceInfoChooseViewHolder(_inflater);
         return deviceInfoChooseViewHolder;
     }
 
@@ -81,21 +76,21 @@ public class DeviceInfoChooseRecyclerAdapter extends RecyclerView.Adapter<Device
     @Override
     public void onBindViewHolder(@NonNull DeviceInfoChooseViewHolder deviceInfoViewHolder, final int i)
     {
-        DeviceInfo deviceInfo = m_list.get(i);
-        deviceInfoViewHolder.m_textView.setText(deviceInfo.getM_name());
-        deviceInfoViewHolder.m_textView2.setText(deviceInfo.getM_deviceId());
-        //deviceInfoViewHolder.m_cbx.setChecked(true);
-        if(deviceInfo.getM_state() == 1)
+        DeviceInfo deviceInfo = _list.get(i);
+        deviceInfoViewHolder._txtView.setText(deviceInfo.getName());
+        deviceInfoViewHolder._txtView2.setText(deviceInfo.getDeviceId());
+        //deviceInfoViewHolder._cbx.setChecked(true);
+        if(deviceInfo.getState() == 1)
         {
-            deviceInfoViewHolder.m_imageView.setImageResource(R.drawable.device3);
+            deviceInfoViewHolder._imageView.setImageResource(R.drawable.device3);
         }
-        if(m_onItemClickListener != null)
+        if(_onItemClickListener != null)
         {
-            deviceInfoViewHolder.itemView.setOnClickListener(v -> m_onItemClickListener.OnClick(i));
-            deviceInfoViewHolder.m_textView2.setOnClickListener(v -> m_onClickListener.OnClick(i));
+            deviceInfoViewHolder.itemView.setOnClickListener(v -> _onItemClickListener.OnClick(i));
+            deviceInfoViewHolder._txtView2.setOnClickListener(v -> _onClickListener.OnClick(i));
             deviceInfoViewHolder.itemView.setOnLongClickListener(v ->
             {
-                m_onItemClickListener.OnLongClick(i);
+                _onItemClickListener.OnLongClick(i);
                 return false;
             });
         }
@@ -104,7 +99,7 @@ public class DeviceInfoChooseRecyclerAdapter extends RecyclerView.Adapter<Device
     @Override
     public int getItemCount()
     {
-        return m_list.size();
+        return _list.size();
     }
 
     /**
@@ -112,16 +107,16 @@ public class DeviceInfoChooseRecyclerAdapter extends RecyclerView.Adapter<Device
      */
     class DeviceInfoChooseViewHolder extends RecyclerView.ViewHolder
     {
-        TextView m_textView;
-        TextView m_textView2;
-        ImageView m_imageView;
+        TextView _txtView;
+        TextView _txtView2;
+        ImageView _imageView;
 
         public DeviceInfoChooseViewHolder(@NonNull View itemView)
         {
             super(itemView);
-            m_imageView = itemView.findViewById(R.id.img_choose);
-            m_textView = itemView.findViewById(R.id.text_view_choose);
-            m_textView2 = itemView.findViewById(R.id.text_view2_choose);
+            _imageView = itemView.findViewById(R.id.img_choose);
+            _txtView = itemView.findViewById(R.id.text_view_choose);
+            _txtView2 = itemView.findViewById(R.id.text_view2_choose);
         }
     }
 

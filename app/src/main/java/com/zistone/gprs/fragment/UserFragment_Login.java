@@ -22,7 +22,7 @@ import com.alibaba.fastjson.JSON;
 import com.zistone.gprs.util.PropertiesUtil;
 import com.zistone.gprs.R;
 import com.zistone.gprs.util.UserSharedPreference;
-import com.zistone.gprs.entity.UserInfo;
+import com.zistone.gprs.pojo.UserInfo;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -56,19 +56,19 @@ public class UserFragment_Login extends Fragment implements View.OnClickListener
     private static final String REGEXUSERNAME = "([a-zA-Z0-9]{4,12})|[\\u4e00-\\u9fa5]{2,6}";
     //首位不能是数字,不能全为数字或字母,6~16位
     private static final String REGEXPASSWORD = "^(?![0-9])(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,16}$";
-    private String mParam1;
-    private String mParam2;
-    private Context m_context;
-    private View m_userView;
-    private EditText m_editText_userName;
-    private EditText m_editText_password;
-    private Button m_btn_login;
-    private Button m_btn_register;
-    private Button m_btn_forget;
-    private ProgressBar m_progressBar;
-    private Timer m_loginTimer;
-    private BottomNavigationView m_bottomNavigationView;
-    private OnFragmentInteractionListener mListener;
+    private String _param1;
+    private String _param2;
+    private Context _context;
+    private View _userView;
+    private EditText _edtUserName;
+    private EditText _edtPassword;
+    private Button _btnLogin;
+    private Button _btnRegister;
+    private Button _btnForget;
+    private ProgressBar _progressBar;
+    private Timer _loginTimer;
+    private BottomNavigationView _bottomNavigationView;
+    private OnFragmentInteractionListener _listener;
 
     public static UserFragment_Login newInstance(String param1, String param2)
     {
@@ -92,12 +92,12 @@ public class UserFragment_Login extends Fragment implements View.OnClickListener
         {
             super.handleMessage(message);
             IsLoginEnd();
-            switch(message.what)
+            switch (message.what)
             {
                 case MESSAGE_RREQUEST_FAIL:
                 {
                     String result = (String) message.obj;
-                    Toast.makeText(m_context, "登录超时,请检查网络环境", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(_context, "登录超时,请检查网络环境", Toast.LENGTH_SHORT).show();
                     break;
                 }
                 case MESSAGE_RESPONSE_SUCCESS:
@@ -110,7 +110,7 @@ public class UserFragment_Login extends Fragment implements View.OnClickListener
                 case MESSAGE_RESPONSE_FAIL:
                 {
                     String result = (String) message.obj;
-                    Toast.makeText(m_context, "登录失败,请与管理员联系", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(_context, "登录失败,请与管理员联系", Toast.LENGTH_SHORT).show();
                     break;
                 }
                 default:
@@ -122,51 +122,48 @@ public class UserFragment_Login extends Fragment implements View.OnClickListener
     private void SendWithOkHttp()
     {
         new Thread(() ->
-        {
-            Looper.prepare();
-            UserInfo userInfo = new UserInfo();
-            userInfo.setM_userName(m_editText_userName.getText().toString());
-            userInfo.setM_password(m_editText_password.getText().toString());
-            String jsonData = JSON.toJSONString(userInfo);
-            //实例化并设置连接超时时间、读取超时时间
-            OkHttpClient okHttpClient = new OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS).readTimeout(10, TimeUnit.SECONDS).build();
-            RequestBody requestBody = FormBody.create(jsonData, MediaType.parse("application/json; charset=utf-8"));
-            Request request = new Request.Builder().post(requestBody).url(URL).build();
-            Call call = okHttpClient.newCall(request);
-            //Android中不允许任何网络的交互在主线程中进行
-            call.enqueue(new Callback()
-            {
-                @Override
-                public void onFailure(@NotNull Call call, @NotNull IOException e)
-                {
-                    Log.e(TAG, "登录失败:" + e.toString());
-                    Message message = handler.obtainMessage(MESSAGE_RREQUEST_FAIL, "请求失败:" + e.toString());
-                    handler.sendMessage(message);
-                }
+                   {
+                       Looper.prepare();
+                       UserInfo userInfo = new UserInfo();
+                       userInfo.setUserName(_edtUserName.getText().toString());
+                       userInfo.setPassword(_edtPassword.getText().toString());
+                       String jsonData = JSON.toJSONString(userInfo);
+                       //实例化并设置连接超时时间、读取超时时间
+                       OkHttpClient okHttpClient = new OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS).readTimeout(10, TimeUnit.SECONDS).build();
+                       RequestBody requestBody = FormBody.create(jsonData, MediaType.parse("application/json; charset=utf-8"));
+                       Request request = new Request.Builder().post(requestBody).url(URL).build();
+                       Call call = okHttpClient.newCall(request);
+                       //异步请求
+                       call.enqueue(new Callback()
+                       {
+                           @Override
+                           public void onFailure(@NotNull Call call, @NotNull IOException e)
+                           {
+                               Message message = handler.obtainMessage(MESSAGE_RREQUEST_FAIL, "请求失败:" + e.toString());
+                               handler.sendMessage(message);
+                           }
 
-                //获得请求响应的字符串:response.body().string()该方法只能被调用一次!另:toString()返回的是对象地址
-                //获得请求响应的二进制字节数组:response.body().bytes()
-                //获得请求响应的inputStream:response.body().byteStream()
-                @Override
-                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException
-                {
-                    String result = response.body().string();
-                    if(response.isSuccessful())
-                    {
-                        Log.i(TAG, "登录成功:" + result);
-                        Message message = handler.obtainMessage(MESSAGE_RESPONSE_SUCCESS, result);
-                        handler.sendMessage(message);
-                    }
-                    else
-                    {
-                        Log.e(TAG, "登录失败:" + result);
-                        Message message = handler.obtainMessage(MESSAGE_RESPONSE_FAIL, result);
-                        handler.sendMessage(message);
-                    }
-                }
-            });
-            Looper.loop();
-        }).start();
+                           //获得请求响应的字符串:response.body().string()该方法只能被调用一次!另:toString()返回的是对象地址
+                           //获得请求响应的二进制字节数组:response.body().bytes()
+                           //获得请求响应的inputStream:response.body().byteStream()
+                           @Override
+                           public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException
+                           {
+                               String result = response.body().string();
+                               if (response.isSuccessful())
+                               {
+                                   Message message = handler.obtainMessage(MESSAGE_RESPONSE_SUCCESS, result);
+                                   handler.sendMessage(message);
+                               }
+                               else
+                               {
+                                   Message message = handler.obtainMessage(MESSAGE_RESPONSE_FAIL, result);
+                                   handler.sendMessage(message);
+                               }
+                           }
+                       });
+                       Looper.loop();
+                   }).start();
     }
 
     /**
@@ -174,20 +171,20 @@ public class UserFragment_Login extends Fragment implements View.OnClickListener
      */
     private void LoginResult(UserInfo userInfo)
     {
-        if(userInfo != null)
+        if (userInfo != null)
         {
-            Log.i(TAG, "登录成功,用户真实姓名为:" + userInfo.getM_realName());
+            Log.i(TAG, "登录成功,用户真实姓名为:" + userInfo.getRealName());
             //本地存储用户基本信息
-            UserSharedPreference.LoginSuccess(m_context, userInfo);
+            UserSharedPreference.LoginSuccess(_context, userInfo);
             UserFragment_Info userFragment_info = UserFragment_Info.newInstance("", "");
             getFragmentManager().beginTransaction().replace(R.id.fragment_current_user, userFragment_info, "userFragment_info").commitNow();
             //当前碎片切换为设备碎片
-            m_bottomNavigationView.setSelectedItemId(m_bottomNavigationView.getMenu().getItem(1).getItemId());
+            _bottomNavigationView.setSelectedItemId(_bottomNavigationView.getMenu().getItem(1).getItemId());
         }
         else
         {
             Log.i(TAG, "登录失败:用户名或密码错误");
-            Toast.makeText(m_context, "用户名或密码错误", Toast.LENGTH_SHORT).show();
+            Toast.makeText(_context, "用户名或密码错误", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -196,12 +193,12 @@ public class UserFragment_Login extends Fragment implements View.OnClickListener
      */
     private void IsLoginEnd()
     {
-        m_progressBar.setVisibility(View.INVISIBLE);
-        m_editText_userName.setEnabled(true);
-        m_editText_password.setEnabled(true);
-        m_btn_login.setEnabled(true);
-        m_btn_forget.setEnabled(true);
-        m_btn_register.setEnabled(true);
+        _progressBar.setVisibility(View.INVISIBLE);
+        _edtUserName.setEnabled(true);
+        _edtPassword.setEnabled(true);
+        _btnLogin.setEnabled(true);
+        _btnForget.setEnabled(true);
+        _btnRegister.setEnabled(true);
     }
 
     /**
@@ -209,17 +206,17 @@ public class UserFragment_Login extends Fragment implements View.OnClickListener
      */
     private void IsLogining()
     {
-        m_progressBar.setVisibility(View.VISIBLE);
-        m_editText_userName.setEnabled(false);
-        m_editText_password.setEnabled(false);
-        m_btn_login.setEnabled(false);
-        m_btn_forget.setEnabled(false);
-        m_btn_register.setEnabled(false);
+        _progressBar.setVisibility(View.VISIBLE);
+        _edtUserName.setEnabled(false);
+        _edtPassword.setEnabled(false);
+        _btnLogin.setEnabled(false);
+        _btnForget.setEnabled(false);
+        _btnRegister.setEnabled(false);
     }
 
     private void Login()
     {
-        m_loginTimer = new Timer();
+        _loginTimer = new Timer();
         TIMEINTERVAL = 5 * 1000;
         IsLogining();
         SendWithOkHttp();
@@ -230,24 +227,24 @@ public class UserFragment_Login extends Fragment implements View.OnClickListener
             {
                 //返回到UI线程,两种更新UI的方法之一
                 getActivity().runOnUiThread(() ->
-                {
-                    IsLoginEnd();
-                    //从任务队列中取消任务
-                    m_loginTimer.cancel();
-                    Toast.makeText(m_context, "登录失败,请检查网络", Toast.LENGTH_SHORT).show();
-                });
+                                            {
+                                                IsLoginEnd();
+                                                //从任务队列中取消任务
+                                                _loginTimer.cancel();
+                                                Toast.makeText(_context, "登录失败,请检查网络", Toast.LENGTH_SHORT).show();
+                                            });
             }
         };
         //请求超时已由Http请求设置,该定时器已弃用
         //任务、延迟执行时间
-        //m_loginTimer.schedule(loginTask, TIMEINTERVAL);
+        //_loginTimer.schedule(loginTask, TIMEINTERVAL);
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState)
     {
         super.onActivityCreated(savedInstanceState);
-        m_bottomNavigationView = getActivity().findViewById(R.id.nav_view);
+        _bottomNavigationView = getActivity().findViewById(R.id.nav_view);
     }
 
     /**
@@ -257,7 +254,7 @@ public class UserFragment_Login extends Fragment implements View.OnClickListener
     public void onStop()
     {
         super.onStop();
-        //m_loginTimer.cancel();
+        //_loginTimer.cancel();
     }
 
     /**
@@ -269,10 +266,10 @@ public class UserFragment_Login extends Fragment implements View.OnClickListener
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        if(getArguments() != null)
+        if (getArguments() != null)
         {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            _param1 = getArguments().getString(ARG_PARAM1);
+            _param2 = getArguments().getString(ARG_PARAM2);
         }
     }
 
@@ -287,28 +284,28 @@ public class UserFragment_Login extends Fragment implements View.OnClickListener
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        m_userView = inflater.inflate(R.layout.fragment_user_login, container, false);
-        m_context = m_userView.getContext();
-        URL = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/UserInfo/Login";
-        m_editText_userName = m_userView.findViewById(R.id.editTextUserName_login);
-        m_editText_userName.setOnFocusChangeListener(this);
-        m_editText_password = m_userView.findViewById(R.id.editTextPassword_login);
-        m_editText_password.setOnFocusChangeListener(this);
-        m_btn_login = m_userView.findViewById(R.id.btn_login_login);
-        m_btn_login.setOnClickListener(this);
-        m_btn_register = m_userView.findViewById(R.id.btn_register_login);
-        m_btn_register.setOnClickListener(this);
-        m_btn_forget = m_userView.findViewById(R.id.btn_forget_login);
-        m_btn_forget.setOnClickListener(this);
-        m_progressBar = m_userView.findViewById(R.id.progressBar_login);
-        return m_userView;
+        _userView = inflater.inflate(R.layout.fragment_user_login, container, false);
+        _context = _userView.getContext();
+        URL = PropertiesUtil.GetValueProperties(_context).getProperty("URL") + "/UserInfo/Login";
+        _edtUserName = _userView.findViewById(R.id.editTextUserName_login);
+        _edtUserName.setOnFocusChangeListener(this);
+        _edtPassword = _userView.findViewById(R.id.editTextPassword_login);
+        _edtPassword.setOnFocusChangeListener(this);
+        _btnLogin = _userView.findViewById(R.id.btn_login_login);
+        _btnLogin.setOnClickListener(this);
+        _btnRegister = _userView.findViewById(R.id.btn_register_login);
+        _btnRegister.setOnClickListener(this);
+        _btnForget = _userView.findViewById(R.id.btn_forget_login);
+        _btnForget.setOnClickListener(this);
+        _progressBar = _userView.findViewById(R.id.progressBar_login);
+        return _userView;
     }
 
     public void onButtonPressed(Uri uri)
     {
-        if(mListener != null)
+        if (_listener != null)
         {
-            mListener.onFragmentInteraction(uri);
+            _listener.onFragmentInteraction(uri);
         }
     }
 
@@ -316,9 +313,9 @@ public class UserFragment_Login extends Fragment implements View.OnClickListener
     public void onAttach(Context context)
     {
         super.onAttach(context);
-        if(context instanceof OnFragmentInteractionListener)
+        if (context instanceof OnFragmentInteractionListener)
         {
-            mListener = (OnFragmentInteractionListener) context;
+            _listener = (OnFragmentInteractionListener) context;
         }
         else
         {
@@ -333,7 +330,7 @@ public class UserFragment_Login extends Fragment implements View.OnClickListener
     public void onDetach()
     {
         super.onDetach();
-        mListener = null;
+        _listener = null;
     }
 
     @Override
@@ -342,27 +339,27 @@ public class UserFragment_Login extends Fragment implements View.OnClickListener
         //隐藏键盘
         InputMethodManager imm = (InputMethodManager) v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(v.getApplicationWindowToken(), 0);
-        switch(v.getId())
+        switch (v.getId())
         {
             //登录,这里是发起登录请求
             case R.id.btn_login_login:
-                if(Pattern.matches(REGEXUSERNAME, m_editText_userName.getText().toString()))
+                if (Pattern.matches(REGEXUSERNAME, _edtUserName.getText().toString()))
                 {
-                    m_editText_userName.setError(null);
+                    _edtUserName.setError(null);
                 }
                 else
                 {
-                    m_editText_userName.setError("用户名非法");
+                    _edtUserName.setError("用户名非法");
                 }
-                if(Pattern.matches(REGEXPASSWORD, m_editText_password.getText().toString()))
+                if (Pattern.matches(REGEXPASSWORD, _edtPassword.getText().toString()))
                 {
-                    m_editText_password.setError(null);
+                    _edtPassword.setError(null);
                 }
                 else
                 {
-                    m_editText_password.setError("密码非法");
+                    _edtPassword.setError("密码非法");
                 }
-                if(m_editText_userName.getError() == null && m_editText_password.getError() == null)
+                if (_edtUserName.getError() == null && _edtPassword.getError() == null)
                 {
                     Login();
                 }
@@ -383,39 +380,39 @@ public class UserFragment_Login extends Fragment implements View.OnClickListener
     @Override
     public void onFocusChange(View v, boolean hasFocus)
     {
-        switch(v.getId())
+        switch (v.getId())
         {
             case R.id.editTextUserName_login:
-                if(hasFocus)
+                if (hasFocus)
                 {
-                    m_editText_userName.setError(null);
+                    _edtUserName.setError(null);
                 }
                 else
                 {
-                    if(Pattern.matches(REGEXUSERNAME, m_editText_userName.getText().toString()))
+                    if (Pattern.matches(REGEXUSERNAME, _edtUserName.getText().toString()))
                     {
-                        m_editText_userName.setError(null);
+                        _edtUserName.setError(null);
                     }
                     else
                     {
-                        m_editText_userName.setError("用户名非法");
+                        _edtUserName.setError("用户名非法");
                     }
                 }
                 break;
             case R.id.editTextPassword_login:
-                if(hasFocus)
+                if (hasFocus)
                 {
-                    m_editText_password.setError(null);
+                    _edtPassword.setError(null);
                 }
                 else
                 {
-                    if(Pattern.matches(REGEXPASSWORD, m_editText_password.getText().toString()))
+                    if (Pattern.matches(REGEXPASSWORD, _edtPassword.getText().toString()))
                     {
-                        m_editText_password.setError(null);
+                        _edtPassword.setError(null);
                     }
                     else
                     {
-                        m_editText_password.setError("密码非法");
+                        _edtPassword.setError("密码非法");
                     }
                 }
                 break;

@@ -18,9 +18,9 @@ public class UserFragment extends Fragment
     private static final String ARG_PARAM2 = "param2";
     private String mParam1;
     private String mParam2;
-    private Context m_context;
-    private View m_userView;
-    private OnFragmentInteractionListener mListener;
+    private Context _context;
+    private View _userView;
+    private OnFragmentInteractionListener _listener;
 
     public UserFragment()
     {
@@ -77,12 +77,12 @@ public class UserFragment extends Fragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        m_userView = inflater.inflate(R.layout.fragment_user, container, false);
-        m_context = getContext();
+        _userView = inflater.inflate(R.layout.fragment_user, container, false);
+        _context = getContext();
         //注意:一个FragmentTransaction只能Commit一次,不要用全局或共享一个FragmentTransaction对象,多个Fragment则多次get
         //已经登录过则显示用户信息页面,否则显示登录页面
-        int id = UserSharedPreference.GetUserId(m_context);
-        int state = UserSharedPreference.GetState(m_context);
+        int id = UserSharedPreference.GetUserId(_context);
+        int state = UserSharedPreference.GetState(_context);
         if (id != 0 && 1 == state)
         {
             UserFragment_Info userFragment_info = UserFragment_Info.newInstance("", "");
@@ -93,14 +93,14 @@ public class UserFragment extends Fragment
             UserFragment_Login userFragment_login = UserFragment_Login.newInstance("", "");
             getChildFragmentManager().beginTransaction().add(R.id.fragment_current_user, userFragment_login, "userFragment_login").show(userFragment_login).commitNow();
         }
-        return m_userView;
+        return _userView;
     }
 
     public void onButtonPressed(Uri uri)
     {
-        if (mListener != null)
+        if (_listener != null)
         {
-            mListener.onFragmentInteraction(uri);
+            _listener.onFragmentInteraction(uri);
         }
     }
 
@@ -110,7 +110,7 @@ public class UserFragment extends Fragment
         super.onAttach(context);
         if (context instanceof OnFragmentInteractionListener)
         {
-            mListener = (OnFragmentInteractionListener) context;
+            _listener = (OnFragmentInteractionListener) context;
         }
         else
         {
@@ -125,7 +125,7 @@ public class UserFragment extends Fragment
     public void onDetach()
     {
         super.onDetach();
-        mListener = null;
+        _listener = null;
     }
 
 }

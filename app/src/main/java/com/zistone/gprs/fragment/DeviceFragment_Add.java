@@ -21,7 +21,7 @@ import android.widget.Toast;
 import com.alibaba.fastjson.JSON;
 import com.zistone.gprs.util.PropertiesUtil;
 import com.zistone.gprs.R;
-import com.zistone.gprs.entity.DeviceInfo;
+import com.zistone.gprs.pojo.DeviceInfo;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -47,18 +47,18 @@ public class DeviceFragment_Add extends Fragment implements View.OnClickListener
     private static final int MESSAGE_RESPONSE_FAIL = 2;
     private static final int MESSAGE_RESPONSE_SUCCESS = 3;
     private static String URL;
-    private Context m_context;
-    private View m_addDeviceView;
-    private ImageButton m_btnReturn;
-    private OnFragmentInteractionListener mListener;
-    private EditText m_editText_deviceName;
-    private EditText m_editText_deviceType;
-    private EditText m_editText_deviceId;
-    private EditText m_editText_simNumber;
-    private EditText m_editText_comment;
-    private Switch m_switch_state;
-    private Button m_btnSave;
-    private ProgressBar m_progressBar;
+    private Context _context;
+    private View _addDeviceView;
+    private ImageButton _btnReturn;
+    private OnFragmentInteractionListener _listener;
+    private EditText _edt_deviceName;
+    private EditText _edt_deviceType;
+    private EditText _edt_deviceId;
+    private EditText _edt_simNumber;
+    private EditText _edt_comment;
+    private Switch _switch_state;
+    private Button _btnSave;
+    private ProgressBar _progressBar;
 
     public static DeviceFragment_Add newInstance(String param1, String param2)
     {
@@ -72,24 +72,24 @@ public class DeviceFragment_Add extends Fragment implements View.OnClickListener
 
     private void IsAdding()
     {
-        m_progressBar.setVisibility(View.VISIBLE);
-        m_editText_deviceName.setEnabled(false);
-        m_editText_deviceType.setEnabled(false);
-        m_editText_deviceId.setEnabled(false);
-        m_editText_simNumber.setEnabled(false);
-        m_editText_comment.setEnabled(false);
-        m_switch_state.setEnabled(false);
+        _progressBar.setVisibility(View.VISIBLE);
+        _edt_deviceName.setEnabled(false);
+        _edt_deviceType.setEnabled(false);
+        _edt_deviceId.setEnabled(false);
+        _edt_simNumber.setEnabled(false);
+        _edt_comment.setEnabled(false);
+        _switch_state.setEnabled(false);
     }
 
     private void IsAddEnd()
     {
-        m_progressBar.setVisibility(View.INVISIBLE);
-        m_editText_deviceName.setEnabled(true);
-        m_editText_deviceType.setEnabled(true);
-        m_editText_deviceId.setEnabled(true);
-        m_editText_simNumber.setEnabled(true);
-        m_editText_comment.setEnabled(true);
-        m_switch_state.setEnabled(true);
+        _progressBar.setVisibility(View.INVISIBLE);
+        _edt_deviceName.setEnabled(true);
+        _edt_deviceType.setEnabled(true);
+        _edt_deviceId.setEnabled(true);
+        _edt_simNumber.setEnabled(true);
+        _edt_comment.setEnabled(true);
+        _switch_state.setEnabled(true);
     }
 
     private Handler handler = new Handler()
@@ -104,7 +104,7 @@ public class DeviceFragment_Add extends Fragment implements View.OnClickListener
                 case MESSAGE_RREQUEST_FAIL:
                 {
                     String result = (String) message.obj;
-                    Toast.makeText(m_context, "添加设备超时,请检查网络环境", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(_context, "添加设备超时,请检查网络环境", Toast.LENGTH_SHORT).show();
                     break;
                 }
                 case MESSAGE_RESPONSE_SUCCESS:
@@ -113,22 +113,22 @@ public class DeviceFragment_Add extends Fragment implements View.OnClickListener
                     DeviceInfo deviceInfo = JSON.parseObject(result, DeviceInfo.class);
                     if (deviceInfo != null)
                     {
-                        Log.i(TAG, "设备添加成功,设备编号为:" + deviceInfo.getM_deviceId());
+                        Log.i(TAG, "设备添加成功,设备编号为:" + deviceInfo.getDeviceId());
                         DeviceFragment_Manage deviceFragment_manage = DeviceFragment_Manage.newInstance("", "");
                         getFragmentManager().beginTransaction().replace(R.id.fragment_current_device, deviceFragment_manage, "deviceFragment_manage").commitNow();
-                        Toast.makeText(m_context, "设备添加成功", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(_context, "设备添加成功", Toast.LENGTH_SHORT).show();
                     }
                     else
                     {
                         Log.i(TAG, "设备添加失败");
-                        Toast.makeText(m_context, "设备添加失败", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(_context, "设备添加失败", Toast.LENGTH_SHORT).show();
                     }
                     break;
                 }
                 case MESSAGE_RESPONSE_FAIL:
                 {
                     String result = (String) message.obj;
-                    Toast.makeText(m_context, "添加设备失败", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(_context, "添加设备失败", Toast.LENGTH_SHORT).show();
                     break;
                 }
                 default:
@@ -147,27 +147,27 @@ public class DeviceFragment_Add extends Fragment implements View.OnClickListener
                 getFragmentManager().beginTransaction().replace(R.id.fragment_current_device, deviceFragment_manage, "deviceFragment_manage").commitNow();
                 break;
             case R.id.btn_save_add:
-                String name = m_editText_deviceName.getText().toString();
-                String type = m_editText_deviceType.getText().toString();
-                String deviceId = m_editText_deviceId.getText().toString();
-                String sim = m_editText_simNumber.getText().toString();
-                String comment = m_editText_comment.getText().toString();
-                boolean state = m_switch_state.isChecked();
+                String name = _edt_deviceName.getText().toString();
+                String type = _edt_deviceType.getText().toString();
+                String deviceId = _edt_deviceId.getText().toString();
+                String sim = _edt_simNumber.getText().toString();
+                String comment = _edt_comment.getText().toString();
+                boolean state = _switch_state.isChecked();
                 if (null == name || "".equals(name) || null == type || "".equals(type) || null == deviceId || "".equals(deviceId))
                 {
-                    Toast.makeText(m_context, "请填写正确的设备信息", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(_context, "请填写正确的设备信息", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 IsAdding();
                 DeviceInfo deviceInfo = new DeviceInfo();
-                deviceInfo.setM_name(name);
-                deviceInfo.setM_type(type);
-                deviceInfo.setM_deviceId(deviceId);
-                deviceInfo.setM_sim(sim);
-                deviceInfo.setM_comment(comment);
-                deviceInfo.setM_state(state ? 1 : 0);
-                deviceInfo.setM_createTime(new Date());
-                deviceInfo.setM_updateTime(new Date());
+                deviceInfo.setName(name);
+                deviceInfo.setType(type);
+                deviceInfo.setDeviceId(deviceId);
+                deviceInfo.setSim(sim);
+                deviceInfo.setComment(comment);
+                deviceInfo.setState(state ? 1 : 0);
+                deviceInfo.setCreateTime(new Date());
+                deviceInfo.setUpdateTime(new Date());
                 String jsonData = JSON.toJSONString(deviceInfo);
                 new Thread(() ->
                 {
@@ -177,7 +177,7 @@ public class DeviceFragment_Add extends Fragment implements View.OnClickListener
                     RequestBody requestBody = FormBody.create(jsonData, MediaType.parse("application/json; charset=utf-8"));
                     Request request = new Request.Builder().post(requestBody).url(URL).build();
                     Call call = okHttpClient.newCall(request);
-                    //Android中不允许任何网络的交互在主线程中进行
+                    //异步请求
                     call.enqueue(new Callback()
                     {
                         @Override
@@ -222,9 +222,9 @@ public class DeviceFragment_Add extends Fragment implements View.OnClickListener
 
     public void onButtonPressed(Uri uri)
     {
-        if (mListener != null)
+        if (_listener != null)
         {
-            mListener.onFragmentInteraction(uri);
+            _listener.onFragmentInteraction(uri);
         }
     }
 
@@ -246,22 +246,22 @@ public class DeviceFragment_Add extends Fragment implements View.OnClickListener
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        m_addDeviceView = inflater.inflate(R.layout.fragment_device_add, container, false);
+        _addDeviceView = inflater.inflate(R.layout.fragment_device_add, container, false);
 
-        m_context = getContext();
-        URL = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/DeviceInfo/InsertByDeviceId";
-        m_btnReturn = m_addDeviceView.findViewById(R.id.btn_return_device_add);
-        m_btnReturn.setOnClickListener(this);
-        m_editText_deviceName = m_addDeviceView.findViewById(R.id.editText_deviceName_add);
-        m_editText_deviceType = m_addDeviceView.findViewById(R.id.editText_deviceType_add);
-        m_editText_deviceId = m_addDeviceView.findViewById(R.id.editText_deviceID_add);
-        m_editText_simNumber = m_addDeviceView.findViewById(R.id.editText_sim_number_add);
-        m_editText_comment = m_addDeviceView.findViewById(R.id.editText_comment_add);
-        m_switch_state = m_addDeviceView.findViewById(R.id.switch_state_add);
-        m_progressBar = m_addDeviceView.findViewById(R.id.progressBar_add);
-        m_btnSave = m_addDeviceView.findViewById(R.id.btn_save_add);
-        m_btnSave.setOnClickListener(this);
-        return m_addDeviceView;
+        _context = getContext();
+        URL = PropertiesUtil.GetValueProperties(_context).getProperty("URL") + "/DeviceInfo/InsertByDeviceId";
+        _btnReturn = _addDeviceView.findViewById(R.id.btn_return_device_add);
+        _btnReturn.setOnClickListener(this);
+        _edt_deviceName = _addDeviceView.findViewById(R.id.editText_deviceName_add);
+        _edt_deviceType = _addDeviceView.findViewById(R.id.editText_deviceType_add);
+        _edt_deviceId = _addDeviceView.findViewById(R.id.editText_deviceID_add);
+        _edt_simNumber = _addDeviceView.findViewById(R.id.editText_sim_number_add);
+        _edt_comment = _addDeviceView.findViewById(R.id.editText_comment_add);
+        _switch_state = _addDeviceView.findViewById(R.id.switch_state_add);
+        _progressBar = _addDeviceView.findViewById(R.id.progressBar_add);
+        _btnSave = _addDeviceView.findViewById(R.id.btn_save_add);
+        _btnSave.setOnClickListener(this);
+        return _addDeviceView;
     }
 
     @Override
@@ -270,7 +270,7 @@ public class DeviceFragment_Add extends Fragment implements View.OnClickListener
         super.onAttach(context);
         if (context instanceof OnFragmentInteractionListener)
         {
-            mListener = (OnFragmentInteractionListener) context;
+            _listener = (OnFragmentInteractionListener) context;
         }
         else
         {
@@ -282,6 +282,6 @@ public class DeviceFragment_Add extends Fragment implements View.OnClickListener
     public void onDetach()
     {
         super.onDetach();
-        mListener = null;
+        _listener = null;
     }
 }

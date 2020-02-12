@@ -54,15 +54,15 @@ public class MainActivity extends AppCompatActivity implements
         UserFragment_Info.OnFragmentInteractionListener
 {
     //当前页,用来切换
-    public Fragment m_currentFragment;
+    public Fragment _currentFragment;
     //地图页
-    public com.zistone.gprs.fragment.MapFragment m_mapFragment;
+    public com.zistone.gprs.fragment.MapFragment _mapFragment;
     //设备页
-    public DeviceFragment m_deviceFragment;
+    public DeviceFragment _deviceFragment;
     //用户页
-    public UserFragment m_userFragment;
+    public UserFragment _userFragment;
     //底部导航栏
-    public BottomNavigationView m_bottomNavigationView;
+    public BottomNavigationView _bottomNavigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -74,25 +74,25 @@ public class MainActivity extends AppCompatActivity implements
 
     private void InitData()
     {
-        m_bottomNavigationView = findViewById(R.id.nav_view);
+        _bottomNavigationView = findViewById(R.id.nav_view);
         //启动时如果已经登录过则在设备页,否则跳转至用户页的登录界面
         String realName = UserSharedPreference.GetRealName(this);
         int state = UserSharedPreference.GetState(this);
         if (!"".equals(realName) && 1 == state)
         {
-            m_deviceFragment = DeviceFragment.newInstance("", "");
-            m_bottomNavigationView.setSelectedItemId(m_bottomNavigationView.getMenu().getItem(1).getItemId());
-            m_currentFragment = m_deviceFragment;
-            getSupportFragmentManager().beginTransaction().add(R.id.fragment_current, m_currentFragment, "deviceFragment").show(m_currentFragment).commitNow();
+            _deviceFragment = DeviceFragment.newInstance("", "");
+            _bottomNavigationView.setSelectedItemId(_bottomNavigationView.getMenu().getItem(1).getItemId());
+            _currentFragment = _deviceFragment;
+            getSupportFragmentManager().beginTransaction().add(R.id.fragment_current, _currentFragment, "deviceFragment").show(_currentFragment).commitNow();
         }
         else
         {
-            m_userFragment = UserFragment.newInstance("", "");
-            m_bottomNavigationView.setSelectedItemId(m_bottomNavigationView.getMenu().getItem(2).getItemId());
-            m_currentFragment = m_userFragment;
-            getSupportFragmentManager().beginTransaction().add(R.id.fragment_current, m_currentFragment, "userFragment").show(m_currentFragment).commitNow();
+            _userFragment = UserFragment.newInstance("", "");
+            _bottomNavigationView.setSelectedItemId(_bottomNavigationView.getMenu().getItem(2).getItemId());
+            _currentFragment = _userFragment;
+            getSupportFragmentManager().beginTransaction().add(R.id.fragment_current, _currentFragment, "userFragment").show(_currentFragment).commitNow();
         }
-        m_bottomNavigationView.setOnNavigationItemSelectedListener(OnNavigationItemSeletecListener);
+        _bottomNavigationView.setOnNavigationItemSelectedListener(OnNavigationItemSeletecListener);
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener OnNavigationItemSeletecListener = new BottomNavigationView.OnNavigationItemSelectedListener()
@@ -119,7 +119,7 @@ public class MainActivity extends AppCompatActivity implements
                         builder.setPositiveButton("确定", (dialog, which) ->
                         {
                             dialog.dismiss();
-                            m_bottomNavigationView.setSelectedItemId(m_bottomNavigationView.getMenu().getItem(2).getItemId());
+                            _bottomNavigationView.setSelectedItemId(_bottomNavigationView.getMenu().getItem(2).getItemId());
                         });
                         builder.setMessage("你还没有登录");
                         builder.show();
@@ -135,49 +135,49 @@ public class MainActivity extends AppCompatActivity implements
 
     private void ClickUserItem()
     {
-        if (m_userFragment == null)
+        if (_userFragment == null)
         {
-            m_userFragment = UserFragment.newInstance("", "");
+            _userFragment = UserFragment.newInstance("", "");
         }
-        AddOrShowFragment(getSupportFragmentManager().beginTransaction(), m_userFragment, "userFragment");
+        AddOrShowFragment(getSupportFragmentManager().beginTransaction(), _userFragment, "userFragment");
     }
 
     private void ClickDeviceItem()
     {
-        if (m_deviceFragment == null)
+        if (_deviceFragment == null)
         {
-            m_deviceFragment = DeviceFragment.newInstance("", "");
+            _deviceFragment = DeviceFragment.newInstance("", "");
         }
-        AddOrShowFragment(getSupportFragmentManager().beginTransaction(), m_deviceFragment, "deviceFragment");
+        AddOrShowFragment(getSupportFragmentManager().beginTransaction(), _deviceFragment, "deviceFragment");
     }
 
     private void ClickMapItem()
     {
-        m_mapFragment = (com.zistone.gprs.fragment.MapFragment) getSupportFragmentManager().findFragmentByTag("mapFragment");
-        if (m_mapFragment == null)
+        _mapFragment = (com.zistone.gprs.fragment.MapFragment) getSupportFragmentManager().findFragmentByTag("mapFragment");
+        if (_mapFragment == null)
         {
-            m_mapFragment = com.zistone.gprs.fragment.MapFragment.newInstance("", "");
+            _mapFragment = com.zistone.gprs.fragment.MapFragment.newInstance("", "");
         }
-        AddOrShowFragment(getSupportFragmentManager().beginTransaction(), m_mapFragment, "mapFragment");
+        AddOrShowFragment(getSupportFragmentManager().beginTransaction(), _mapFragment, "mapFragment");
     }
 
     private void AddOrShowFragment(FragmentTransaction transaction, Fragment fragment, String tagStr)
     {
-        if (m_currentFragment == null)
+        if (_currentFragment == null)
         {
             return;
         }
         //如果当前的Fragment未被添加到管理器中
         if (!fragment.isAdded())
         {
-            transaction.hide(m_currentFragment).add(R.id.fragment_current, fragment, tagStr).commitNow();
+            transaction.hide(_currentFragment).add(R.id.fragment_current, fragment, tagStr).commitNow();
         }
         //否则就显示
         else
         {
-            transaction.hide(m_currentFragment).show(fragment).commitNow();
+            transaction.hide(_currentFragment).show(fragment).commitNow();
         }
-        m_currentFragment = fragment;
+        _currentFragment = fragment;
     }
 
     @Override

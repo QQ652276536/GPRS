@@ -16,7 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.zistone.gprs.R;
-import com.zistone.gprs.entity.DeviceInfo;
+import com.zistone.gprs.pojo.DeviceInfo;
 import com.zistone.gprs.util.PropertiesUtil;
 
 import org.jetbrains.annotations.NotNull;
@@ -40,15 +40,15 @@ public class MapFragment_Bind extends Fragment implements View.OnClickListener
     private static final int MESSAGE_RESPONSE_FAIL = 2;
     private static final int MESSAGE_RESPONSE_SUCCESS = 3;
     private static String URL;
-    private Context m_context;
-    private View m_deviceBindView;
-    private ImageButton m_btnReturn;
-    private OnFragmentInteractionListener mListener;
-    private DeviceInfo m_deviceInfo;
-    private TextView m_textView1;
-    private TextView m_textView2;
-    private TextView m_textView3;
-    private TextView m_textView4;
+    private Context _context;
+    private View _deviceBindView;
+    private ImageButton _btnReturn;
+    private OnFragmentInteractionListener _listener;
+    private DeviceInfo _deviceInfo;
+    private TextView _txtView1;
+    private TextView _txtView2;
+    private TextView _txtView3;
+    private TextView _txtView4;
 
     /**
      * @param deviceInfo
@@ -69,7 +69,7 @@ public class MapFragment_Bind extends Fragment implements View.OnClickListener
         switch(v.getId())
         {
             case R.id.btn_return_device_bind:
-                MapFragment_Choose mapFragment_choose = MapFragment_Choose.newInstance(m_deviceInfo);
+                MapFragment_Choose mapFragment_choose = MapFragment_Choose.newInstance(_deviceInfo);
                 getFragmentManager().beginTransaction().replace(R.id.fragment_current_map, mapFragment_choose, "mapFragment_choose").commitNow();
                 break;
         }
@@ -85,9 +85,9 @@ public class MapFragment_Bind extends Fragment implements View.OnClickListener
 
     public void onButtonPressed(Uri uri)
     {
-        if(mListener != null)
+        if(_listener != null)
         {
-            mListener.onFragmentInteraction(uri);
+            _listener.onFragmentInteraction(uri);
         }
     }
 
@@ -102,7 +102,7 @@ public class MapFragment_Bind extends Fragment implements View.OnClickListener
                 case MESSAGE_RREQUEST_FAIL:
                 {
                     String result = (String) message.obj;
-                    Toast.makeText(m_context, "网络连接超时,请检查网络环境", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(_context, "网络连接超时,请检查网络环境", Toast.LENGTH_SHORT).show();
                     break;
                 }
                 case MESSAGE_RESPONSE_SUCCESS:
@@ -117,7 +117,7 @@ public class MapFragment_Bind extends Fragment implements View.OnClickListener
                 case MESSAGE_RESPONSE_FAIL:
                 {
                     String result = (String) message.obj;
-                    Toast.makeText(m_context, "获取数据失败,请与管理员联系", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(_context, "获取数据失败,请与管理员联系", Toast.LENGTH_SHORT).show();
                     break;
                 }
                 default:
@@ -136,7 +136,7 @@ public class MapFragment_Bind extends Fragment implements View.OnClickListener
             RequestBody requestBody = FormBody.create("", MediaType.parse("application/json; charset=utf-8"));
             Request request = new Request.Builder().post(requestBody).url(URL).build();
             Call call = okHttpClient.newCall(request);
-            //Android中不允许任何网络的交互在主线程中进行
+            //异步请求
             call.enqueue(new Callback()
             {
                 @Override
@@ -185,30 +185,30 @@ public class MapFragment_Bind extends Fragment implements View.OnClickListener
         if(getArguments() != null)
         {
             //获取设备信息
-            m_deviceInfo = getArguments().getParcelable("DEVICEINFO");
+            _deviceInfo = getArguments().getParcelable("DEVICEINFO");
         }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        m_deviceBindView = inflater.inflate(R.layout.fragment_map_device_bind, container, false);
-        m_context = m_deviceBindView.getContext();
-        URL = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/DeviceInfo/Update";
-        m_btnReturn = m_deviceBindView.findViewById(R.id.btn_return_device_bind);
-        m_btnReturn.setOnClickListener(this::onClick);
-        m_textView1 = m_deviceBindView.findViewById(R.id.textView1_bind);
-        m_textView2 = m_deviceBindView.findViewById(R.id.textView2_bind);
-        m_textView3 = m_deviceBindView.findViewById(R.id.textView3_bind);
-        m_textView4 = m_deviceBindView.findViewById(R.id.textView4_bind);
-        if(null != m_deviceInfo)
+        _deviceBindView = inflater.inflate(R.layout.fragment_map_device_bind, container, false);
+        _context = _deviceBindView.getContext();
+        URL = PropertiesUtil.GetValueProperties(_context).getProperty("URL") + "/DeviceInfo/Update";
+        _btnReturn = _deviceBindView.findViewById(R.id.btn_return_device_bind);
+        _btnReturn.setOnClickListener(this::onClick);
+        _txtView1 = _deviceBindView.findViewById(R.id.textView1_bind);
+        _txtView2 = _deviceBindView.findViewById(R.id.textView2_bind);
+        _txtView3 = _deviceBindView.findViewById(R.id.textView3_bind);
+        _txtView4 = _deviceBindView.findViewById(R.id.textView4_bind);
+        if(null != _deviceInfo)
         {
-            m_textView1.setText(m_deviceInfo.getM_name());
-            m_textView2.setText("");
-            m_textView3.setText(m_deviceInfo.getM_deviceId());
-            m_textView4.setText(m_deviceInfo.getM_sim());
+            _txtView1.setText(_deviceInfo.getName());
+            _txtView2.setText("");
+            _txtView3.setText(_deviceInfo.getDeviceId());
+            _txtView4.setText(_deviceInfo.getSim());
         }
-        return m_deviceBindView;
+        return _deviceBindView;
     }
 
     @Override
@@ -217,7 +217,7 @@ public class MapFragment_Bind extends Fragment implements View.OnClickListener
         super.onAttach(context);
         if(context instanceof OnFragmentInteractionListener)
         {
-            mListener = (OnFragmentInteractionListener) context;
+            _listener = (OnFragmentInteractionListener) context;
         }
         else
         {
@@ -229,6 +229,6 @@ public class MapFragment_Bind extends Fragment implements View.OnClickListener
     public void onDetach()
     {
         super.onDetach();
-        mListener = null;
+        _listener = null;
     }
 }

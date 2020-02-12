@@ -19,7 +19,7 @@ import android.widget.Toast;
 import com.alibaba.fastjson.JSON;
 import com.zistone.gprs.R;
 import com.zistone.gprs.control.DeviceInfoChooseRecyclerAdapter;
-import com.zistone.gprs.entity.DeviceInfo;
+import com.zistone.gprs.pojo.DeviceInfo;
 import com.zistone.gprs.util.PropertiesUtil;
 import com.zistone.material_refresh_layout.MaterialRefreshLayout;
 import com.zistone.material_refresh_layout.MaterialRefreshListener;
@@ -48,18 +48,18 @@ public class MapFragment_Choose extends Fragment implements View.OnClickListener
     private static final int MESSAGE_RESPONSE_FAIL = 2;
     private static final int MESSAGE_RESPONSE_SUCCESS = 3;
     private static String URL;
-    private Context m_context;
-    private View m_deviceListView;
-    private List<DeviceInfo> m_deviceList = new ArrayList<>();
+    private Context _context;
+    private View _deviceListView;
+    private List<DeviceInfo> _deviceList = new ArrayList<>();
     //下拉刷新控件
-    private MaterialRefreshLayout m_materialRefreshLayout;
+    private MaterialRefreshLayout _materialRefreshLayout;
     //RecyclerView
-    private RecyclerView m_recyclerView;
+    private RecyclerView _recyclerView;
     //适配器
-    private DeviceInfoChooseRecyclerAdapter m_deviceInfoChooseRecyclerAdapter;
-    private ImageButton m_btnReturn;
-    private OnFragmentInteractionListener mListener;
-    private DeviceInfo m_deviceInfo;
+    private DeviceInfoChooseRecyclerAdapter _deviceInfoChooseRecyclerAdapter;
+    private ImageButton _btnReturn;
+    private OnFragmentInteractionListener _listener;
+    private DeviceInfo _deviceInfo;
 
     /**
      * @param deviceInfo
@@ -80,7 +80,7 @@ public class MapFragment_Choose extends Fragment implements View.OnClickListener
         switch(v.getId())
         {
             case R.id.btn_return_device_choose:
-                MapFragment_Map mapFragment_map = MapFragment_Map.newInstance(m_deviceInfo);
+                MapFragment_Map mapFragment_map = MapFragment_Map.newInstance(_deviceInfo);
                 getFragmentManager().beginTransaction().replace(R.id.fragment_current_map, mapFragment_map, "mapFragment_map").show(mapFragment_map).commitNow();
                 break;
         }
@@ -96,9 +96,9 @@ public class MapFragment_Choose extends Fragment implements View.OnClickListener
 
     public void onButtonPressed(Uri uri)
     {
-        if(mListener != null)
+        if(_listener != null)
         {
-            mListener.onFragmentInteraction(uri);
+            _listener.onFragmentInteraction(uri);
         }
     }
 
@@ -107,32 +107,32 @@ public class MapFragment_Choose extends Fragment implements View.OnClickListener
      */
     private void SetDeviceInfoRecyclerAdapterListener()
     {
-        if(null != m_deviceInfoChooseRecyclerAdapter)
+        if(null != _deviceInfoChooseRecyclerAdapter)
         {
-            m_deviceInfoChooseRecyclerAdapter.SetOnItemClickListener(new DeviceInfoChooseRecyclerAdapter.OnItemClickListener()
+            _deviceInfoChooseRecyclerAdapter.SetOnItemClickListener(new DeviceInfoChooseRecyclerAdapter.OnItemClickListener()
             {
                 @Override
                 public void OnClick(int position)
                 {
-                    m_deviceInfo = m_deviceList.get(position);
-                    MapFragment_Map mapFragment_map = MapFragment_Map.newInstance(m_deviceInfo);
+                    _deviceInfo = _deviceList.get(position);
+                    MapFragment_Map mapFragment_map = MapFragment_Map.newInstance(_deviceInfo);
                     getFragmentManager().beginTransaction().replace(R.id.fragment_current_map, mapFragment_map, "mapFragment_map").show(mapFragment_map).commitNow();
                 }
 
                 @Override
                 public void OnLongClick(int position)
                 {
-                    //Toast.makeText(m_context, "当前长按 " + position, Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(_context, "当前长按 " + position, Toast.LENGTH_SHORT).show();
                 }
             });
-            m_deviceInfoChooseRecyclerAdapter.SetOnClickListener(position ->
+            _deviceInfoChooseRecyclerAdapter.SetOnClickListener(position ->
             {
-                m_deviceInfo = m_deviceList.get(position);
-                if(null == m_deviceInfo)
+                _deviceInfo = _deviceList.get(position);
+                if(null == _deviceInfo)
                 {
                     return;
                 }
-                MapFragment_Bind mapFragment_bind = MapFragment_Bind.newInstance(m_deviceInfo);
+                MapFragment_Bind mapFragment_bind = MapFragment_Bind.newInstance(_deviceInfo);
                 getFragmentManager().beginTransaction().replace(R.id.fragment_current_map, mapFragment_bind, "mapFragment_bind").commitNow();
             });
         }
@@ -149,7 +149,7 @@ public class MapFragment_Choose extends Fragment implements View.OnClickListener
                 case MESSAGE_RREQUEST_FAIL:
                 {
                     String result = (String) message.obj;
-                    Toast.makeText(m_context, "网络连接超时,请检查网络环境", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(_context, "网络连接超时,请检查网络环境", Toast.LENGTH_SHORT).show();
                     break;
                 }
                 case MESSAGE_RESPONSE_SUCCESS:
@@ -159,27 +159,27 @@ public class MapFragment_Choose extends Fragment implements View.OnClickListener
                     {
                         return;
                     }
-                    m_deviceList = JSON.parseArray(result, DeviceInfo.class);
-                    Iterator<DeviceInfo> iterator = m_deviceList.iterator();
+                    _deviceList = JSON.parseArray(result, DeviceInfo.class);
+                    Iterator<DeviceInfo> iterator = _deviceList.iterator();
                     //过滤掉离线设备
                     while(iterator.hasNext())
                     {
                         DeviceInfo temp = iterator.next();
-                        if(temp.getM_state() == 0)
+                        if(temp.getState() == 0)
                         {
                             iterator.remove();
                         }
                     }
-                    m_deviceInfoChooseRecyclerAdapter = new DeviceInfoChooseRecyclerAdapter(m_context, m_deviceList);
+                    _deviceInfoChooseRecyclerAdapter = new DeviceInfoChooseRecyclerAdapter(_context, _deviceList);
                     //设置适配器
-                    m_recyclerView.setAdapter(m_deviceInfoChooseRecyclerAdapter);
+                    _recyclerView.setAdapter(_deviceInfoChooseRecyclerAdapter);
                     SetDeviceInfoRecyclerAdapterListener();
                     break;
                 }
                 case MESSAGE_RESPONSE_FAIL:
                 {
                     String result = (String) message.obj;
-                    Toast.makeText(m_context, "获取数据失败,请与管理员联系", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(_context, "获取数据失败,请与管理员联系", Toast.LENGTH_SHORT).show();
                     break;
                 }
                 default:
@@ -198,7 +198,7 @@ public class MapFragment_Choose extends Fragment implements View.OnClickListener
             RequestBody requestBody = FormBody.create("", MediaType.parse("application/json; charset=utf-8"));
             Request request = new Request.Builder().post(requestBody).url(URL).build();
             Call call = okHttpClient.newCall(request);
-            //Android中不允许任何网络的交互在主线程中进行
+            //异步请求
             call.enqueue(new Callback()
             {
                 @Override
@@ -247,24 +247,24 @@ public class MapFragment_Choose extends Fragment implements View.OnClickListener
         if(getArguments() != null)
         {
             //获取设备信息
-            m_deviceInfo = getArguments().getParcelable("DEVICEINFO");
+            _deviceInfo = getArguments().getParcelable("DEVICEINFO");
         }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        m_deviceListView = inflater.inflate(R.layout.fragment_map_device_choose, container, false);
-        m_context = m_deviceListView.getContext();
-        URL = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/DeviceInfo/FindAll";
-        m_btnReturn = m_deviceListView.findViewById(R.id.btn_return_device_choose);
-        m_btnReturn.setOnClickListener(this::onClick);
-        m_recyclerView = m_deviceListView.findViewById(R.id.device_recycler_choose);
+        _deviceListView = inflater.inflate(R.layout.fragment_map_device_choose, container, false);
+        _context = _deviceListView.getContext();
+        URL = PropertiesUtil.GetValueProperties(_context).getProperty("URL") + "/DeviceInfo/FindAll";
+        _btnReturn = _deviceListView.findViewById(R.id.btn_return_device_choose);
+        _btnReturn.setOnClickListener(this::onClick);
+        _recyclerView = _deviceListView.findViewById(R.id.device_recycler_choose);
         //下拉刷新控件
-        m_materialRefreshLayout = m_deviceListView.findViewById(R.id.refresh_choose);
+        _materialRefreshLayout = _deviceListView.findViewById(R.id.refresh_choose);
         //启用加载更多
-        m_materialRefreshLayout.setLoadMore(true);
-        m_materialRefreshLayout.setMaterialRefreshListener(new MaterialRefreshListener()
+        _materialRefreshLayout.setLoadMore(true);
+        _materialRefreshLayout.setMaterialRefreshListener(new MaterialRefreshListener()
         {
             /**
              * 下拉刷新
@@ -287,7 +287,7 @@ public class MapFragment_Choose extends Fragment implements View.OnClickListener
             @Override
             public void onfinish()
             {
-                //Toast.makeText(m_context, "完成", Toast.LENGTH_LONG).show();
+                //Toast.makeText(_context, "完成", Toast.LENGTH_LONG).show();
             }
 
             /**
@@ -297,22 +297,22 @@ public class MapFragment_Choose extends Fragment implements View.OnClickListener
             @Override
             public void onRefreshLoadMore(MaterialRefreshLayout materialRefreshLayout)
             {
-                //Toast.makeText(m_context, "别滑了,到底了", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(_context, "别滑了,到底了", Toast.LENGTH_SHORT).show();
             }
         });
         //使用线性布局
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(m_context);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(_context);
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        //此时的m_deviceList里面并没有数据,但是需要设置适配器,可以避免在第一次自动下拉刷新时抛出No adapter attached; skipping layout异常
-        m_deviceInfoChooseRecyclerAdapter = new DeviceInfoChooseRecyclerAdapter(m_context, m_deviceList);
+        //此时的_deviceList里面并没有数据,但是需要设置适配器,可以避免在第一次自动下拉刷新时抛出No adapter attached; skipping layout异常
+        _deviceInfoChooseRecyclerAdapter = new DeviceInfoChooseRecyclerAdapter(_context, _deviceList);
         //设置适配器
-        m_recyclerView.setAdapter(m_deviceInfoChooseRecyclerAdapter);
+        _recyclerView.setAdapter(_deviceInfoChooseRecyclerAdapter);
         SetDeviceInfoRecyclerAdapterListener();
         //设置布局
-        m_recyclerView.setLayoutManager(linearLayoutManager);
+        _recyclerView.setLayoutManager(linearLayoutManager);
         //自动刷新
-        m_materialRefreshLayout.autoRefresh();
-        return m_deviceListView;
+        _materialRefreshLayout.autoRefresh();
+        return _deviceListView;
     }
 
     @Override
@@ -321,7 +321,7 @@ public class MapFragment_Choose extends Fragment implements View.OnClickListener
         super.onAttach(context);
         if(context instanceof OnFragmentInteractionListener)
         {
-            mListener = (OnFragmentInteractionListener) context;
+            _listener = (OnFragmentInteractionListener) context;
         }
         else
         {
@@ -333,6 +333,6 @@ public class MapFragment_Choose extends Fragment implements View.OnClickListener
     public void onDetach()
     {
         super.onDetach();
-        mListener = null;
+        _listener = null;
     }
 }

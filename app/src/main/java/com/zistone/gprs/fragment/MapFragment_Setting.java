@@ -1,6 +1,5 @@
 package com.zistone.gprs.fragment;
 
-import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.net.Uri;
@@ -8,45 +7,28 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.support.design.chip.ChipGroup;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.zistone.gprs.R;
-import com.zistone.gprs.control.MyRadioGroup;
-import com.zistone.gprs.entity.DeviceInfo;
+import com.zistone.gprs.pojo.DeviceInfo;
 import com.zistone.gprs.util.ConvertUtil;
 import com.zistone.gprs.util.PropertiesUtil;
-
-import org.jetbrains.annotations.NotNull;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.Calendar;
-import java.util.concurrent.TimeUnit;
-
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.FormBody;
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
 
 public class MapFragment_Setting extends Fragment implements View.OnClickListener
 {
@@ -55,22 +37,22 @@ public class MapFragment_Setting extends Fragment implements View.OnClickListene
     private static final int MESSAGE_RESPONSE_FAIL = 2;
     private static final int MESSAGE_RESPONSE_SUCCESS = 3;
     private static String URL;
-    private Context m_context;
-    private View m_deviceSettingView;
-    private ImageButton m_btnReturn;
-    private OnFragmentInteractionListener mListener;
-    private DeviceInfo m_deviceInfo;
-    private Button m_btnSave;
-    private TextView m_textView1;
-    private TextView m_textView2;
-    private TextView m_textView3;
-    private TextView m_textView4;
-    private EditText m_editText1;
-    private EditText m_editText2;
-    private EditText m_editText3;
-    private RadioButton m_radio1;
-    private RadioButton m_radio2;
-    private RadioButton m_radio3;
+    private Context _context;
+    private View _deviceSettingView;
+    private ImageButton _btnReturn;
+    private OnFragmentInteractionListener _listener;
+    private DeviceInfo _deviceInfo;
+    private Button _btnSave;
+    private TextView _txtView1;
+    private TextView _txtView2;
+    private TextView _txtView3;
+    private TextView _txtView4;
+    private EditText _edt1;
+    private EditText _edt2;
+    private EditText _edt3;
+    private RadioButton _rbtn1;
+    private RadioButton _rbtn2;
+    private RadioButton _rbtn3;
 
     /**
      * @param deviceInfo
@@ -91,12 +73,12 @@ public class MapFragment_Setting extends Fragment implements View.OnClickListene
         switch(v.getId())
         {
             case R.id.btn_return_device_device_setting:
-                MapFragment_Map mapFragment_map = MapFragment_Map.newInstance(m_deviceInfo);
+                MapFragment_Map mapFragment_map = MapFragment_Map.newInstance(_deviceInfo);
                 getFragmentManager().beginTransaction().replace(R.id.fragment_current_map, mapFragment_map, "mapFragment_map").commitNow();
                 break;
             case R.id.btn_confirm_device_device_setting:
                 String data = "";
-                String timeStr = m_editText1.getText().toString();
+                String timeStr = _edt1.getText().toString();
                 String time1 = timeStr.split(":")[0];
                 String time2 = timeStr.split(":")[1];
                 if(time1.length() < 2)
@@ -110,17 +92,17 @@ public class MapFragment_Setting extends Fragment implements View.OnClickListene
                 //每天上报起始时间
                 String hexStartTime = "000000090400" + time1 + time2 + "00";
                 //监控模式
-                if(m_radio1.isChecked() || m_radio2.isChecked())
+                if(_rbtn1.isChecked() || _rbtn2.isChecked())
                 {
                     int second;
-                    if(m_radio1.isChecked())
+                    if(_rbtn1.isChecked())
                     {
-                        String minue = m_editText2.getText().toString();
+                        String minue = _edt2.getText().toString();
                         second = Integer.valueOf(minue) * 60;
                     }
                     else
                     {
-                        String hour = m_editText3.getText().toString();
+                        String hour = _edt3.getText().toString();
                         second = Integer.valueOf(hour) * 60 * 60;
                     }
                     String hexStrSecond = ConvertUtil.IntToHexStr(second);
@@ -132,19 +114,19 @@ public class MapFragment_Setting extends Fragment implements View.OnClickListene
                     }
                     //上报间隔,秒
                     hexStrSecond = "0000002904" + stringBuffer.toString();
-                    if(m_deviceInfo.getM_type().contains("铱星"))
+                    if(_deviceInfo.getType().contains("铱星"))
                     {
-                        data = "YX," + m_deviceInfo.getM_deviceId() + ",02" + hexStartTime + hexStrSecond;
+                        data = "YX," + _deviceInfo.getDeviceId() + ",02" + hexStartTime + hexStrSecond;
                     }
                     else
                     {
-                        data = "GPRS," + m_deviceInfo.getM_deviceId() + ",02" + hexStartTime + hexStrSecond;
+                        data = "GPRS," + _deviceInfo.getDeviceId() + ",02" + hexStartTime + hexStrSecond;
                     }
                 }
                 //追踪模式
-                else if(m_radio3.isChecked())
+                else if(_rbtn3.isChecked())
                 {
-                    data = "GPRS," + m_deviceInfo.getM_deviceId() + ",020000000A040000000A0000000B0400000E10";
+                    data = "GPRS," + _deviceInfo.getDeviceId() + ",020000000A040000000A0000000B0400000E10";
                 }
                 if(!data.equals(""))
                 {
@@ -152,17 +134,17 @@ public class MapFragment_Setting extends Fragment implements View.OnClickListene
                 }
                 else
                 {
-                    Toast.makeText(m_context, "请检查参数无误", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(_context, "请检查参数无误", Toast.LENGTH_SHORT).show();
                 }
                 break;
             case R.id.editText_upStart_device_setting:
                 //隐藏键盘
                 InputMethodManager imm = (InputMethodManager) v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(v.getApplicationWindowToken(), 0);
-                m_editText1.clearFocus();
+                _edt1.clearFocus();
                 Calendar calendar = Calendar.getInstance();
-                TimePickerDialog.OnTimeSetListener onTimeSetListener = (view, h, m) -> m_editText1.setText(h + ":" + m);
-                TimePickerDialog timePickerDialog = new TimePickerDialog(m_context, onTimeSetListener, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true);
+                TimePickerDialog.OnTimeSetListener onTimeSetListener = (view, h, m) -> _edt1.setText(h + ":" + m);
+                TimePickerDialog timePickerDialog = new TimePickerDialog(_context, onTimeSetListener, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true);
                 timePickerDialog.show();
                 break;
         }
@@ -178,9 +160,9 @@ public class MapFragment_Setting extends Fragment implements View.OnClickListene
 
     public void onButtonPressed(Uri uri)
     {
-        if(mListener != null)
+        if(_listener != null)
         {
-            mListener.onFragmentInteraction(uri);
+            _listener.onFragmentInteraction(uri);
         }
     }
 
@@ -195,7 +177,7 @@ public class MapFragment_Setting extends Fragment implements View.OnClickListene
                 case MESSAGE_RREQUEST_FAIL:
                 {
                     String result = (String) message.obj;
-                    Toast.makeText(m_context, "网络连接超时,请检查网络环境", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(_context, "网络连接超时,请检查网络环境", Toast.LENGTH_SHORT).show();
                     break;
                 }
                 case MESSAGE_RESPONSE_SUCCESS:
@@ -210,7 +192,7 @@ public class MapFragment_Setting extends Fragment implements View.OnClickListene
                 case MESSAGE_RESPONSE_FAIL:
                 {
                     String result = (String) message.obj;
-                    Toast.makeText(m_context, "获取数据失败,请与管理员联系", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(_context, "获取数据失败,请与管理员联系", Toast.LENGTH_SHORT).show();
                     break;
                 }
                 default:
@@ -235,7 +217,7 @@ public class MapFragment_Setting extends Fragment implements View.OnClickListene
                 String result = dataInputStream.readUTF();
                 if(result.contains("OK"))
                 {
-                    Toast.makeText(m_context, "参数设置成功", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(_context, "参数设置成功", Toast.LENGTH_SHORT).show();
                 }
                 dataInputStream.close();
                 dataOutputStream.close();
@@ -244,7 +226,7 @@ public class MapFragment_Setting extends Fragment implements View.OnClickListene
             catch(IOException e)
             {
                 e.printStackTrace();
-                Toast.makeText(m_context, "参数设置失败,请检查与服务的连接", Toast.LENGTH_SHORT).show();
+                Toast.makeText(_context, "参数设置失败,请检查与服务的连接", Toast.LENGTH_SHORT).show();
             }
             Looper.loop();
         }).start();
@@ -263,47 +245,47 @@ public class MapFragment_Setting extends Fragment implements View.OnClickListene
         if(getArguments() != null)
         {
             //获取设备信息
-            m_deviceInfo = getArguments().getParcelable("DEVICEINFO");
+            _deviceInfo = getArguments().getParcelable("DEVICEINFO");
         }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        m_deviceSettingView = inflater.inflate(R.layout.fragment_map_device_setting, container, false);
-        m_context = m_deviceSettingView.getContext();
-        URL = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/DeviceInfo/Update";
-        m_btnReturn = m_deviceSettingView.findViewById(R.id.btn_return_device_device_setting);
-        m_btnReturn.setOnClickListener(this::onClick);
-        m_btnSave = m_deviceSettingView.findViewById(R.id.btn_confirm_device_device_setting);
-        m_btnSave.setOnClickListener(this::onClick);
-        m_textView1 = m_deviceSettingView.findViewById(R.id.textView1_device_setting);
-        m_textView2 = m_deviceSettingView.findViewById(R.id.textView2_device_setting);
-        m_textView3 = m_deviceSettingView.findViewById(R.id.textView3_device_setting);
-        m_textView4 = m_deviceSettingView.findViewById(R.id.textView4_device_setting);
-        m_radio1 = m_deviceSettingView.findViewById(R.id.radio1_setting);
-        m_radio2 = m_deviceSettingView.findViewById(R.id.radio2_setting);
-        m_radio3 = m_deviceSettingView.findViewById(R.id.radio3_setting);
-        m_editText1 = m_deviceSettingView.findViewById(R.id.editText_upStart_device_setting);
-        m_editText1.setOnClickListener(this::onClick);
-        m_editText2 = m_deviceSettingView.findViewById(R.id.editText_upForMinute_device_setting);
-        m_editText3 = m_deviceSettingView.findViewById(R.id.editText_upForHour_device_setting);
-        if(null != m_deviceInfo)
+        _deviceSettingView = inflater.inflate(R.layout.fragment_map_device_setting, container, false);
+        _context = _deviceSettingView.getContext();
+        URL = PropertiesUtil.GetValueProperties(_context).getProperty("URL") + "/DeviceInfo/Update";
+        _btnReturn = _deviceSettingView.findViewById(R.id.btn_return_device_device_setting);
+        _btnReturn.setOnClickListener(this::onClick);
+        _btnSave = _deviceSettingView.findViewById(R.id.btn_confirm_device_device_setting);
+        _btnSave.setOnClickListener(this::onClick);
+        _txtView1 = _deviceSettingView.findViewById(R.id.textView1_device_setting);
+        _txtView2 = _deviceSettingView.findViewById(R.id.textView2_device_setting);
+        _txtView3 = _deviceSettingView.findViewById(R.id.textView3_device_setting);
+        _txtView4 = _deviceSettingView.findViewById(R.id.textView4_device_setting);
+        _rbtn1 = _deviceSettingView.findViewById(R.id.radio1_setting);
+        _rbtn2 = _deviceSettingView.findViewById(R.id.radio2_setting);
+        _rbtn3 = _deviceSettingView.findViewById(R.id.radio3_setting);
+        _edt1 = _deviceSettingView.findViewById(R.id.editText_upStart_device_setting);
+        _edt1.setOnClickListener(this::onClick);
+        _edt2 = _deviceSettingView.findViewById(R.id.editText_upForMinute_device_setting);
+        _edt3 = _deviceSettingView.findViewById(R.id.editText_upForHour_device_setting);
+        if(null != _deviceInfo)
         {
-            m_textView1.setText(m_deviceInfo.getM_name());
-            m_textView2.setText(m_deviceInfo.getM_deviceId());
-            m_textView3.setText(m_deviceInfo.getM_sim());
-            m_textView4.setText("");
-            if(m_deviceInfo.getM_type().contains("铱星"))
+            _txtView1.setText(_deviceInfo.getName());
+            _txtView2.setText(_deviceInfo.getDeviceId());
+            _txtView3.setText(_deviceInfo.getSim());
+            _txtView4.setText("");
+            if(_deviceInfo.getType().contains("铱星"))
             {
-                m_radio3.setEnabled(false);
+                _rbtn3.setEnabled(false);
             }
             else
             {
-                m_radio3.setEnabled(true);
+                _rbtn3.setEnabled(true);
             }
         }
-        return m_deviceSettingView;
+        return _deviceSettingView;
     }
 
     @Override
@@ -312,7 +294,7 @@ public class MapFragment_Setting extends Fragment implements View.OnClickListene
         super.onAttach(context);
         if(context instanceof OnFragmentInteractionListener)
         {
-            mListener = (OnFragmentInteractionListener) context;
+            _listener = (OnFragmentInteractionListener) context;
         }
         else
         {
@@ -324,6 +306,6 @@ public class MapFragment_Setting extends Fragment implements View.OnClickListene
     public void onDetach()
     {
         super.onDetach();
-        mListener = null;
+        _listener = null;
     }
 }

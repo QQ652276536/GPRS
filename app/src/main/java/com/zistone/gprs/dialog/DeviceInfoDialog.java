@@ -6,15 +6,10 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
-import android.widget.CompoundButton;
-import android.widget.ImageButton;
-import android.widget.Switch;
 import android.widget.TextView;
 
 import com.zistone.gprs.R;
-import com.zistone.gprs.entity.DeviceInfo;
-import com.zistone.gprs.entity.FenceInfo;
-import com.zistone.gprs.fragment.MapFragment_Setting;
+import com.zistone.gprs.pojo.DeviceInfo;
 
 import java.text.SimpleDateFormat;
 
@@ -24,21 +19,21 @@ import java.text.SimpleDateFormat;
 public class DeviceInfoDialog extends Dialog implements View.OnClickListener
 {
     private static final SimpleDateFormat SIMPLEDATEFORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    private DeviceInfoDialog.Callback callback;
-    private Button m_btn1;
-    private Button m_btn2;
-    private TextView m_textView1;
-    private TextView m_textView3;
-    private TextView m_textView4;
-    private TextView m_textView5;
-    private TextView m_textView6;
-    private TextView m_textView7;
-    private TextView m_textView8;
-    private TextView m_textView9;
-    private TextView m_textView10;
-    private TextView m_textView11;
-    private DeviceInfo m_deviceInfo;
-    private String m_deviceAddress;
+    private DeviceInfoDialog.Callback _callback;
+    private Button _btn1;
+    private Button _btn2;
+    private TextView _txtView1;
+    private TextView _txtView3;
+    private TextView _txtView4;
+    private TextView _txtView5;
+    private TextView _txtView6;
+    private TextView _txtView7;
+    private TextView _txtView8;
+    private TextView _txtView9;
+    private TextView _txtView10;
+    private TextView _txtView11;
+    private DeviceInfo _deviceInfo;
+    private String _deviceAddress;
 
     /**
      * @param activity
@@ -46,9 +41,9 @@ public class DeviceInfoDialog extends Dialog implements View.OnClickListener
     public DeviceInfoDialog(Activity activity, Callback callback, DeviceInfo deviceInfo, String deviceAddress)
     {
         super(activity);
-        this.callback = callback;
-        m_deviceInfo = deviceInfo;
-        m_deviceAddress = deviceAddress;
+        this._callback = callback;
+        _deviceInfo = deviceInfo;
+        _deviceAddress = deviceAddress;
     }
 
     @Override
@@ -57,32 +52,32 @@ public class DeviceInfoDialog extends Dialog implements View.OnClickListener
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.device_info_dialog);
-        m_textView1 = findViewById(R.id.text1_deviceInfo_dialog);
-        m_textView3 = findViewById(R.id.text3_deviceInfo_dialog);
-        m_textView4 = findViewById(R.id.text4_deviceInfo_dialog);
-        m_textView5 = findViewById(R.id.text5_deviceInfo_dialog);
-        m_textView6 = findViewById(R.id.text6_deviceInfo_dialog);
-        m_textView7 = findViewById(R.id.text7_deviceInfo_dialog);
-        m_textView8 = findViewById(R.id.text8_deviceInfo_dialog);
-        m_textView9 = findViewById(R.id.text9_deviceInfo_dialog);
-        m_textView10 = findViewById(R.id.text10_deviceInfo_dialog);
-        m_textView11 = findViewById(R.id.text11_deviceInfo_dialog);
-        m_btn1 = findViewById(R.id.btn1_deviceInfo_dialog);
-        m_btn1.setOnClickListener(this::onClick);
-        m_btn2 = findViewById(R.id.btn2_deviceInfo_dialog);
-        m_btn2.setOnClickListener(this::onClick);
-        if(m_deviceInfo != null)
+        _txtView1 = findViewById(R.id.text1_deviceInfo_dialog);
+        _txtView3 = findViewById(R.id.text3_deviceInfo_dialog);
+        _txtView4 = findViewById(R.id.text4_deviceInfo_dialog);
+        _txtView5 = findViewById(R.id.text5_deviceInfo_dialog);
+        _txtView6 = findViewById(R.id.text6_deviceInfo_dialog);
+        _txtView7 = findViewById(R.id.text7_deviceInfo_dialog);
+        _txtView8 = findViewById(R.id.text8_deviceInfo_dialog);
+        _txtView9 = findViewById(R.id.text9_deviceInfo_dialog);
+        _txtView10 = findViewById(R.id.text10_deviceInfo_dialog);
+        _txtView11 = findViewById(R.id.text11_deviceInfo_dialog);
+        _btn1 = findViewById(R.id.btn1_deviceInfo_dialog);
+        _btn1.setOnClickListener(this::onClick);
+        _btn2 = findViewById(R.id.btn2_deviceInfo_dialog);
+        _btn2.setOnClickListener(this::onClick);
+        if(_deviceInfo != null)
         {
-            m_textView1.setText("车辆跟踪GPRS-1");
-            m_textView3.setText(m_deviceInfo.getM_name());
-            m_textView4.setText("undefined");
-            m_textView5.setText("正常模式");
-            m_textView6.setText("10分钟/次");
-            m_textView7.setText(SIMPLEDATEFORMAT.format(m_deviceInfo.getM_updateTime()));
-            m_textView8.setText(m_deviceInfo.getM_lot() + ", " + m_deviceInfo.getM_lat());
-            m_textView9.setText(m_deviceAddress);
-            m_textView10.setText(m_deviceInfo.getM_temperature() + "℃");
-            m_textView11.setText(m_deviceInfo.getM_electricity() + "%");
+            _txtView1.setText("车辆跟踪GPRS-1");
+            _txtView3.setText(_deviceInfo.getName());
+            _txtView4.setText("undefined");
+            _txtView5.setText("正常模式");
+            _txtView6.setText("10分钟/次");
+            _txtView7.setText(SIMPLEDATEFORMAT.format(_deviceInfo.getUpdateTime()));
+            _txtView8.setText(_deviceInfo.getLot() + ", " + _deviceInfo.getLat());
+            _txtView9.setText(_deviceAddress);
+            _txtView10.setText(_deviceInfo.getTemperature() + "℃");
+            _txtView11.setText(_deviceInfo.getElectricity() + "%");
         }
     }
 
@@ -104,9 +99,9 @@ public class DeviceInfoDialog extends Dialog implements View.OnClickListener
             }
             case R.id.btn2_deviceInfo_dialog:
             {
-                if(null != callback)
+                if(null != _callback)
                 {
-                    callback.onSetCallback();
+                    _callback.onSetCallback();
                 }
                 dismiss();
                 break;

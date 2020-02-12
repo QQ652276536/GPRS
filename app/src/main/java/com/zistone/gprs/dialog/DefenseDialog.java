@@ -6,11 +6,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.TextView;
 
 import com.zistone.gprs.R;
-import com.zistone.gprs.entity.FenceInfo;
 
 import java.text.SimpleDateFormat;
 
@@ -20,9 +17,9 @@ import java.text.SimpleDateFormat;
 public class DefenseDialog extends Dialog implements View.OnClickListener
 {
     private static final SimpleDateFormat SIMPLEDATEFORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    private Callback callback;
-    private Button m_btn1;
-    private Button m_btn2;
+    private Callback _callback;
+    private Button _btn1;
+    private Button _btn2;
 
     /**
      * @param activity
@@ -30,7 +27,7 @@ public class DefenseDialog extends Dialog implements View.OnClickListener
     public DefenseDialog(Activity activity, Callback callback)
     {
         super(activity);
-        this.callback = callback;
+        this._callback = callback;
     }
 
     @Override
@@ -39,10 +36,10 @@ public class DefenseDialog extends Dialog implements View.OnClickListener
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.defense_dialog);
-        m_btn1 = findViewById(R.id.btn_warning_defense);
-        m_btn1.setOnClickListener(this::onClick);
-        m_btn2 = findViewById(R.id.btn_area_defense);
-        m_btn2.setOnClickListener(this::onClick);
+        _btn1 = findViewById(R.id.btn_warning_defense);
+        _btn1.setOnClickListener(this::onClick);
+        _btn2 = findViewById(R.id.btn_area_defense);
+        _btn2.setOnClickListener(this::onClick);
     }
 
     @Override
@@ -59,18 +56,18 @@ public class DefenseDialog extends Dialog implements View.OnClickListener
             case R.id.btn_area_defense:
             {
                 dismiss();
-                if(null != callback)
+                if(null != _callback)
                 {
-                    callback.onSetCallback();
+                    _callback.onSetCallback();
                 }
                 break;
             }
             case R.id.btn_warning_defense:
             {
                 dismiss();
-                if(null != callback)
+                if(null != _callback)
                 {
-                    callback.onWarnCallback();
+                    _callback.onWarnCallback();
                 }
                 break;
             }

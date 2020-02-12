@@ -52,9 +52,9 @@ public class CircleProgressBar extends ImageView implements MaterialHeadListener
     public static final int DEFAULT_CIRCLE_BG_LIGHT = 0xFFFAFAFA;
     private static final int DEFAULT_CIRCLE_DIAMETER = 40;
     private static final int STROKE_WIDTH_LARGE = 3;
-    public static final int DEFAULT_TEXT_SIZE = 9;
+    public static final int DEFAULT_txt_SIZE = 9;
 
-    private Animation.AnimationListener mListener;
+    private Animation.AnimationListener _listener;
     private int mShadowRadius;
     private int mBackGroundColor;
     private int mProgressColor;
@@ -112,8 +112,8 @@ public class CircleProgressBar extends ImageView implements MaterialHeadListener
         mProgressStokeWidth = a.getDimensionPixelOffset(R.styleable.CircleProgressBar_mlpb_progress_stoke_width, (int) (STROKE_WIDTH_LARGE * density));
         mArrowWidth = a.getDimensionPixelOffset(R.styleable.CircleProgressBar_mlpb_arrow_width, -1);
         mArrowHeight = a.getDimensionPixelOffset(R.styleable.CircleProgressBar_mlpb_arrow_height, -1);
-        mTextSize = a.getDimensionPixelOffset(R.styleable.CircleProgressBar_mlpb_progress_text_size, (int) (DEFAULT_TEXT_SIZE * density));
-        mTextColor = a.getColor(R.styleable.CircleProgressBar_mlpb_progress_text_color, Color.BLACK);
+        mTextSize = a.getDimensionPixelOffset(R.styleable.CircleProgressBar_mlpb_progress_txt_size, (int) (DEFAULT_txt_SIZE * density));
+        mTextColor = a.getColor(R.styleable.CircleProgressBar_mlpb_progress_txt_color, Color.BLACK);
 
         mShowArrow = a.getBoolean(R.styleable.CircleProgressBar_mlpb_show_arrow, false);
         mCircleBackgroundEnabled = a.getBoolean(R.styleable.CircleProgressBar_mlpb_enable_circle_background, true);
@@ -121,7 +121,7 @@ public class CircleProgressBar extends ImageView implements MaterialHeadListener
 
         mProgress = a.getInt(R.styleable.CircleProgressBar_mlpb_progress, 0);
         mMax = a.getInt(R.styleable.CircleProgressBar_mlpb_max, 100);
-        int textVisible = a.getInt(R.styleable.CircleProgressBar_mlpb_progress_text_visibility, 1);
+        int textVisible = a.getInt(R.styleable.CircleProgressBar_mlpb_progress_txt_visibility, 1);
         if(textVisible != 1)
         {
             mIfDrawText = true;
@@ -273,16 +273,16 @@ public class CircleProgressBar extends ImageView implements MaterialHeadListener
 
     public void setAnimationListener(Animation.AnimationListener listener)
     {
-        mListener = listener;
+        _listener = listener;
     }
 
     @Override
     public void onAnimationStart()
     {
         super.onAnimationStart();
-        if(mListener != null)
+        if(_listener != null)
         {
-            mListener.onAnimationStart(getAnimation());
+            _listener.onAnimationStart(getAnimation());
         }
     }
 
@@ -290,9 +290,9 @@ public class CircleProgressBar extends ImageView implements MaterialHeadListener
     public void onAnimationEnd()
     {
         super.onAnimationEnd();
-        if(mListener != null)
+        if(_listener != null)
         {
-            mListener.onAnimationEnd(getAnimation());
+            _listener.onAnimationEnd(getAnimation());
         }
     }
 

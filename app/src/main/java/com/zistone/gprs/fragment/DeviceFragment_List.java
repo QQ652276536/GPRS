@@ -22,7 +22,7 @@ import com.alibaba.fastjson.JSON;
 import com.zistone.gprs.util.PropertiesUtil;
 import com.zistone.gprs.R;
 import com.zistone.gprs.control.DeviceInfoRecyclerAdapter;
-import com.zistone.gprs.entity.DeviceInfo;
+import com.zistone.gprs.pojo.DeviceInfo;
 import com.zistone.material_refresh_layout.MaterialRefreshLayout;
 import com.zistone.material_refresh_layout.MaterialRefreshListener;
 
@@ -55,23 +55,23 @@ public class DeviceFragment_List extends Fragment implements View.OnClickListene
     private static final int MESSAGE_RESPONSE_FAIL = 2;
     private static final int MESSAGE_RESPONSE_SUCCESS = 3;
     private static String URL;
-    private Context m_context;
-    private View m_deviceListView;
-    private List<DeviceInfo> m_deviceList = new ArrayList<>();
+    private Context _context;
+    private View _deviceListView;
+    private List<DeviceInfo> _deviceList = new ArrayList<>();
     //下拉刷新控件
-    private MaterialRefreshLayout m_materialRefreshLayout;
+    private MaterialRefreshLayout _materialRefreshLayout;
     //RecyclerView
-    private RecyclerView m_recyclerView;
+    private RecyclerView _recyclerView;
     //适配器
-    private DeviceInfoRecyclerAdapter m_deviceInfoRecyclerAdapter;
-    private Timer m_refreshTimer;
+    private DeviceInfoRecyclerAdapter _deviceInfoRecyclerAdapter;
+    private Timer _refreshTimer;
     //设备状态
-    private int m_deviceState;
-    private TextView m_ToolbarTextView;
-    private ImageButton m_btnReturn;
+    private int _deviceState;
+    private TextView _ToolbarTextView;
+    private ImageButton _btnReturn;
     //底部导航栏
-    public BottomNavigationView m_bottomNavigationView;
-    private OnFragmentInteractionListener mListener;
+    public BottomNavigationView _bottomNavigationView;
+    private OnFragmentInteractionListener _listener;
 
     /**
      * @param param1 设备状态
@@ -110,9 +110,9 @@ public class DeviceFragment_List extends Fragment implements View.OnClickListene
 
     public void onButtonPressed(Uri uri)
     {
-        if(mListener != null)
+        if(_listener != null)
         {
-            mListener.onFragmentInteraction(uri);
+            _listener.onFragmentInteraction(uri);
         }
     }
 
@@ -121,7 +121,7 @@ public class DeviceFragment_List extends Fragment implements View.OnClickListene
      */
     private void RefreshDeviceList()
     {
-        m_refreshTimer = new Timer();
+        _refreshTimer = new Timer();
         TimerTask refreshTask = new TimerTask()
         {
             @Override
@@ -132,7 +132,7 @@ public class DeviceFragment_List extends Fragment implements View.OnClickListene
             }
         };
         //任务、延迟执行时间、重复调用间隔
-        //m_refreshTimer.schedule(refreshTask, 0, TIMEINTERVAL);
+        //_refreshTimer.schedule(refreshTask, 0, TIMEINTERVAL);
     }
 
     /**
@@ -140,14 +140,14 @@ public class DeviceFragment_List extends Fragment implements View.OnClickListene
      */
     private void SetDeviceInfoRecyclerAdapterListener()
     {
-        if(null != m_deviceInfoRecyclerAdapter)
+        if(null != _deviceInfoRecyclerAdapter)
         {
-            m_deviceInfoRecyclerAdapter.SetOnItemClickListener(new DeviceInfoRecyclerAdapter.OnItemClickListener()
+            _deviceInfoRecyclerAdapter.SetOnItemClickListener(new DeviceInfoRecyclerAdapter.OnItemClickListener()
             {
                 @Override
                 public void OnClick(int position)
                 {
-                    DeviceInfo tempDevice = m_deviceList.get(position);
+                    DeviceInfo tempDevice = _deviceList.get(position);
                     DeviceFragment_Info deviceFragment_info = DeviceFragment_Info.newInstance(tempDevice);
                     getFragmentManager().beginTransaction().replace(R.id.fragment_current_device, deviceFragment_info, "deviceFragment_info").commitNow();
                 }
@@ -155,7 +155,7 @@ public class DeviceFragment_List extends Fragment implements View.OnClickListene
                 @Override
                 public void OnLongClick(int position)
                 {
-                    Toast.makeText(m_context, "当前长按 " + position, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(_context, "当前长按 " + position, Toast.LENGTH_SHORT).show();
                 }
             });
         }
@@ -172,7 +172,7 @@ public class DeviceFragment_List extends Fragment implements View.OnClickListene
                 case MESSAGE_RREQUEST_FAIL:
                 {
                     String result = (String) message.obj;
-                    Toast.makeText(m_context, "网络连接超时,请检查网络环境", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(_context, "网络连接超时,请检查网络环境", Toast.LENGTH_SHORT).show();
                     break;
                 }
                 case MESSAGE_RESPONSE_SUCCESS:
@@ -182,16 +182,16 @@ public class DeviceFragment_List extends Fragment implements View.OnClickListene
                     {
                         return;
                     }
-                    m_deviceList = JSON.parseArray(result, DeviceInfo.class);
-                    Iterator<DeviceInfo> iterator = m_deviceList.iterator();
+                    _deviceList = JSON.parseArray(result, DeviceInfo.class);
+                    Iterator<DeviceInfo> iterator = _deviceList.iterator();
                     //在线设备
-                    if(m_deviceState == 1)
+                    if(_deviceState == 1)
                     {
                         //过滤掉离线设备
                         while(iterator.hasNext())
                         {
                             DeviceInfo temp = iterator.next();
-                            if(temp.getM_state() == 0)
+                            if(temp.getState() == 0)
                             {
                                 iterator.remove();
                             }
@@ -204,22 +204,22 @@ public class DeviceFragment_List extends Fragment implements View.OnClickListene
                         while(iterator.hasNext())
                         {
                             DeviceInfo temp = iterator.next();
-                            if(temp.getM_state() == 1)
+                            if(temp.getState() == 1)
                             {
                                 iterator.remove();
                             }
                         }
                     }
-                    m_deviceInfoRecyclerAdapter = new DeviceInfoRecyclerAdapter(m_context, m_deviceList);
+                    _deviceInfoRecyclerAdapter = new DeviceInfoRecyclerAdapter(_context, _deviceList);
                     //设置适配器
-                    m_recyclerView.setAdapter(m_deviceInfoRecyclerAdapter);
+                    _recyclerView.setAdapter(_deviceInfoRecyclerAdapter);
                     SetDeviceInfoRecyclerAdapterListener();
                     break;
                 }
                 case MESSAGE_RESPONSE_FAIL:
                 {
                     String result = (String) message.obj;
-                    Toast.makeText(m_context, "获取数据失败,请与管理员联系", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(_context, "获取数据失败,请与管理员联系", Toast.LENGTH_SHORT).show();
                     break;
                 }
                 default:
@@ -238,7 +238,7 @@ public class DeviceFragment_List extends Fragment implements View.OnClickListene
             RequestBody requestBody = FormBody.create("", MediaType.parse("application/json; charset=utf-8"));
             Request request = new Request.Builder().post(requestBody).url(URL).build();
             Call call = okHttpClient.newCall(request);
-            //Android中不允许任何网络的交互在主线程中进行
+            //异步请求
             call.enqueue(new Callback()
             {
                 @Override
@@ -278,7 +278,7 @@ public class DeviceFragment_List extends Fragment implements View.OnClickListene
     public void onActivityCreated(Bundle savedInstanceState)
     {
         super.onActivityCreated(savedInstanceState);
-        m_bottomNavigationView = getActivity().findViewById(R.id.nav_view);
+        _bottomNavigationView = getActivity().findViewById(R.id.nav_view);
     }
 
     @Override
@@ -293,27 +293,27 @@ public class DeviceFragment_List extends Fragment implements View.OnClickListene
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        m_deviceListView = inflater.inflate(R.layout.fragment_device_list, container, false);
-        m_context = m_deviceListView.getContext();
-        URL = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/DeviceInfo/FindAll";
-        m_btnReturn = m_deviceListView.findViewById(R.id.btn_return_device_list);
-        m_btnReturn.setOnClickListener(this::onClick);
-        m_ToolbarTextView = m_deviceListView.findViewById(R.id.textView_toolbar);
-        m_recyclerView = m_deviceListView.findViewById(R.id.device_recycler);
-        m_deviceState = getArguments().getInt("DEVICESTATE");
-        if(m_deviceState == 1)
+        _deviceListView = inflater.inflate(R.layout.fragment_device_list, container, false);
+        _context = _deviceListView.getContext();
+        URL = PropertiesUtil.GetValueProperties(_context).getProperty("URL") + "/DeviceInfo/FindAll";
+        _btnReturn = _deviceListView.findViewById(R.id.btn_return_device_list);
+        _btnReturn.setOnClickListener(this::onClick);
+        _ToolbarTextView = _deviceListView.findViewById(R.id.textView_toolbar);
+        _recyclerView = _deviceListView.findViewById(R.id.device_recycler);
+        _deviceState = getArguments().getInt("DEVICESTATE");
+        if(_deviceState == 1)
         {
-            m_ToolbarTextView.setText("可用设备列表");
+            _ToolbarTextView.setText("可用设备列表");
         }
         else
         {
-            m_ToolbarTextView.setText("停用设备列表");
+            _ToolbarTextView.setText("停用设备列表");
         }
         //下拉刷新控件
-        m_materialRefreshLayout = m_deviceListView.findViewById(R.id.refresh);
+        _materialRefreshLayout = _deviceListView.findViewById(R.id.refresh);
         //启用加载更多
-        m_materialRefreshLayout.setLoadMore(true);
-        m_materialRefreshLayout.setMaterialRefreshListener(new MaterialRefreshListener()
+        _materialRefreshLayout.setLoadMore(true);
+        _materialRefreshLayout.setMaterialRefreshListener(new MaterialRefreshListener()
         {
             /**
              * 下拉刷新
@@ -336,7 +336,7 @@ public class DeviceFragment_List extends Fragment implements View.OnClickListene
             @Override
             public void onfinish()
             {
-                //Toast.makeText(m_context, "完成", Toast.LENGTH_LONG).show();
+                //Toast.makeText(_context, "完成", Toast.LENGTH_LONG).show();
             }
 
             /**
@@ -346,24 +346,24 @@ public class DeviceFragment_List extends Fragment implements View.OnClickListene
             @Override
             public void onRefreshLoadMore(MaterialRefreshLayout materialRefreshLayout)
             {
-                //Toast.makeText(m_context, "别滑了,到底了", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(_context, "别滑了,到底了", Toast.LENGTH_SHORT).show();
             }
         });
         //使用线性布局
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(m_context);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(_context);
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        //此时的m_deviceList里面并没有数据,但是需要设置适配器,可以避免在第一次自动下拉刷新时抛出No adapter attached; skipping layout异常
-        m_deviceInfoRecyclerAdapter = new DeviceInfoRecyclerAdapter(m_context, m_deviceList);
+        //此时的_deviceList里面并没有数据,但是需要设置适配器,可以避免在第一次自动下拉刷新时抛出No adapter attached; skipping layout异常
+        _deviceInfoRecyclerAdapter = new DeviceInfoRecyclerAdapter(_context, _deviceList);
         //设置适配器
-        m_recyclerView.setAdapter(m_deviceInfoRecyclerAdapter);
+        _recyclerView.setAdapter(_deviceInfoRecyclerAdapter);
         SetDeviceInfoRecyclerAdapterListener();
         //设置布局
-        m_recyclerView.setLayoutManager(linearLayoutManager);
+        _recyclerView.setLayoutManager(linearLayoutManager);
         //自动刷新
-        m_materialRefreshLayout.autoRefresh();
+        _materialRefreshLayout.autoRefresh();
         //定时刷新
         RefreshDeviceList();
-        return m_deviceListView;
+        return _deviceListView;
     }
 
     @Override
@@ -372,7 +372,7 @@ public class DeviceFragment_List extends Fragment implements View.OnClickListene
         super.onAttach(context);
         if(context instanceof OnFragmentInteractionListener)
         {
-            mListener = (OnFragmentInteractionListener) context;
+            _listener = (OnFragmentInteractionListener) context;
         }
         else
         {
@@ -384,7 +384,7 @@ public class DeviceFragment_List extends Fragment implements View.OnClickListene
     public void onDetach()
     {
         super.onDetach();
-        mListener = null;
-        m_refreshTimer.cancel();
+        _listener = null;
+        _refreshTimer.cancel();
     }
 }

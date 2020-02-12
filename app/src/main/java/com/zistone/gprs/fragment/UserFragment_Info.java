@@ -33,7 +33,7 @@ import com.zistone.gprs.util.ImageUtil;
 import com.zistone.gprs.util.PropertiesUtil;
 import com.zistone.gprs.R;
 import com.zistone.gprs.util.UserSharedPreference;
-import com.zistone.gprs.entity.UserInfo;
+import com.zistone.gprs.pojo.UserInfo;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -70,25 +70,21 @@ public class UserFragment_Info extends Fragment implements View.OnClickListener,
     private static final int TAKE_PICTURE = 1;
     //裁剪图片回传
     private static final int CROP_SMALL_PICTURE = 2;
-    private String m_param1;
-    private String m_param2;
-    private Context m_context;
-    private View m_userInfoView;
-    private EditText m_editText_password;
-    private EditText m_editText_rePassword;
-    private Button m_btnUpdate;
-    private Button m_btnLogout;
-    private ProgressBar m_progressBar;
-    private Uri m_imageUri;
-    private OnFragmentInteractionListener mListener;
-    private ImageView m_imageView;
-    private EditText m_editText_userName;
-    private EditText m_editText_userRealName;
-    private EditText m_editText_userPhone;
-
-    public UserFragment_Info()
-    {
-    }
+    private String _param1;
+    private String _param2;
+    private Context _context;
+    private View _userInfoView;
+    private Button _btnUpdate;
+    private Button _btnLogout;
+    private ProgressBar _progressBar;
+    private Uri _imageUri;
+    private OnFragmentInteractionListener _listener;
+    private ImageView _imageView;
+    private EditText _edtPwd;
+    private EditText _edtRePwd;
+    private EditText _edtUserName;
+    private EditText _edtUserRealName;
+    private EditText _edtUserPhone;
 
     public static UserFragment_Info newInstance(String param1, String param2)
     {
@@ -119,7 +115,7 @@ public class UserFragment_Info extends Fragment implements View.OnClickListener,
             Log.e(TAG, ">>>Bitmap为Null");
             return;
         }
-        m_imageView.setImageBitmap(bitmap);
+        _imageView.setImageBitmap(bitmap);
     }
 
     /**
@@ -127,13 +123,13 @@ public class UserFragment_Info extends Fragment implements View.OnClickListener,
      */
     private void IsUpdateEnd()
     {
-        m_progressBar.setVisibility(View.INVISIBLE);
-        m_editText_userRealName.setEnabled(true);
-        m_editText_userPhone.setEnabled(true);
-        m_editText_password.setEnabled(true);
-        m_editText_rePassword.setEnabled(true);
-        m_btnUpdate.setEnabled(true);
-        m_btnLogout.setEnabled(true);
+        _progressBar.setVisibility(View.INVISIBLE);
+        _edtUserRealName.setEnabled(true);
+        _edtUserPhone.setEnabled(true);
+        _edtPwd.setEnabled(true);
+        _edtRePwd.setEnabled(true);
+        _btnUpdate.setEnabled(true);
+        _btnLogout.setEnabled(true);
     }
 
     /**
@@ -141,13 +137,13 @@ public class UserFragment_Info extends Fragment implements View.OnClickListener,
      */
     private void IsUpdateing()
     {
-        m_progressBar.setVisibility(View.VISIBLE);
-        m_editText_userRealName.setEnabled(false);
-        m_editText_userPhone.setEnabled(false);
-        m_editText_password.setEnabled(false);
-        m_editText_rePassword.setEnabled(false);
-        m_btnUpdate.setEnabled(false);
-        m_btnLogout.setEnabled(false);
+        _progressBar.setVisibility(View.VISIBLE);
+        _edtUserRealName.setEnabled(false);
+        _edtUserPhone.setEnabled(false);
+        _edtPwd.setEnabled(false);
+        _edtRePwd.setEnabled(false);
+        _btnUpdate.setEnabled(false);
+        _btnLogout.setEnabled(false);
     }
 
     /**
@@ -164,12 +160,12 @@ public class UserFragment_Info extends Fragment implements View.OnClickListener,
         }
         Intent intent = new Intent("com.android.camera.action.CROP");
         intent.setDataAndType(uri, "image/*");
-        // 设置裁剪
+        //设置裁剪
         intent.putExtra("crop", "true");
-        // aspectX aspectY 是宽高的比例
+        //aspectX aspectY 是宽高的比例
         intent.putExtra("aspectX", 1);
         intent.putExtra("aspectY", 1);
-        // outputX outputY 是裁剪图片宽高
+        //outputX outputY 是裁剪图片宽高
         intent.putExtra("outputX", 80);
         intent.putExtra("outputY", 80);
         intent.putExtra("return-data", true);
@@ -178,7 +174,7 @@ public class UserFragment_Info extends Fragment implements View.OnClickListener,
 
     private void ShowChoosePhotoDialog()
     {
-        AlertDialog.Builder builder = new AlertDialog.Builder(m_context);
+        AlertDialog.Builder builder = new AlertDialog.Builder(_context);
         builder.setTitle("设置头像");
         String[] items = {
                 "选择本地照片",
@@ -202,7 +198,7 @@ public class UserFragment_Info extends Fragment implements View.OnClickListener,
                 case TAKE_PICTURE:
                 {
                     Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    m_imageUri = Uri.fromFile(new File(Environment.getExternalStorageDirectory(), "blowdown_userimage.jpeg"));
+                    _imageUri = Uri.fromFile(new File(Environment.getExternalStorageDirectory(), "blowdown_userimage.jpeg"));
                     startActivityForResult(intent, TAKE_PICTURE);
                     break;
                 }
@@ -231,7 +227,7 @@ public class UserFragment_Info extends Fragment implements View.OnClickListener,
             };
             for(String perm : permissions)
             {
-                if(PackageManager.PERMISSION_GRANTED != m_context.checkSelfPermission(perm))
+                if(PackageManager.PERMISSION_GRANTED != _context.checkSelfPermission(perm))
                 {
                     //进入到这里代表没有权限
                     permissionsList.add(perm);
@@ -257,7 +253,7 @@ public class UserFragment_Info extends Fragment implements View.OnClickListener,
                 case MESSAGE_RREQUEST_FAIL:
                 {
                     String result = (String) message.obj;
-                    Toast.makeText(m_context, "用户信息更新超时,请检查网络环境", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(_context, "用户信息更新超时,请检查网络环境", Toast.LENGTH_SHORT).show();
                     break;
                 }
                 case MESSAGE_RESPONSE_SUCCESS:
@@ -267,14 +263,14 @@ public class UserFragment_Info extends Fragment implements View.OnClickListener,
                     if(null != userInfo)
                     {
                         Log.i(TAG, ">>>用户信息更新成功");
-                        UserSharedPreference.UpdateSuccess(m_context, userInfo);
+                        UserSharedPreference.UpdateSuccess(_context, userInfo);
                         //修改用户头像
-                        String imageStr = UserSharedPreference.GetUserImage(m_context);
+                        String imageStr = UserSharedPreference.GetUserImage(_context);
                         if(null != imageStr && !"".equals(imageStr))
                         {
                             byte[] bytes = Base64.decode(imageStr, Base64.DEFAULT);
                             Bitmap bitmap = ImageUtil.ByteArrayToBitmap(bytes);
-                            m_imageView.setImageBitmap(bitmap);
+                            _imageView.setImageBitmap(bitmap);
                         }
                     }
                     else
@@ -287,7 +283,7 @@ public class UserFragment_Info extends Fragment implements View.OnClickListener,
                 {
                     String result = (String) message.obj;
                     Log.e(TAG, ">>>请求超时:" + result);
-                    Toast.makeText(m_context, "用户信息失败,请与管理员联系", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(_context, "用户信息失败,请与管理员联系", Toast.LENGTH_SHORT).show();
                     break;
                 }
                 default:
@@ -302,19 +298,19 @@ public class UserFragment_Info extends Fragment implements View.OnClickListener,
         {
             Looper.prepare();
             UserInfo userInfo = new UserInfo();
-            userInfo.setM_id(UserSharedPreference.GetUserId(m_context));
-            m_imageView.setDrawingCacheEnabled(true);
-            Bitmap bitmap = Bitmap.createBitmap(m_imageView.getDrawingCache());
-            m_imageView.setDrawingCacheEnabled(false);
+            userInfo.setId(UserSharedPreference.GetUserId(_context));
+            _imageView.setDrawingCacheEnabled(true);
+            Bitmap bitmap = Bitmap.createBitmap(_imageView.getDrawingCache());
+            _imageView.setDrawingCacheEnabled(false);
             if(null != bitmap)
             {
                 byte[] bytes = ImageUtil.BitmapToByteArray(bitmap);
                 String imageStr = Base64.encodeToString(bytes, Base64.DEFAULT);
-                userInfo.setM_userImage(imageStr);
+                userInfo.setUserImage(imageStr);
             }
-            if(!"".equals(m_editText_rePassword.getText().toString()))
+            if(!"".equals(_edtRePwd.getText().toString()))
             {
-                userInfo.setM_password(m_editText_rePassword.getText().toString());
+                userInfo.setPassword(_edtRePwd.getText().toString());
             }
             String jsonData = JSON.toJSONString(userInfo);
             //实例化并设置连接超时时间、读取超时时间
@@ -322,7 +318,7 @@ public class UserFragment_Info extends Fragment implements View.OnClickListener,
             RequestBody requestBody = FormBody.create(jsonData, MediaType.parse("application/json; charset=utf-8"));
             Request request = new Request.Builder().post(requestBody).url(URL).build();
             Call call = okHttpClient.newCall(request);
-            //Android中不允许任何网络的交互在主线程中进行
+            //异步请求
             call.enqueue(new Callback()
             {
                 @Override
@@ -365,9 +361,9 @@ public class UserFragment_Info extends Fragment implements View.OnClickListener,
 
     public void onButtonPressed(Uri uri)
     {
-        if(mListener != null)
+        if(_listener != null)
         {
-            mListener.onFragmentInteraction(uri);
+            _listener.onFragmentInteraction(uri);
         }
     }
 
@@ -385,7 +381,7 @@ public class UserFragment_Info extends Fragment implements View.OnClickListener,
                 CropImage(data.getData());
                 break;
             case TAKE_PICTURE:
-                CropImage(m_imageUri);
+                CropImage(_imageUri);
                 break;
             case CROP_SMALL_PICTURE:
                 SetImageToView(data);
@@ -415,8 +411,8 @@ public class UserFragment_Info extends Fragment implements View.OnClickListener,
         super.onCreate(savedInstanceState);
         if(getArguments() != null)
         {
-            m_param1 = getArguments().getString(ARG_PARAM1);
-            m_param2 = getArguments().getString(ARG_PARAM2);
+            _param1 = getArguments().getString(ARG_PARAM1);
+            _param2 = getArguments().getString(ARG_PARAM2);
         }
     }
 
@@ -431,39 +427,39 @@ public class UserFragment_Info extends Fragment implements View.OnClickListener,
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        m_userInfoView = inflater.inflate(R.layout.fragment_user_info, container, false);
-        m_context = m_userInfoView.getContext();
-        URL = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/UserInfo/Update";
-        m_editText_userName = m_userInfoView.findViewById(R.id.editText_userName_userInfo);
-        m_editText_userRealName = m_userInfoView.findViewById(R.id.editText_userRealName_userInfo);
-        m_editText_userRealName.setOnFocusChangeListener(this);
-        m_editText_userPhone = m_userInfoView.findViewById(R.id.editText_userPhone_userInfo);
-        m_editText_userPhone.setOnFocusChangeListener(this);
-        m_editText_password = m_userInfoView.findViewById(R.id.editText_password_userInfo);
-        m_editText_password.setOnFocusChangeListener(this);
-        m_editText_rePassword = m_userInfoView.findViewById(R.id.editText_rePassword_userInfo);
-        m_editText_rePassword.setOnFocusChangeListener(this);
-        m_btnUpdate = m_userInfoView.findViewById(R.id.btnUpdate_userInfo);
-        m_btnUpdate.setOnClickListener(this);
-        m_btnLogout = m_userInfoView.findViewById(R.id.btnLogout_userInfo);
-        m_btnLogout.setOnClickListener(this);
-        m_imageView = m_userInfoView.findViewById(R.id.imageView);
-        m_imageView.setOnClickListener(this);
-        m_progressBar = m_userInfoView.findViewById(R.id.progressBar_updateUserInfo);
+        _userInfoView = inflater.inflate(R.layout.fragment_user_info, container, false);
+        _context = _userInfoView.getContext();
+        URL = PropertiesUtil.GetValueProperties(_context).getProperty("URL") + "/UserInfo/Update";
+        _edtUserName = _userInfoView.findViewById(R.id.editText_userName_userInfo);
+        _edtUserRealName = _userInfoView.findViewById(R.id.editText_userRealName_userInfo);
+        _edtUserRealName.setOnFocusChangeListener(this);
+        _edtUserPhone = _userInfoView.findViewById(R.id.editText_userPhone_userInfo);
+        _edtUserPhone.setOnFocusChangeListener(this);
+        _edtPwd = _userInfoView.findViewById(R.id.editText_password_userInfo);
+        _edtPwd.setOnFocusChangeListener(this);
+        _edtRePwd = _userInfoView.findViewById(R.id.editText_rePassword_userInfo);
+        _edtRePwd.setOnFocusChangeListener(this);
+        _btnUpdate = _userInfoView.findViewById(R.id.btnUpdate_userInfo);
+        _btnUpdate.setOnClickListener(this);
+        _btnLogout = _userInfoView.findViewById(R.id.btnLogout_userInfo);
+        _btnLogout.setOnClickListener(this);
+        _imageView = _userInfoView.findViewById(R.id.imageView);
+        _imageView.setOnClickListener(this);
+        _progressBar = _userInfoView.findViewById(R.id.progressBar_updateUserInfo);
         //动态获取权限
         RequestPermission();
         //显示用户基本信息
-        String imageStr = UserSharedPreference.GetUserImage(m_context);
+        String imageStr = UserSharedPreference.GetUserImage(_context);
         if(null != imageStr && !"".equals(imageStr))
         {
             byte[] bytes = Base64.decode(imageStr, Base64.DEFAULT);
             Bitmap bitmap = ImageUtil.ByteArrayToBitmap(bytes);
-            m_imageView.setImageBitmap(bitmap);
+            _imageView.setImageBitmap(bitmap);
         }
-        m_editText_userName.setText(UserSharedPreference.GetUserName(m_context));
-        m_editText_userRealName.setText(UserSharedPreference.GetRealName(m_context));
-        m_editText_userPhone.setText(UserSharedPreference.GetPhone(m_context));
-        return m_userInfoView;
+        _edtUserName.setText(UserSharedPreference.GetUserName(_context));
+        _edtUserRealName.setText(UserSharedPreference.GetRealName(_context));
+        _edtUserPhone.setText(UserSharedPreference.GetPhone(_context));
+        return _userInfoView;
     }
 
     @Override
@@ -472,7 +468,7 @@ public class UserFragment_Info extends Fragment implements View.OnClickListener,
         super.onAttach(context);
         if(context instanceof OnFragmentInteractionListener)
         {
-            mListener = (OnFragmentInteractionListener) context;
+            _listener = (OnFragmentInteractionListener) context;
         }
         else
         {
@@ -487,7 +483,7 @@ public class UserFragment_Info extends Fragment implements View.OnClickListener,
     public void onDetach()
     {
         super.onDetach();
-        mListener = null;
+        _listener = null;
     }
 
     @Override
@@ -506,7 +502,7 @@ public class UserFragment_Info extends Fragment implements View.OnClickListener,
                 break;
             //退出登录
             case R.id.btnLogout_userInfo:
-                UserSharedPreference.LogoutSuccess(m_context);
+                UserSharedPreference.LogoutSuccess(_context);
                 UserFragment_Login userFragment_login = new UserFragment_Login();
                 getFragmentManager().beginTransaction().replace(R.id.fragment_current_user, userFragment_login, "userFragment_login").commitNow();
                 break;
@@ -521,7 +517,7 @@ public class UserFragment_Info extends Fragment implements View.OnClickListener,
             case R.id.editText_userRealName_userInfo:
                 if(hasFocus)
                 {
-                    m_editText_userRealName.setError(null);
+                    _edtUserRealName.setError(null);
                 }
                 break;
             case R.id.editText_userPhone_userInfo:

@@ -39,34 +39,34 @@ import java.util.List;
 
 public class MapActivity extends AppCompatActivity implements SensorEventListener
 {
-    private MyLocationListener m_locationListener = new MyLocationListener();
-    private LocationClient m_locationClient;
-    private TextView m_textView;
-    private MapView m_mapView;
-    private BaiduMap m_baiduMap;
-    private SensorManager m_sensorManager;
+    private MyLocationListener _locationListener = new MyLocationListener();
+    private LocationClient _locationClient;
+    private TextView _txtView;
+    private MapView _mapView;
+    private BaiduMap _baiduMap;
+    private SensorManager _sensorManager;
     //是否首次定位
-    private boolean m_isFirstLoc = true;
-    private double m_lastX;
-    private MyLocationData m_locationData;
-    private int m_currentDirection;
+    private boolean _isFirstLoc = true;
+    private double _lastX;
+    private MyLocationData _locationData;
+    private int _currentDirection;
     //当前纬度
-    private double m_currentLat;
+    private double _currentLat;
     //当前经度
-    private double m_currentLon;
+    private double _currentLon;
     //当前定位精度
-    private float m_currentAccracy;
-    private boolean m_isPermissionRequested;
-    private SDKReceiver m_sdkReceiver;
+    private float _currentAccracy;
+    private boolean _isPermissionRequested;
+    private SDKReceiver _sdkReceiver;
 
     /**
      * Android6.0之后需要动态申请权限
      */
     private void RequestPermission()
     {
-        if (Build.VERSION.SDK_INT >= 23 && !m_isPermissionRequested)
+        if (Build.VERSION.SDK_INT >= 23 && !_isPermissionRequested)
         {
-            m_isPermissionRequested = true;
+            _isPermissionRequested = true;
             ArrayList<String> permissionsList = new ArrayList<>();
             String[] permissions = {
                     Manifest.permission.ACCESS_NETWORK_STATE,
@@ -107,23 +107,23 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
                 return;
             }
             //鉴权错误信息描述
-            m_textView.setTextColor(Color.RED);
+            _txtView.setTextColor(Color.RED);
             if (action.equals(SDKInitializer.SDK_BROADTCAST_ACTION_STRING_PERMISSION_CHECK_ERROR))
             {
-                m_textView.setText("Key验证出错!错误码:"
+                _txtView.setText("Key验证出错!错误码:"
                         + intent.getIntExtra(SDKInitializer.SDK_BROADTCAST_INTENT_EXTRA_INFO_KEY_ERROR_CODE, 0)
                         + ";错误信息:"
                         + intent.getStringExtra(SDKInitializer.SDK_BROADTCAST_INTENT_EXTRA_INFO_KEY_ERROR_MESSAGE));
             }
             else if (action.equals(SDKInitializer.SDK_BROADCAST_ACTION_STRING_NETWORK_ERROR))
             {
-                m_textView.setText("网络出错");
+                _txtView.setText("网络出错");
             }
             else if (action.equals(SDKInitializer.SDK_BROADTCAST_ACTION_STRING_PERMISSION_CHECK_OK))
             {
-                m_textView.setText("Key验证成功!功能可以正常使用");
-                m_textView.setTextColor(Color.GREEN);
-                m_textView.setVisibility(View.GONE);
+                _txtView.setText("Key验证成功!功能可以正常使用");
+                _txtView.setTextColor(Color.GREEN);
+                _txtView.setVisibility(View.GONE);
             }
         }
     }
@@ -139,7 +139,7 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
             //此处的BDLocation为定位结果信息类,通过它的各种get方法可获取定位相关的全部结果
             //以下只列举部分获取经纬度相关（常用）的结果信息更多结果信息获取说明,请参照类参考中BDLocation类中的说明
             //BDLocation.TypeServerError:服务端定位失败,请您检查是否禁用获取位置信息权限,尝试重新请求定位
-            if (null == m_mapView || null == location || BDLocation.TypeServerError == location.getLocType())
+            if (null == _mapView || null == location || BDLocation.TypeServerError == location.getLocType())
             {
                 return;
             }
@@ -150,17 +150,17 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
             sb.append(location.getTime());
             //获取纬度信息
             double latitude = location.getLatitude();
-            m_currentLat = latitude;
+            _currentLat = latitude;
             sb.append("\n纬度 : ");
             sb.append(latitude);
             //获取经度信息
             double longitude = location.getLongitude();
-            m_currentLon = longitude;
+            _currentLon = longitude;
             sb.append("\n经度 : ");
             sb.append(longitude);
             //获取定位精度,默认值为0.0f
             float radius = location.getRadius();
-            m_currentAccracy = radius;
+            _currentAccracy = radius;
             sb.append("\n精度 : ");
             sb.append(radius);
             //获取经纬度坐标类型,以LocationClientOption中设置过的坐标类型为准
@@ -254,18 +254,18 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
             }
             //将定位信息显示在TextView
             //PrintLocationResult(sb.toString());
-            m_locationData = new MyLocationData.Builder().accuracy(location.getRadius()).direction(m_currentDirection).latitude(location.getLatitude()).longitude(location.getLongitude()).build();
+            _locationData = new MyLocationData.Builder().accuracy(location.getRadius()).direction(_currentDirection).latitude(location.getLatitude()).longitude(location.getLongitude()).build();
             //此处设置开发者获取到的方向信息,顺时针0-360
-            m_baiduMap.setMyLocationData(m_locationData);
+            _baiduMap.setMyLocationData(_locationData);
             //如果是首次定位
-            if (m_isFirstLoc)
+            if (_isFirstLoc)
             {
-                m_isFirstLoc = false;
+                _isFirstLoc = false;
                 //根据经纬度定位位置
                 LatLng ll = new LatLng(location.getLatitude(), location.getLongitude());
                 MapStatus.Builder builder = new MapStatus.Builder();
                 builder.target(ll).zoom(18.0f);
-                m_baiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(builder.build()));
+                _baiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(builder.build()));
             }
         }
     }
@@ -285,12 +285,12 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
                 @Override
                 public void run()
                 {
-                    m_textView.post(new Runnable()
+                    _txtView.post(new Runnable()
                     {
                         @Override
                         public void run()
                         {
-                            m_textView.setText(finalStr);
+                            _txtView.setText(finalStr);
                         }
                     });
 
@@ -367,13 +367,13 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
     protected void onDestroy()
     {
         //停止定位
-        m_locationClient.stop();
+        _locationClient.stop();
         //关闭定位图层
-        m_baiduMap.setMyLocationEnabled(false);
-        m_mapView.onDestroy();
-        m_mapView = null;
+        _baiduMap.setMyLocationEnabled(false);
+        _mapView.onDestroy();
+        _mapView = null;
         //取消监听SDK广播
-        unregisterReceiver(m_sdkReceiver);
+        unregisterReceiver(_sdkReceiver);
         super.onDestroy();
     }
 
@@ -384,7 +384,7 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
     protected void onStop()
     {
         //取消注册传感器监听
-        m_sensorManager.unregisterListener(this);
+        _sensorManager.unregisterListener(this);
         super.onStop();
     }
 
@@ -394,10 +394,10 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
     @Override
     protected void onResume()
     {
-        m_mapView.onResume();
+        _mapView.onResume();
         super.onResume();
         //为系统的方向传感器注册监听器
-        m_sensorManager.registerListener(this, m_sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION), SensorManager.SENSOR_DELAY_UI);
+        _sensorManager.registerListener(this, _sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION), SensorManager.SENSOR_DELAY_UI);
     }
 
     /**
@@ -406,7 +406,7 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
     @Override
     protected void onPause()
     {
-        m_mapView.onPause();
+        _mapView.onPause();
         super.onPause();
     }
 
@@ -414,14 +414,14 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
     public void onSensorChanged(SensorEvent sensorEvent)
     {
         double x = sensorEvent.values[SensorManager.DATA_X];
-        if (Math.abs(x - m_lastX) > 1.0)
+        if (Math.abs(x - _lastX) > 1.0)
         {
-            m_currentDirection = (int) x;
-            m_locationData = new MyLocationData.Builder().accuracy(m_currentAccracy).direction(m_currentDirection).latitude(m_currentLat).longitude(m_currentLon).build();
+            _currentDirection = (int) x;
+            _locationData = new MyLocationData.Builder().accuracy(_currentAccracy).direction(_currentDirection).latitude(_currentLat).longitude(_currentLon).build();
             //此处设置开发者获取到的方向信息,顺时针0-360
-            m_baiduMap.setMyLocationData(m_locationData);
+            _baiduMap.setMyLocationData(_locationData);
         }
-        m_lastX = x;
+        _lastX = x;
     }
 
     @Override
@@ -434,8 +434,8 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
-        m_textView = findViewById(R.id.textView);
-        m_mapView = findViewById(R.id.mapView);
+        _txtView = findViewById(R.id.textView);
+        _mapView = findViewById(R.id.mapView);
         //动态获取权限
         RequestPermission();
         //注册SDK广播监听者
@@ -443,29 +443,29 @@ public class MapActivity extends AppCompatActivity implements SensorEventListene
         iFilter.addAction(SDKInitializer.SDK_BROADTCAST_ACTION_STRING_PERMISSION_CHECK_OK);
         iFilter.addAction(SDKInitializer.SDK_BROADTCAST_ACTION_STRING_PERMISSION_CHECK_ERROR);
         iFilter.addAction(SDKInitializer.SDK_BROADCAST_ACTION_STRING_NETWORK_ERROR);
-        m_sdkReceiver = new SDKReceiver();
-        registerReceiver(m_sdkReceiver, iFilter);
+        _sdkReceiver = new SDKReceiver();
+        registerReceiver(_sdkReceiver, iFilter);
         //获取传感器管理服务
-        m_sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        _sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         //支持TextView内容滑动
-        m_textView.setMovementMethod(ScrollingMovementMethod.getInstance());
+        _txtView.setMovementMethod(ScrollingMovementMethod.getInstance());
         //地图初始化
         MapStatus.Builder builder = new MapStatus.Builder();
         builder.overlook(0);
-        m_baiduMap = m_mapView.getMap();
-        m_baiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(builder.build()));
+        _baiduMap = _mapView.getMap();
+        _baiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(builder.build()));
         //定位模式:罗盘
         MyLocationConfiguration locationConfiguration = new MyLocationConfiguration(MyLocationConfiguration.LocationMode.COMPASS, true, null);
-        m_baiduMap.setMyLocationConfiguration(locationConfiguration);
+        _baiduMap.setMyLocationConfiguration(locationConfiguration);
         //开启定位图层
-        m_baiduMap.setMyLocationEnabled(true);
+        _baiduMap.setMyLocationEnabled(true);
         //定位初始化
-        m_locationClient = new LocationClient(this);
-        m_locationClient.registerLocationListener(m_locationListener);
+        _locationClient = new LocationClient(this);
+        _locationClient.registerLocationListener(_locationListener);
         //设置坐标各项参数
         LocationClientOption option = SetLocationClientOption(new LocationClientOption());
-        m_locationClient.setLocOption(option);
-        m_locationClient.start();
+        _locationClient.setLocOption(option);
+        _locationClient.start();
     }
 
 }

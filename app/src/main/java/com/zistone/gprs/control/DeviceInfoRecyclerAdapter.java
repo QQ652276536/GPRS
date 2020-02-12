@@ -1,10 +1,6 @@
 package com.zistone.gprs.control;
 
 import android.content.Context;
-import android.content.res.Resources;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-import android.media.Image;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -14,17 +10,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.zistone.gprs.R;
-import com.zistone.gprs.entity.DeviceInfo;
+import com.zistone.gprs.pojo.DeviceInfo;
 
 import java.util.List;
 
 public class DeviceInfoRecyclerAdapter extends RecyclerView.Adapter<DeviceInfoRecyclerAdapter.DeviceInfoViewHolder>
 {
     private static final String TAG = "DeviceInfoRecyclerAdapt";
-    private Context m_context;
-    private List<DeviceInfo> m_list;
-    private View m_inflater;
-    private OnItemClickListener m_onItemClickListener;
+    private Context _context;
+    private List<DeviceInfo> _list;
+    private View _inflater;
+    private OnItemClickListener _onItemClickListener;
 
     public interface OnItemClickListener
     {
@@ -35,13 +31,13 @@ public class DeviceInfoRecyclerAdapter extends RecyclerView.Adapter<DeviceInfoRe
 
     public DeviceInfoRecyclerAdapter(Context context, List<DeviceInfo> list)
     {
-        m_context = context;
-        m_list = list;
+        _context = context;
+        _list = list;
     }
 
     public void SetOnItemClickListener(OnItemClickListener onItemClickListener)
     {
-        this.m_onItemClickListener = onItemClickListener;
+        this._onItemClickListener = onItemClickListener;
     }
 
     /**
@@ -55,8 +51,8 @@ public class DeviceInfoRecyclerAdapter extends RecyclerView.Adapter<DeviceInfoRe
     @Override
     public DeviceInfoViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i)
     {
-        m_inflater = LayoutInflater.from(m_context).inflate(R.layout.device_item, viewGroup, false);
-        DeviceInfoViewHolder deviceInfoViewHolder = new DeviceInfoViewHolder(m_inflater);
+        _inflater = LayoutInflater.from(_context).inflate(R.layout.device_item, viewGroup, false);
+        DeviceInfoViewHolder deviceInfoViewHolder = new DeviceInfoViewHolder(_inflater);
         return deviceInfoViewHolder;
     }
 
@@ -69,23 +65,23 @@ public class DeviceInfoRecyclerAdapter extends RecyclerView.Adapter<DeviceInfoRe
     @Override
     public void onBindViewHolder(@NonNull DeviceInfoViewHolder deviceInfoViewHolder, final int i)
     {
-        DeviceInfo deviceInfo = m_list.get(i);
-        deviceInfoViewHolder.m_textView.setText(deviceInfo.getM_name() + "\n" + deviceInfo.getM_type());
-        if(deviceInfo.getM_state() == 1)
+        DeviceInfo deviceInfo = _list.get(i);
+        deviceInfoViewHolder._txtView.setText(deviceInfo.getName() + "\n" + deviceInfo.getType());
+        if(deviceInfo.getState() == 1)
         {
-            deviceInfoViewHolder.m_imageView.setImageResource(R.drawable.device3);
-            deviceInfoViewHolder.m_textView.setTextColor(m_context.getResources().getColor(R.color.colorPrimary));
+            deviceInfoViewHolder._imageView.setImageResource(R.drawable.device3);
+            deviceInfoViewHolder._txtView.setTextColor(_context.getResources().getColor(R.color.colorPrimary));
         }
         else
         {
-            deviceInfoViewHolder.m_imageView.setImageResource(R.drawable.device4);
+            deviceInfoViewHolder._imageView.setImageResource(R.drawable.device4);
         }
-        if(m_onItemClickListener != null)
+        if(_onItemClickListener != null)
         {
-            deviceInfoViewHolder.itemView.setOnClickListener(v -> m_onItemClickListener.OnClick(i));
+            deviceInfoViewHolder.itemView.setOnClickListener(v -> _onItemClickListener.OnClick(i));
             deviceInfoViewHolder.itemView.setOnLongClickListener(v ->
             {
-                m_onItemClickListener.OnLongClick(i);
+                _onItemClickListener.OnLongClick(i);
                 return false;
             });
         }
@@ -94,7 +90,7 @@ public class DeviceInfoRecyclerAdapter extends RecyclerView.Adapter<DeviceInfoRe
     @Override
     public int getItemCount()
     {
-        return m_list.size();
+        return _list.size();
     }
 
     /**
@@ -102,14 +98,14 @@ public class DeviceInfoRecyclerAdapter extends RecyclerView.Adapter<DeviceInfoRe
      */
     class DeviceInfoViewHolder extends RecyclerView.ViewHolder
     {
-        TextView m_textView;
-        ImageView m_imageView;
+        TextView _txtView;
+        ImageView _imageView;
 
         public DeviceInfoViewHolder(@NonNull View itemView)
         {
             super(itemView);
-            m_textView = itemView.findViewById(R.id.text_view);
-            m_imageView = itemView.findViewById(R.id.img);
+            _txtView = itemView.findViewById(R.id.text_view);
+            _imageView = itemView.findViewById(R.id.img);
         }
     }
 

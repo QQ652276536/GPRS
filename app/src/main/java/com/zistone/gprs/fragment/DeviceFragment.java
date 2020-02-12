@@ -16,9 +16,9 @@ public class DeviceFragment extends Fragment
     private static final String TAG = "DeviceFragment";
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    private Context m_context;
-    private View m_deviceView;
-    private OnFragmentInteractionListener mListener;
+    private Context _context;
+    private View _deviceView;
+    private OnFragmentInteractionListener _listener;
 
     public static DeviceFragment newInstance(String param1, String param2)
     {
@@ -40,9 +40,9 @@ public class DeviceFragment extends Fragment
 
     public void onButtonPressed(Uri uri)
     {
-        if (mListener != null)
+        if (_listener != null)
         {
-            mListener.onFragmentInteraction(uri);
+            _listener.onFragmentInteraction(uri);
         }
     }
 
@@ -64,13 +64,13 @@ public class DeviceFragment extends Fragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        m_deviceView = inflater.inflate(R.layout.fragment_device, container, false);
+        _deviceView = inflater.inflate(R.layout.fragment_device, container, false);
 
-        m_context = getContext();
+        _context = getContext();
         //注意:一个FragmentTransaction只能Commit一次,不要用全局或共享一个FragmentTransaction对象,多个Fragment则多次get
         DeviceFragment_Manage deviceFragment_manage = DeviceFragment_Manage.newInstance("", "");
         getChildFragmentManager().beginTransaction().add(R.id.fragment_current_device, deviceFragment_manage, "deviceFragment_manage").show(deviceFragment_manage).commitNow();
-        return m_deviceView;
+        return _deviceView;
     }
 
     @Override
@@ -79,7 +79,7 @@ public class DeviceFragment extends Fragment
         super.onAttach(context);
         if (context instanceof OnFragmentInteractionListener)
         {
-            mListener = (OnFragmentInteractionListener) context;
+            _listener = (OnFragmentInteractionListener) context;
         }
         else
         {
@@ -91,6 +91,6 @@ public class DeviceFragment extends Fragment
     public void onDetach()
     {
         super.onDetach();
-        mListener = null;
+        _listener = null;
     }
 }

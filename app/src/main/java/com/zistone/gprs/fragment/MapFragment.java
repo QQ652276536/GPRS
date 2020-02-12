@@ -16,9 +16,9 @@ public class MapFragment extends Fragment
     private static final String TAG = "MapFragment";
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    private Context m_context;
-    private View m_mapView;
-    private OnFragmentInteractionListener mListener;
+    private Context _context;
+    private View _mapView;
+    private OnFragmentInteractionListener _listener;
 
     public static MapFragment newInstance(String param1, String param2)
     {
@@ -40,9 +40,9 @@ public class MapFragment extends Fragment
 
     public void onButtonPressed(Uri uri)
     {
-        if (mListener != null)
+        if (_listener != null)
         {
-            mListener.onFragmentInteraction(uri);
+            _listener.onFragmentInteraction(uri);
         }
     }
 
@@ -64,12 +64,12 @@ public class MapFragment extends Fragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        m_mapView = inflater.inflate(R.layout.fragment_map, container, false);
-        m_context = getContext();
+        _mapView = inflater.inflate(R.layout.fragment_map, container, false);
+        _context = getContext();
         //注意:一个FragmentTransaction只能Commit一次,不要用全局或共享一个FragmentTransaction对象,多个Fragment则多次get
         MapFragment_Map mapFragment_map = MapFragment_Map.newInstance(null);
         getChildFragmentManager().beginTransaction().add(R.id.fragment_current_map, mapFragment_map, "mapFragment_map").show(mapFragment_map).commitNow();
-        return m_mapView;
+        return _mapView;
     }
 
     @Override
@@ -78,7 +78,7 @@ public class MapFragment extends Fragment
         super.onAttach(context);
         if (context instanceof OnFragmentInteractionListener)
         {
-            mListener = (OnFragmentInteractionListener) context;
+            _listener = (OnFragmentInteractionListener) context;
         }
         else
         {
@@ -90,6 +90,6 @@ public class MapFragment extends Fragment
     public void onDetach()
     {
         super.onDetach();
-        mListener = null;
+        _listener = null;
     }
 }

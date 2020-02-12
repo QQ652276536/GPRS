@@ -22,7 +22,7 @@ import android.widget.Toast;
 import com.alibaba.fastjson.JSON;
 import com.zistone.gprs.util.PropertiesUtil;
 import com.zistone.gprs.R;
-import com.zistone.gprs.entity.UserInfo;
+import com.zistone.gprs.pojo.UserInfo;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -52,24 +52,22 @@ public class UserFragment_Register extends Fragment implements View.OnClickListe
     private static final String REGEXUSERNAME = "([a-zA-Z0-9]{6,12})|[\\u4e00-\\u9fa5]{2,6}";
     //首位不能是数字,不能全为数字或字母,6~16位
     private static final String REGEXPASSWORD = "^(?![0-9])(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,16}$";
-    //2~4位纯中文
-    private static final String REGEXNAME = "[\\u4e00-\\u9fa5]{2,4}";
     //手机号
     private static final String REGEXPHONE = "^(13|14|15|18|17)[0-9]{9}";
     private String mParam1;
     private String mParam2;
-    private Context m_context;
-    private View m_registerView;
-    private EditText m_editText_userName;
-    private EditText m_editText_userRealName;
-    private EditText m_editText_userPhone;
-    private EditText m_editText_password;
-    private EditText m_editText_rePassword;
-    private ImageButton m_btnReturn;
-    private Button m_btnRegister;
-    private ProgressBar m_progressBar;
+    private Context _context;
+    private View _registerView;
+    private EditText _edtUserName;
+    private EditText _edtRealName;
+    private EditText _edtPhone;
+    private EditText _edtPwd;
+    private EditText _edtRePwd;
+    private ImageButton _btnReturn;
+    private Button _btnRegister;
+    private ProgressBar _progressBar;
 
-    private OnFragmentInteractionListener mListener;
+    private OnFragmentInteractionListener _listener;
 
     public static UserFragment_Register newInstance(String param1, String param2)
     {
@@ -83,9 +81,9 @@ public class UserFragment_Register extends Fragment implements View.OnClickListe
 
     public void onButtonPressed(Uri uri)
     {
-        if(mListener != null)
+        if(_listener != null)
         {
-            mListener.onFragmentInteraction(uri);
+            _listener.onFragmentInteraction(uri);
         }
     }
 
@@ -106,7 +104,7 @@ public class UserFragment_Register extends Fragment implements View.OnClickListe
                 case MESSAGE_RREQUEST_FAIL:
                 {
                     String result = (String) message.obj;
-                    Toast.makeText(m_context, "注册超时,请检查网络环境", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(_context, "注册超时,请检查网络环境", Toast.LENGTH_SHORT).show();
                     break;
                 }
                 case MESSAGE_RESPONSE_SUCCESS:
@@ -119,7 +117,7 @@ public class UserFragment_Register extends Fragment implements View.OnClickListe
                 case MESSAGE_RESPONSE_FAIL:
                 {
                     String result = (String) message.obj;
-                    Toast.makeText(m_context, "注册失败,请与管理员联系", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(_context, "注册失败,请与管理员联系", Toast.LENGTH_SHORT).show();
                     break;
                 }
                 default:
@@ -134,19 +132,19 @@ public class UserFragment_Register extends Fragment implements View.OnClickListe
         {
             Looper.prepare();
             UserInfo userInfo = new UserInfo();
-            userInfo.setM_realName(m_editText_userRealName.getText().toString());
-            userInfo.setM_userName(m_editText_userName.getText().toString());
-            userInfo.setM_phoneNumber(m_editText_userPhone.getText().toString());
-            userInfo.setM_password(m_editText_rePassword.getText().toString());
-            userInfo.setM_state(1);
-            userInfo.setM_level(1);
+            userInfo.setRealName(_edtRealName.getText().toString());
+            userInfo.setUserName(_edtUserName.getText().toString());
+            userInfo.setPhoneNumber(_edtPhone.getText().toString());
+            userInfo.setPassword(_edtRePwd.getText().toString());
+            userInfo.setState(1);
+            userInfo.setLevel(1);
             String jsonData = JSON.toJSONString(userInfo);
             //实例化并设置连接超时时间、读取超时时间
             OkHttpClient okHttpClient = new OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS).readTimeout(10, TimeUnit.SECONDS).build();
             RequestBody requestBody = FormBody.create(jsonData, MediaType.parse("application/json; charset=utf-8"));
             Request request = new Request.Builder().post(requestBody).url(URL).build();
             Call call = okHttpClient.newCall(request);
-            //Android中不允许任何网络的交互在主线程中进行
+            //异步请求
             call.enqueue(new Callback()
             {
                 @Override
@@ -189,7 +187,7 @@ public class UserFragment_Register extends Fragment implements View.OnClickListe
     {
         if(userInfo != null)
         {
-            Log.i(TAG, "注册成功:用户ID是" + userInfo.getM_id());
+            Log.i(TAG, "注册成功:用户ID是" + userInfo.getId());
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder.setPositiveButton("确定", (dialog, which) ->
             {
@@ -197,13 +195,13 @@ public class UserFragment_Register extends Fragment implements View.OnClickListe
                 UserFragment_Login userFragment_login = UserFragment_Login.newInstance("", "");
                 getFragmentManager().beginTransaction().replace(R.id.fragment_current_user, userFragment_login, "userFragment_login").commitNow();
             });
-            builder.setMessage("注册成功,请牢记你的用户名" + userInfo.getM_userName() + "和密码!");
+            builder.setMessage("注册成功,请牢记你的用户名" + userInfo.getUserName() + "和密码!");
             builder.show();
         }
         else
         {
             Log.i(TAG, "注册失败:用户名已被注册");
-            Toast.makeText(m_context, "注册失败:用户名已被注册", Toast.LENGTH_SHORT).show();
+            Toast.makeText(_context, "注册失败:用户名已被注册", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -212,14 +210,14 @@ public class UserFragment_Register extends Fragment implements View.OnClickListe
      */
     private void IsRegisterEd()
     {
-        m_progressBar.setVisibility(View.INVISIBLE);
-        m_editText_userName.setEnabled(true);
-        m_editText_userRealName.setEnabled(true);
-        m_editText_userPhone.setEnabled(true);
-        m_editText_password.setEnabled(true);
-        m_editText_rePassword.setEnabled(true);
-        m_btnReturn.setEnabled(true);
-        m_btnRegister.setEnabled(true);
+        _progressBar.setVisibility(View.INVISIBLE);
+        _edtUserName.setEnabled(true);
+        _edtRealName.setEnabled(true);
+        _edtPhone.setEnabled(true);
+        _edtPwd.setEnabled(true);
+        _edtRePwd.setEnabled(true);
+        _btnReturn.setEnabled(true);
+        _btnRegister.setEnabled(true);
     }
 
     /**
@@ -227,14 +225,14 @@ public class UserFragment_Register extends Fragment implements View.OnClickListe
      */
     private void IsRegistering()
     {
-        m_progressBar.setVisibility(View.VISIBLE);
-        m_editText_userName.setEnabled(false);
-        m_editText_userRealName.setEnabled(false);
-        m_editText_userPhone.setEnabled(false);
-        m_editText_password.setEnabled(false);
-        m_editText_rePassword.setEnabled(false);
-        //m_btnReturn.setEnabled(false);
-        m_btnRegister.setEnabled(false);
+        _progressBar.setVisibility(View.VISIBLE);
+        _edtUserName.setEnabled(false);
+        _edtRealName.setEnabled(false);
+        _edtPhone.setEnabled(false);
+        _edtPwd.setEnabled(false);
+        _edtRePwd.setEnabled(false);
+        //_btnReturn.setEnabled(false);
+        _btnRegister.setEnabled(false);
     }
 
     private void Register()
@@ -256,54 +254,54 @@ public class UserFragment_Register extends Fragment implements View.OnClickListe
                 getFragmentManager().beginTransaction().replace(R.id.fragment_current_user, userFragment_login, "userFragment_login").commitNow();
                 break;
             case R.id.btn_register_register:
-                if(Pattern.matches(REGEXUSERNAME, m_editText_userName.getText().toString()))
+                if(Pattern.matches(REGEXUSERNAME, _edtUserName.getText().toString()))
                 {
-                    m_editText_userName.setError(null);
+                    _edtUserName.setError(null);
                 }
                 else
                 {
-                    m_editText_userName.setError("用户名非法");
+                    _edtUserName.setError("用户名非法");
                 }
-                if(Pattern.matches(REGEXNAME, m_editText_userRealName.getText().toString()))
+                if(Pattern.matches(REGEXUSERNAME, _edtRealName.getText().toString()))
                 {
-                    m_editText_userRealName.setError(null);
-                }
-                else
-                {
-                    m_editText_userRealName.setError("姓名非法");
-                }
-                if(Pattern.matches(REGEXPHONE, m_editText_userPhone.getText().toString()))
-                {
-                    m_editText_userPhone.setError(null);
+                    _edtRealName.setError(null);
                 }
                 else
                 {
-                    m_editText_userPhone.setError("手机号非法");
+                    _edtRealName.setError("姓名非法");
                 }
-                if(Pattern.matches(REGEXPASSWORD, m_editText_password.getText().toString()))
+                if(Pattern.matches(REGEXPHONE, _edtPhone.getText().toString()))
                 {
-                    m_editText_password.setError(null);
+                    _edtPhone.setError(null);
                 }
                 else
                 {
-                    m_editText_password.setError("密码非法");
+                    _edtPhone.setError("手机号非法");
                 }
-                if(Pattern.matches(REGEXPASSWORD, m_editText_rePassword.getText().toString()))
+                if(Pattern.matches(REGEXPASSWORD, _edtPwd.getText().toString()))
                 {
-                    if(!m_editText_rePassword.getText().toString().equals(m_editText_password.getText().toString()))
+                    _edtPwd.setError(null);
+                }
+                else
+                {
+                    _edtPwd.setError("密码非法");
+                }
+                if(Pattern.matches(REGEXPASSWORD, _edtRePwd.getText().toString()))
+                {
+                    if(!_edtRePwd.getText().toString().equals(_edtPwd.getText().toString()))
                     {
-                        m_editText_rePassword.setError("两次密码不一致");
+                        _edtRePwd.setError("两次密码不一致");
                     }
                     else
                     {
-                        m_editText_rePassword.setError(null);
+                        _edtRePwd.setError(null);
                     }
                 }
                 else
                 {
-                    m_editText_rePassword.setError("密码非法");
+                    _edtRePwd.setError("密码非法");
                 }
-                if(m_editText_userName.getError() == null && m_editText_userRealName.getError() == null && m_editText_userPhone.getError() == null && m_editText_password.getError() == null && m_editText_rePassword.getError() == null)
+                if(_edtUserName.getError() == null && _edtRealName.getError() == null && _edtPhone.getError() == null && _edtPwd.getError() == null && _edtRePwd.getError() == null)
                 {
                     Register();
                 }
@@ -319,92 +317,92 @@ public class UserFragment_Register extends Fragment implements View.OnClickListe
             case R.id.editTextUserName_register:
                 if(hasFocus)
                 {
-                    m_editText_userName.setError(null);
+                    _edtUserName.setError(null);
                 }
                 else
                 {
-                    if(Pattern.matches(REGEXUSERNAME, m_editText_userName.getText().toString()))
+                    if(Pattern.matches(REGEXUSERNAME, _edtUserName.getText().toString()))
                     {
-                        m_editText_userName.setError(null);
+                        _edtUserName.setError(null);
                     }
                     else
                     {
-                        m_editText_userName.setError("用户名非法");
+                        _edtUserName.setError("用户名非法");
                     }
                 }
                 break;
             case R.id.editTextRealName_register:
                 if(hasFocus)
                 {
-                    m_editText_userRealName.setError(null);
+                    _edtRealName.setError(null);
                 }
                 else
                 {
-                    if(Pattern.matches(REGEXNAME, m_editText_userRealName.getText().toString()))
+                    if(Pattern.matches(REGEXUSERNAME, _edtRealName.getText().toString()))
                     {
-                        m_editText_userRealName.setError(null);
+                        _edtRealName.setError(null);
                     }
                     else
                     {
-                        m_editText_userRealName.setError("密码非法");
+                        _edtRealName.setError("姓名非法");
                     }
                 }
                 break;
             case R.id.editTextPhone_register:
                 if(hasFocus)
                 {
-                    m_editText_userPhone.setError(null);
+                    _edtPhone.setError(null);
                 }
                 else
                 {
-                    if(Pattern.matches(REGEXPHONE, m_editText_userPhone.getText().toString()))
+                    if(Pattern.matches(REGEXPHONE, _edtPhone.getText().toString()))
                     {
-                        m_editText_userPhone.setError(null);
+                        _edtPhone.setError(null);
                     }
                     else
                     {
-                        m_editText_userPhone.setError("手机号非法");
+                        _edtPhone.setError("手机号非法");
                     }
                 }
                 break;
             case R.id.editTextPassword_register:
                 if(hasFocus)
                 {
-                    m_editText_password.setError(null);
+                    _edtPwd.setError(null);
                 }
                 else
                 {
-                    if(Pattern.matches(REGEXPASSWORD, m_editText_password.getText().toString()))
+                    if(Pattern.matches(REGEXPASSWORD, _edtPwd.getText().toString()))
                     {
-                        m_editText_password.setError(null);
+                        _edtPwd.setError(null);
                     }
                     else
                     {
-                        m_editText_password.setError("密码非法");
+                        _edtPwd.setError("密码非法");
                     }
                 }
                 break;
             case R.id.editTextRePassword_register:
                 if(hasFocus)
                 {
-                    m_editText_rePassword.setError(null);
+                    _edtRePwd.setError(null);
                 }
                 else
                 {
-                    if(Pattern.matches(REGEXPASSWORD, m_editText_rePassword.getText().toString()))
+                    if(Pattern.matches(REGEXPASSWORD, _edtRePwd.getText().toString()))
                     {
-                        if(!m_editText_rePassword.getText().toString().equals(m_editText_password.getText().toString()))
+                        if(!_edtRePwd.getText().toString().equals(_edtPwd.getText().toString()))
                         {
-                            m_editText_rePassword.setError("再次密码不一致");
+                            _edtRePwd.setError("再次密码不一致");
                         }
                         else
                         {
-                            m_editText_rePassword.setError(null);
+                            _edtRePwd.setError(null);
                         }
                     }
                     else
                     {
-                        m_editText_rePassword.setError("密码非法");
+                        _edtRePwd.setError("密码非法");
                     }
                 }
                 break;
@@ -422,25 +420,25 @@ public class UserFragment_Register extends Fragment implements View.OnClickListe
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        m_registerView = inflater.inflate(R.layout.fragment_user_register, container, false);
-        m_context = m_registerView.getContext();
-        URL = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/UserInfo/Register";
-        m_editText_userName = m_registerView.findViewById(R.id.editTextUserName_register);
-        m_editText_userName.setOnFocusChangeListener(this);
-        m_editText_userRealName = m_registerView.findViewById(R.id.editTextRealName_register);
-        m_editText_userRealName.setOnFocusChangeListener(this);
-        m_editText_userPhone = m_registerView.findViewById(R.id.editTextPhone_register);
-        m_editText_userPhone.setOnFocusChangeListener(this);
-        m_editText_password = m_registerView.findViewById(R.id.editTextPassword_register);
-        m_editText_password.setOnFocusChangeListener(this);
-        m_editText_rePassword = m_registerView.findViewById(R.id.editTextRePassword_register);
-        m_editText_rePassword.setOnFocusChangeListener(this);
-        m_btnReturn = m_registerView.findViewById(R.id.btn_return_register);
-        m_btnReturn.setOnClickListener(this);
-        m_btnRegister = m_registerView.findViewById(R.id.btn_register_register);
-        m_btnRegister.setOnClickListener(this);
-        m_progressBar = m_registerView.findViewById(R.id.progressBar_register);
-        return m_registerView;
+        _registerView = inflater.inflate(R.layout.fragment_user_register, container, false);
+        _context = _registerView.getContext();
+        URL = PropertiesUtil.GetValueProperties(_context).getProperty("URL") + "/UserInfo/Register";
+        _edtUserName = _registerView.findViewById(R.id.editTextUserName_register);
+        _edtUserName.setOnFocusChangeListener(this);
+        _edtRealName = _registerView.findViewById(R.id.editTextRealName_register);
+        _edtRealName.setOnFocusChangeListener(this);
+        _edtPhone = _registerView.findViewById(R.id.editTextPhone_register);
+        _edtPhone.setOnFocusChangeListener(this);
+        _edtPwd = _registerView.findViewById(R.id.editTextPassword_register);
+        _edtPwd.setOnFocusChangeListener(this);
+        _edtRePwd = _registerView.findViewById(R.id.editTextRePassword_register);
+        _edtRePwd.setOnFocusChangeListener(this);
+        _btnReturn = _registerView.findViewById(R.id.btn_return_register);
+        _btnReturn.setOnClickListener(this);
+        _btnRegister = _registerView.findViewById(R.id.btn_register_register);
+        _btnRegister.setOnClickListener(this);
+        _progressBar = _registerView.findViewById(R.id.progressBar_register);
+        return _registerView;
     }
 
     /**
@@ -474,7 +472,7 @@ public class UserFragment_Register extends Fragment implements View.OnClickListe
         super.onAttach(context);
         if(context instanceof OnFragmentInteractionListener)
         {
-            mListener = (OnFragmentInteractionListener) context;
+            _listener = (OnFragmentInteractionListener) context;
         }
         else
         {
@@ -489,7 +487,7 @@ public class UserFragment_Register extends Fragment implements View.OnClickListe
     public void onDetach()
     {
         super.onDetach();
-        mListener = null;
+        _listener = null;
     }
 
 }

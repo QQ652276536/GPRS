@@ -23,13 +23,13 @@ import com.zistone.gprs.R;
  */
 public class CreateFenceDialog extends Dialog implements View.OnClickListener
 {
-    private Callback callback;
-    private Button m_btn1 = null;
-    private Button m_btn2 = null;
-    private EditText m_editText1 = null;
-    private EditText m_editText2 = null;
-    private EditText m_editText3 = null;
-    private String m_address;
+    private Callback _callback;
+    private Button _btn1 = null;
+    private Button _btn2 = null;
+    private EditText _edt1 = null;
+    private EditText _edt2 = null;
+    private EditText _edt3 = null;
+    private String _address;
 
     /**
      * @param activity
@@ -37,8 +37,8 @@ public class CreateFenceDialog extends Dialog implements View.OnClickListener
     public CreateFenceDialog(Activity activity, Callback callback, String address)
     {
         super(activity);
-        this.callback = callback;
-        m_address = address;
+        this._callback = callback;
+        _address = address;
     }
 
     @Override
@@ -47,14 +47,14 @@ public class CreateFenceDialog extends Dialog implements View.OnClickListener
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.create_fence_dialog);
-        m_editText1 = findViewById(R.id.edt1_createFence);
-        m_editText2 = findViewById(R.id.edt2_createFence);
-        m_editText2.setText(m_address);
-        m_editText3 = findViewById(R.id.edt3_createFence);
-        m_btn1 = findViewById(R.id.btn1_createFence);
-        m_btn1.setOnClickListener(this::onClick);
-        m_btn2 = findViewById(R.id.btn2_createFence);
-        m_btn2.setOnClickListener(this::onClick);
+        _edt1 = findViewById(R.id.edt1_createFence);
+        _edt2 = findViewById(R.id.edt2_createFence);
+        _edt2.setText(_address);
+        _edt3 = findViewById(R.id.edt3_createFence);
+        _btn1 = findViewById(R.id.btn1_createFence);
+        _btn1.setOnClickListener(this::onClick);
+        _btn2 = findViewById(R.id.btn2_createFence);
+        _btn2.setOnClickListener(this::onClick);
     }
 
     @Override
@@ -70,14 +70,14 @@ public class CreateFenceDialog extends Dialog implements View.OnClickListener
         {
             case R.id.btn1_createFence:
             {
-                String name = m_editText1.getText().toString();
-                String address = m_editText2.getText().toString();
-                double radius = Double.valueOf(m_editText3.getText().toString());
+                String name = _edt1.getText().toString();
+                String address = _edt2.getText().toString();
+                double radius = Double.valueOf(_edt3.getText().toString());
                 if(name != null && !name.trim().equals("") && radius > 0)
                 {
-                    if(null != callback)
+                    if(null != _callback)
                     {
-                        callback.onSureCallback(name, address, radius);
+                        _callback.onSureCallback(name, address, radius);
                     }
                 }
                 else
@@ -90,9 +90,9 @@ public class CreateFenceDialog extends Dialog implements View.OnClickListener
             case R.id.btn2_createFence:
             {
                 dismiss();
-                if(null != callback)
+                if(null != _callback)
                 {
-                    callback.onCancelCallback();
+                    _callback.onCancelCallback();
                 }
                 break;
             }

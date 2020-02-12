@@ -3,31 +3,31 @@ package com.zistone.gprs.util;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.zistone.gprs.entity.UserInfo;
+import com.zistone.gprs.pojo.UserInfo;
 
 public class UserSharedPreference
 {
 
     public static void UpdateSuccess(Context context, UserInfo userInfo)
     {
-        if(null != userInfo.getM_password())
+        if (null != userInfo.getPassword())
         {
-            UserSharedPreference.SetPassword(context, userInfo.getM_password());
+            UserSharedPreference.SetPassword(context, userInfo.getPassword());
         }
-        if(null != userInfo.getM_userImage())
+        if (null != userInfo.getUserImage())
         {
-            UserSharedPreference.SetUserImage(context, userInfo.getM_userImage());
+            UserSharedPreference.SetUserImage(context, userInfo.getUserImage());
         }
     }
 
     public static void LogoutSuccess(Context context)
     {
-        //        UserSharedPreference.SetUserId(context, 0);
-        //        UserSharedPreference.SetUserName(context, "");
-        //        UserSharedPreference.SetRealName(context, "");
-        //        UserSharedPreference.SetPassword(context, "");
-        //        UserSharedPreference.SetLevel(context, 1);
-        //        UserSharedPreference.SetUserImage(context, "");
+        UserSharedPreference.SetUserId(context, 0);
+        UserSharedPreference.SetUserName(context, "");
+        UserSharedPreference.SetRealName(context, "");
+        UserSharedPreference.SetPassword(context, "");
+        UserSharedPreference.SetLevel(context, 1);
+        UserSharedPreference.SetUserImage(context, "");
         SharedPreferences.Editor editor = Share(context).edit();
         editor.clear();
         editor.commit();
@@ -35,14 +35,14 @@ public class UserSharedPreference
 
     public static void LoginSuccess(Context context, UserInfo userInfo)
     {
-        UserSharedPreference.SetUserId(context, userInfo.getM_id());
-        UserSharedPreference.SetUserName(context, userInfo.getM_userName());
-        UserSharedPreference.SetRealName(context, userInfo.getM_realName());
-        UserSharedPreference.SetPhone(context, userInfo.getM_phoneNumber());
-        UserSharedPreference.SetPassword(context, userInfo.getM_password());
-        UserSharedPreference.SetState(context, userInfo.getM_state());
-        UserSharedPreference.SetLevel(context, userInfo.getM_level());
-        UserSharedPreference.SetUserImage(context, userInfo.getM_userImage());
+        UserSharedPreference.SetUserId(context, userInfo.getId());
+        UserSharedPreference.SetUserName(context, userInfo.getUserName());
+        UserSharedPreference.SetRealName(context, userInfo.getRealName());
+        UserSharedPreference.SetPhone(context, userInfo.getPhoneNumber());
+        UserSharedPreference.SetPassword(context, userInfo.getPassword());
+        UserSharedPreference.SetState(context, userInfo.getState());
+        UserSharedPreference.SetLevel(context, userInfo.getLevel());
+        UserSharedPreference.SetUserImage(context, userInfo.getUserImage());
     }
 
     public static SharedPreferences Share(Context context)

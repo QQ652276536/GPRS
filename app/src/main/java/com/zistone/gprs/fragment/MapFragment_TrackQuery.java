@@ -8,14 +8,12 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.v4.app.Fragment;
-import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,8 +21,8 @@ import android.widget.Toast;
 import com.alibaba.fastjson.JSON;
 import com.baidu.mapapi.model.LatLng;
 import com.zistone.gprs.R;
-import com.zistone.gprs.entity.DeviceInfo;
-import com.zistone.gprs.entity.LocationInfo;
+import com.zistone.gprs.pojo.DeviceInfo;
+import com.zistone.gprs.pojo.LocationInfo;
 import com.zistone.gprs.util.MapUtil;
 import com.zistone.gprs.util.PropertiesUtil;
 
@@ -56,20 +54,20 @@ public class MapFragment_TrackQuery extends Fragment implements View.OnClickList
     private static final SimpleDateFormat SIMPLEDATEFORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static final SimpleDateFormat SIMPLEDATEFORMAT_YMD = new SimpleDateFormat("yyyy-MM-dd");
     private static String URL;
-    private Context m_context;
-    private View m_trackQueryView;
-    private ImageButton m_btnReturn;
-    private Button m_btnQuery;
-    private OnFragmentInteractionListener mListener;
-    private DeviceInfo m_deviceInfo;
-    private TextView m_textBegin;
-    private TextView m_textEnd;
+    private Context _context;
+    private View _trackQueryView;
+    private ImageButton _btnReturn;
+    private Button _btnQuery;
+    private OnFragmentInteractionListener _listener;
+    private DeviceInfo _deviceInfo;
+    private TextView _txtBegin;
+    private TextView _txtEnd;
     //地图工具
-    private MapUtil m_mapUtil = null;
+    private MapUtil _mapUtil = null;
     //查询轨迹的开始时间
-    private String m_startStr;
+    private String _startStr;
     //查询轨迹的结束时间
-    private String m_endStr;
+    private String _endStr;
 
     public static MapFragment_TrackQuery newInstance(DeviceInfo deviceInfo)
     {
@@ -89,28 +87,28 @@ public class MapFragment_TrackQuery extends Fragment implements View.OnClickList
         int day = calendar.get(Calendar.DAY_OF_MONTH);
         //隐藏键盘
         InputMethodManager imm =
-                (InputMethodManager) m_context.getSystemService(Context.INPUT_METHOD_SERVICE);
+                (InputMethodManager) _context.getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(v.getApplicationWindowToken(), 0);
         switch(v.getId())
         {
             case R.id.text_beginTime_trackQuery:
             {
                 DatePickerDialog.OnDateSetListener onDateSetListener =
-                        (view, y, m, d) -> m_textBegin.setText(y + "-" + ++m + "-" + d);
-                DatePickerDialog datePickerDialog = new DatePickerDialog(m_context, onDateSetListener, year, month, day);
+                        (view, y, m, d) -> _txtBegin.setText(y + "-" + ++m + "-" + d);
+                DatePickerDialog datePickerDialog = new DatePickerDialog(_context, onDateSetListener, year, month, day);
                 datePickerDialog.show();
                 break;
             }
             case R.id.text_endTime_trackQuery:
             {
                 DatePickerDialog.OnDateSetListener onDateSetListener =
-                        (view, y, m, d) -> m_textEnd.setText(y + "-" + ++m + "-" + d);
+                        (view, y, m, d) -> _txtEnd.setText(y + "-" + ++m + "-" + d);
                 DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(), onDateSetListener, year, month, day);
                 datePickerDialog.show();
                 break;
             }
             case R.id.btn_return_trackQuery:
-                MapFragment_Map mapFragment_map = MapFragment_Map.newInstance(m_deviceInfo);
+                MapFragment_Map mapFragment_map = MapFragment_Map.newInstance(_deviceInfo);
                 getFragmentManager().beginTransaction().replace(R.id.fragment_current_map, mapFragment_map, "mapFragment_map").commitNow();
                 break;
             case R.id.btn_query_trackQuery:
@@ -129,9 +127,9 @@ public class MapFragment_TrackQuery extends Fragment implements View.OnClickList
 
     public void onButtonPressed(Uri uri)
     {
-        if(mListener != null)
+        if(_listener != null)
         {
-            mListener.onFragmentInteraction(uri);
+            _listener.onFragmentInteraction(uri);
         }
     }
 
@@ -146,7 +144,7 @@ public class MapFragment_TrackQuery extends Fragment implements View.OnClickList
                 case MESSAGE_RREQUEST_FAIL:
                 {
                     String result = (String) message.obj;
-                    Toast.makeText(m_context, "网络连接超时,请检查网络环境", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(_context, "网络连接超时,请检查网络环境", Toast.LENGTH_SHORT).show();
                     break;
                 }
                 case MESSAGE_RESPONSE_SUCCESS:
@@ -155,7 +153,7 @@ public class MapFragment_TrackQuery extends Fragment implements View.OnClickList
                     if(null == result || "".equals(result) || "[]".equals(result))
                     {
                         //绘制历史轨迹
-                        m_mapUtil.drawHistoryTrack(null);
+                        _mapUtil.drawHistoryTrack(null);
                         return;
                     }
                     List<LocationInfo> locationList = JSON.parseArray(result, LocationInfo.class);
@@ -164,17 +162,17 @@ public class MapFragment_TrackQuery extends Fragment implements View.OnClickList
                     {
                         for(LocationInfo locationInfo : locationList)
                         {
-                            trackPointList.add(new LatLng(locationInfo.getM_lat(), locationInfo.getM_lot()));
+                            trackPointList.add(new LatLng(locationInfo.getLat(), locationInfo.getLot()));
                         }
                     }
                     //绘制历史轨迹
-                    m_mapUtil.drawHistoryTrack(trackPointList);
+                    _mapUtil.drawHistoryTrack(trackPointList);
                     break;
                 }
                 case MESSAGE_RESPONSE_FAIL:
                 {
                     String result = (String) message.obj;
-                    Toast.makeText(m_context, "获取数据失败,请与管理员联系", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(_context, "获取数据失败,请与管理员联系", Toast.LENGTH_SHORT).show();
                     break;
                 }
                 default:
@@ -189,15 +187,15 @@ public class MapFragment_TrackQuery extends Fragment implements View.OnClickList
         Date endDate = null;
         try
         {
-            m_startStr = m_textBegin.getText() + " 00:00:00";
-            startDate = SIMPLEDATEFORMAT.parse(m_startStr);
+            _startStr = _txtBegin.getText() + " 00:00:00";
+            startDate = SIMPLEDATEFORMAT.parse(_startStr);
         }
         catch(ParseException e)
         {
             try
             {
-                m_startStr = "2019-01-01 00:00:00";
-                startDate = SIMPLEDATEFORMAT.parse(m_startStr);
+                _startStr = "2019-01-01 00:00:00";
+                startDate = SIMPLEDATEFORMAT.parse(_startStr);
             }
             catch(ParseException e1)
             {
@@ -206,15 +204,15 @@ public class MapFragment_TrackQuery extends Fragment implements View.OnClickList
         }
         try
         {
-            m_endStr = m_textEnd.getText() + " 23:59:59";
-            endDate = SIMPLEDATEFORMAT.parse(m_endStr);
+            _endStr = _txtEnd.getText() + " 23:59:59";
+            endDate = SIMPLEDATEFORMAT.parse(_endStr);
         }
         catch(Exception e)
         {
             try
             {
-                m_endStr = SIMPLEDATEFORMAT_YMD.format(new Date()) + " 23:59:59";
-                endDate = SIMPLEDATEFORMAT.parse(m_endStr);
+                _endStr = SIMPLEDATEFORMAT_YMD.format(new Date()) + " 23:59:59";
+                endDate = SIMPLEDATEFORMAT.parse(_endStr);
             }
             catch(ParseException e1)
             {
@@ -230,13 +228,13 @@ public class MapFragment_TrackQuery extends Fragment implements View.OnClickList
             OkHttpClient okHttpClient = new OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS).readTimeout(10, TimeUnit.SECONDS).build();
             //RequestBody requestBody = FormBody.create("", MediaType.parse("application/json; charset=utf-8"));
             FormBody.Builder builder = new FormBody.Builder();
-            builder.add("deviceId", m_deviceInfo.getM_deviceId());
+            builder.add("deviceId", _deviceInfo.getDeviceId());
             builder.add("startTime", finalStartDate.getTime() + "");
             builder.add("endTime", finalEndDate.getTime() + "");
             RequestBody requestBody = builder.build();
             Request request = new Request.Builder().post(requestBody).url(URL).build();
             Call call = okHttpClient.newCall(request);
-            //Android中不允许任何网络的交互在主线程中进行
+            //异步请求
             call.enqueue(new Callback()
             {
                 @Override
@@ -281,31 +279,31 @@ public class MapFragment_TrackQuery extends Fragment implements View.OnClickList
         super.onCreate(savedInstanceState);
         if(getArguments() != null)
         {
-            m_deviceInfo = getArguments().getParcelable("DEVICEINFO");
+            _deviceInfo = getArguments().getParcelable("DEVICEINFO");
         }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        m_trackQueryView = inflater.inflate(R.layout.fragment_map_track_query, container, false);
+        _trackQueryView = inflater.inflate(R.layout.fragment_map_track_query, container, false);
 
-        m_context = getContext();
-        URL = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/LocationInfo/FindByDeviceIdAndBetweenTime";
-        m_btnReturn = m_trackQueryView.findViewById(R.id.btn_return_trackQuery);
-        m_btnReturn.setOnClickListener(this::onClick);
-        m_btnQuery = m_trackQueryView.findViewById(R.id.btn_query_trackQuery);
-        m_btnQuery.setOnClickListener(this::onClick);
-        m_textBegin = m_trackQueryView.findViewById(R.id.text_beginTime_trackQuery);
-        m_textBegin.setOnClickListener(this::onClick);
-        m_textEnd = m_trackQueryView.findViewById(R.id.text_endTime_trackQuery);
-        m_textEnd.setOnClickListener(this::onClick);
-        m_mapUtil = MapUtil.getInstance();
-        m_mapUtil.init(m_trackQueryView.findViewById(R.id.mapView_trackQuery));
+        _context = getContext();
+        URL = PropertiesUtil.GetValueProperties(_context).getProperty("URL") + "/LocationInfo/FindByDeviceIdAndBetweenTime";
+        _btnReturn = _trackQueryView.findViewById(R.id.btn_return_trackQuery);
+        _btnReturn.setOnClickListener(this::onClick);
+        _btnQuery = _trackQueryView.findViewById(R.id.btn_query_trackQuery);
+        _btnQuery.setOnClickListener(this::onClick);
+        _txtBegin = _trackQueryView.findViewById(R.id.text_beginTime_trackQuery);
+        _txtBegin.setOnClickListener(this::onClick);
+        _txtEnd = _trackQueryView.findViewById(R.id.text_endTime_trackQuery);
+        _txtEnd.setOnClickListener(this::onClick);
+        _mapUtil = MapUtil.getInstance();
+        _mapUtil.init(_trackQueryView.findViewById(R.id.mapView_trackQuery));
         //设置地图中心
-        LatLng latLng = new LatLng(m_deviceInfo.getM_lat(), m_deviceInfo.getM_lot());
-        m_mapUtil.UpdateStatus(latLng, false, m_context);
-        return m_trackQueryView;
+        LatLng latLng = new LatLng(_deviceInfo.getLat(), _deviceInfo.getLot());
+        _mapUtil.UpdateStatus(latLng, false, _context);
+        return _trackQueryView;
     }
 
     @Override
@@ -314,7 +312,7 @@ public class MapFragment_TrackQuery extends Fragment implements View.OnClickList
         super.onAttach(context);
         if(context instanceof OnFragmentInteractionListener)
         {
-            mListener = (OnFragmentInteractionListener) context;
+            _listener = (OnFragmentInteractionListener) context;
         }
         else
         {
@@ -326,6 +324,6 @@ public class MapFragment_TrackQuery extends Fragment implements View.OnClickList
     public void onDetach()
     {
         super.onDetach();
-        mListener = null;
+        _listener = null;
     }
 }

@@ -6,11 +6,10 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.zistone.gprs.R;
-import com.zistone.gprs.entity.FenceInfo;
+import com.zistone.gprs.pojo.FenceInfo;
 
 import java.text.SimpleDateFormat;
 
@@ -20,14 +19,14 @@ import java.text.SimpleDateFormat;
 public class FenceInfoDialog extends Dialog implements View.OnClickListener
 {
     private static final SimpleDateFormat SIMPLEDATEFORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    private Callback callback;
-    private Button m_btn1;
-    private Button m_btn2;
-    private TextView m_textView1;
-    private TextView m_textView2;
-    private TextView m_textView3;
-    private TextView m_textView4;
-    private FenceInfo m_fenceInfo;
+    private Callback _callback;
+    private Button _btn1;
+    private Button _btn2;
+    private TextView _txtView1;
+    private TextView _txtView2;
+    private TextView _txtView3;
+    private TextView _txtView4;
+    private FenceInfo _fenceInfo;
 
     /**
      * @param activity
@@ -35,8 +34,8 @@ public class FenceInfoDialog extends Dialog implements View.OnClickListener
     public FenceInfoDialog(Activity activity, Callback callback, FenceInfo fenceInfo)
     {
         super(activity);
-        this.callback = callback;
-        m_fenceInfo = fenceInfo;
+        this._callback = callback;
+        _fenceInfo = fenceInfo;
     }
 
     @Override
@@ -45,20 +44,20 @@ public class FenceInfoDialog extends Dialog implements View.OnClickListener
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.fence_info_dialog);
-        m_textView1 = findViewById(R.id.text1_infoFence);
-        m_textView2 = findViewById(R.id.text2_infoFence);
-        m_textView3 = findViewById(R.id.text3_infoFence);
-        m_textView4 = findViewById(R.id.text4_infoFence);
-        m_btn1 = findViewById(R.id.btn1_infoFence);
-        m_btn1.setOnClickListener(this::onClick);
-        m_btn2 = findViewById(R.id.btn2_infoFence);
-        m_btn2.setOnClickListener(this::onClick);
-        if(m_fenceInfo != null)
+        _txtView1 = findViewById(R.id.text1_infoFence);
+        _txtView2 = findViewById(R.id.text2_infoFence);
+        _txtView3 = findViewById(R.id.text3_infoFence);
+        _txtView4 = findViewById(R.id.text4_infoFence);
+        _btn1 = findViewById(R.id.btn1_infoFence);
+        _btn1.setOnClickListener(this::onClick);
+        _btn2 = findViewById(R.id.btn2_infoFence);
+        _btn2.setOnClickListener(this::onClick);
+        if(_fenceInfo != null)
         {
-            m_textView1.setText(m_fenceInfo.getM_name());
-            m_textView2.setText(m_fenceInfo.getM_address());
-            m_textView3.setText(SIMPLEDATEFORMAT.format(m_fenceInfo.getM_setTime()));
-            m_textView4.setText(m_fenceInfo.getM_radius() + "");
+            _txtView1.setText(_fenceInfo.getName());
+            _txtView2.setText(_fenceInfo.getAddress());
+            _txtView3.setText(SIMPLEDATEFORMAT.format(_fenceInfo.getSetTime()));
+            _txtView4.setText(_fenceInfo.getRadius() + "");
         }
     }
 
@@ -76,9 +75,9 @@ public class FenceInfoDialog extends Dialog implements View.OnClickListener
             case R.id.btn1_infoFence:
             {
                 dismiss();
-                if(null != callback)
+                if(null != _callback)
                 {
-                    callback.onDelCallback();
+                    _callback.onDelCallback();
                 }
                 break;
             }

@@ -21,12 +21,12 @@ public class UserFragment_Forget extends Fragment implements View.OnClickListene
     private static String URL;
     private String mParam1;
     private String mParam2;
-    private Context m_context;
-    private View m_forgetView;
-    private Toolbar m_toolbar;
-    private ImageButton m_btnReturn;
+    private Context _context;
+    private View _forgetView;
+    private Toolbar _toolbar;
+    private ImageButton _btnReturn;
 
-    private OnFragmentInteractionListener mListener;
+    private OnFragmentInteractionListener _listener;
 
     public static UserFragment_Forget newInstance(String param1, String param2)
     {
@@ -52,21 +52,21 @@ public class UserFragment_Forget extends Fragment implements View.OnClickListene
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        m_forgetView = inflater.inflate(R.layout.fragment_user_forget, container, false);
+        _forgetView = inflater.inflate(R.layout.fragment_user_forget, container, false);
 
-        m_context = getContext();
-        URL = PropertiesUtil.GetValueProperties(m_context).getProperty("URL") + "/UserInfo/Forget";
-        m_toolbar = m_forgetView.findViewById(R.id.toolbar_forget);
-        m_btnReturn = m_forgetView.findViewById(R.id.btn_return_forget);
-        m_btnReturn.setOnClickListener(this);
-        return m_forgetView;
+        _context = getContext();
+        URL = PropertiesUtil.GetValueProperties(_context).getProperty("URL") + "/UserInfo/Forget";
+        _toolbar = _forgetView.findViewById(R.id.toolbar_forget);
+        _btnReturn = _forgetView.findViewById(R.id.btn_return_forget);
+        _btnReturn.setOnClickListener(this);
+        return _forgetView;
     }
 
     public void onButtonPressed(Uri uri)
     {
-        if(mListener != null)
+        if(_listener != null)
         {
-            mListener.onFragmentInteraction(uri);
+            _listener.onFragmentInteraction(uri);
         }
     }
 
@@ -76,7 +76,7 @@ public class UserFragment_Forget extends Fragment implements View.OnClickListene
         super.onAttach(context);
         if(context instanceof OnFragmentInteractionListener)
         {
-            mListener = (OnFragmentInteractionListener) context;
+            _listener = (OnFragmentInteractionListener) context;
         }
         else
         {
@@ -88,7 +88,7 @@ public class UserFragment_Forget extends Fragment implements View.OnClickListene
     public void onDetach()
     {
         super.onDetach();
-        mListener = null;
+        _listener = null;
     }
 
     @Override
