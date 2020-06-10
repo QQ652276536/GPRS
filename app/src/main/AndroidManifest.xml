@@ -38,8 +38,7 @@
         android:usesCleartextTraffic="true"
         android:windowSoftInputMode="stateAlwaysHidden">
 
-        <!-- meta-data需要写在application中 -->
-        <!-- 公司的AK鉴权 -->
+        <!-- 百度地图AK鉴权 -->
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
             android:value="iHpQqgevg3XxMWbPDWTyoY9Mm7plx2qi" />
